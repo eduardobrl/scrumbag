@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 3 context gathered
-last_updated: "2026-05-31T14:31:39.488Z"
-last_activity: 2026-05-31 -- Completed 02-01 Squad & Absences
+stopped_at: Phase 2 complete; ready to plan Phase 3
+last_updated: "2026-05-31T14:55:50.506Z"
+last_activity: 2026-05-31
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 7
-  completed_plans: 5
-  percent: 25
+  completed_phases: 2
+  total_plans: 11
+  completed_plans: 7
+  percent: 50
 ---
 
 # Project State
@@ -21,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-30)
 
 **Core value:** Permitir o planejamento realista de sprints com capacity ajustada a realidade da squad (ausencias, desperdicio), gerando previsoes confiaveis de entrega de epicos.
-**Current focus:** Phase 2 - Squad & Capacity Engine
+**Current focus:** Phase 3 - Sprint Planning, Board & Estimation
 
 ## Current Position
 
-Phase: 2 - IN_PROGRESS
-Plan: 1 of 3
-Status: Plan 02-01 complete; ready for 02-02 Capacity Engine
-Last activity: 2026-05-31 -- Completed 02-01 Squad & Absences
+Phase: 03
+Plan: Not started
+Status: Phase 2 complete; Phase 3 context exists and is ready for planning
+Last activity: 2026-05-31
 
-Progress: [███████░░░] 71%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 1
+- Total plans completed: 4
 - Average duration: 43 min
 - Total execution time: 43 min
 
@@ -44,7 +44,7 @@ Progress: [███████░░░] 71%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 02 | 1 | 3 | 43 min |
+| 02 | 3 | - | - |
 
 **Recent Trend:**
 
@@ -63,10 +63,11 @@ Recent decisions affecting current work:
 - Roadmap: Adopted 4-phase coarse-grain structure aligning with natural delivery boundaries (foundation -> capacity -> sprint workflow -> analytics)
 - Phase 2 planning: 3 plans created covering squad management, capacity engine, and waste/overhead with override
 - Phase 2 execution: 02-01 delivered squad member CRUD, absence tracking, REST APIs, and React UI
+- Phase 2 execution: 02-02 and 02-03 delivered CapacityService, /api/capacity, waste config, capacity overrides, and Capacidade UI
 
 ### Pending Todos
 
-Execute Phase 2 plans: 02-02, 02-03
+Plan and execute Phase 3: Sprint Planning, Board & Estimation
 
 ### Blockers/Concerns
 
@@ -84,10 +85,10 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-31T14:21:45.557Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-sprint-planning-board-estimation/03-CONTEXT.md
+Last session: 2026-05-31T14:54:42.702Z
+Stopped at: Phase 2 complete; ready to plan Phase 3
+Resume file: None
 
 ## Next Step
 
-Execute Phase 2: `/gsd-execute-phase 2`
+Plan Phase 3: `/gsd-plan-phase 3`

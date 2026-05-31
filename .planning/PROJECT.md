@@ -12,17 +12,16 @@ Permitir o planejamento realista de sprints com capacity ajustada à realidade d
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Cadastrar e gerenciar membros da squad - Validated in Phase 2: Squad & Capacity Engine
+- [x] Registrar ausências, férias, folgas não compensadas e feriados - Validated in Phase 2: Squad & Capacity Engine
+- [x] Calcular capacity real da sprint com ajustes de disponibilidade - Validated in Phase 2: Squad & Capacity Engine
+- [x] Calcular desperdícios (reuniões, suporte, incidentes) com tolerância configurável - Validated in Phase 2: Squad & Capacity Engine
 
 ### Active
 
 - [ ] Ler e sincronizar planilhas Excel de pasta no OneDrive
-- [ ] Cadastrar e gerenciar membros da squad
-- [ ] Registrar ausências, férias, folgas não compensadas e feriados
 - [ ] Criar e gerenciar features, histórias e backlog
 - [ ] Estimar histórias em story points e dias de trabalho
-- [ ] Calcular capacity real da sprint com ajustes de disponibilidade
-- [ ] Calcular desperdícios (reuniões, suporte, incidentes) com tolerância configurável
 - [ ] Visualizar board de sprint (Kanban/Scrum board)
 - [ ] Visualizar épicos com previsão de entrega
 - [ ] Sugerir histórias que cabem na capacity da sprint
@@ -62,6 +61,7 @@ Permitir o planejamento realista de sprints com capacity ajustada à realidade d
 | Estimativa em story points + dias | Time já familiarizado com story points; dias ajudam na previsão de calendário | — Pending |
 | Servidor MCP embutido | Permitir que agentes de IA consultem dados para decisões de planejamento | — Pending |
 | Manual entry para histórias | Não há integração automática disponível com a ferramenta interna | — Pending |
+| Capacity final pós-waste e override | Planejamento deve usar a capacidade final após ausências, feriados, desperdício e ajustes manuais | Validated in Phase 2 |
 
 ## Evolution
 
@@ -81,4 +81,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2025-05-30 after initialization*
+*Last updated: 2026-05-31 after Phase 2 completion*

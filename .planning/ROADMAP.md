@@ -7,7 +7,7 @@ Scrumbag is a local-first, single-executable Scrum capacity planning tool. The r
 ## Phases
 
 - [x] **Phase 1: Foundation & Data Ingestion** - Single executable scaffold, SQLite schema, Excel sync, and initial backlog management (completed 2026-05-31)
-- [ ] **Phase 2: Squad & Capacity Engine** - Squad management, absence tracking, and realistic capacity calculation
+- [x] **Phase 2: Squad & Capacity Engine** - Squad management, absence tracking, and realistic capacity calculation (completed 2026-05-31)
 - [ ] **Phase 3: Sprint Planning, Board & Estimation** - Sprint creation, Kanban board, story estimation, and drag-and-drop workflow
 - [ ] **Phase 4: Forecasting, Velocity & Analytics** - Velocity tracking, burndown chart, and probabilistic epic forecasting
 
@@ -54,8 +54,8 @@ Plans:
 Plans:
 
 - [x] 02-01-PLAN.md — Squad & Absences: squad member CRUD, absence tracking with holidays, REST API, and React UI
-- [ ] 02-02-PLAN.md — Capacity Engine: working-day calculation, absence/holiday deduction, per-member breakdown API and UI
-- [ ] 02-03-PLAN.md — Waste, Transparency & Override: configurable waste percentage, capacity breakdown with waste, manual override for specific members and dates
+- [x] 02-02-PLAN.md — Capacity Engine: working-day calculation, absence/holiday deduction, per-member breakdown API and UI
+- [x] 02-03-PLAN.md — Waste, Transparency & Override: configurable waste percentage, capacity breakdown with waste, manual override for specific members and dates
 
 ### Phase 3: Sprint Planning, Board & Estimation
 
@@ -113,6 +113,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
-| 2. Squad & Capacity Engine | 1/3 | In Progress|  |
+| 2. Squad & Capacity Engine | 3/3 | Complete    | 2026-05-31 |
 | 3. Sprint Planning, Board & Estimation | 0/4 | Planned    |  |
 | 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |
