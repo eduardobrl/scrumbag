@@ -4,21 +4,30 @@ import { mkdirSync, existsSync } from "node:fs";
 import { initSchema } from "./src/data/schema";
 import { BacklogRepository } from "./src/data/backlog-repository";
 import { startWatcher, stopWatcher } from "./src/sync/watcher";
+import { importExcelFile } from "./src/sync/excel-importer";
 
 const db = new Database("scrumbag.db");
 initSchema(db);
 
 const backlogRepo = new BacklogRepository(db);
 
-const DEFAULT_SYNC_FOLDER = process.env.SYNC_FOLDER || "./synced";
+let activeSyncFolder = process.env.SYNC_FOLDER || "./synced";
 
-if (!existsSync(DEFAULT_SYNC_FOLDER)) {
-  mkdirSync(DEFAULT_SYNC_FOLDER, { recursive: true });
+function ensureFolder(folderPath: string) {
+  if (!existsSync(folderPath)) {
+    mkdirSync(folderPath, { recursive: true });
+  }
 }
 
-startWatcher(DEFAULT_SYNC_FOLDER, db, (event) => {
-  console.log(`[sync] Detected ${event.isNew ? "new" : "changed"} file: ${event.filePath}`);
-});
+function startSyncWatcher(folderPath: string) {
+  ensureFolder(folderPath);
+  startWatcher(folderPath, db, async (result) => {
+    console.log(`[sync] Processed ${result.filePath}: ${result.imported} imported, ${result.skipped} skipped`);
+  });
+}
+
+ensureFolder(activeSyncFolder);
+startSyncWatcher(activeSyncFolder);
 
 const backlogItemSchema = z.object({
   type: z.enum(["epic", "feature", "story", "bug"]),
@@ -29,12 +38,34 @@ const backlogItemSchema = z.object({
   priority: z.number().optional(),
 });
 
+const folderPathSchema = z.object({
+  folderPath: z.string().refine(
+    (val) => !val.startsWith("/") && !val.startsWith("\\") && !val.includes("..")
+  ),
+});
+
 async function parseJson(req: Request): Promise<unknown | Response> {
   try {
     return await req.json();
   } catch {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
+}
+
+function getSyncStatus() {
+  const filesWatched = db
+    .query<{ count: number }, []>("SELECT COUNT(*) as count FROM file_hashes")
+    .get()?.count ?? 0;
+
+  const lastSyncRow = db
+    .query<{ synced_at: string }, []>("SELECT synced_at FROM file_hashes ORDER BY synced_at DESC LIMIT 1")
+    .get();
+
+  return {
+    folderPath: activeSyncFolder,
+    lastSync: lastSyncRow?.synced_at ?? null,
+    filesWatched,
+  };
 }
 
 const server = Bun.serve({
@@ -48,6 +79,59 @@ const server = Bun.serve({
   },
   async fetch(req) {
     const url = new URL(req.url);
+
+    if (url.pathname === "/api/sync/status") {
+      if (req.method === "GET") {
+        return Response.json(getSyncStatus());
+      }
+    }
+
+    if (url.pathname === "/api/sync/folder") {
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = folderPathSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: "Invalid folder path. Must be relative and cannot contain '..'" },
+            { status: 400 }
+          );
+        }
+
+        stopWatcher();
+        activeSyncFolder = parseResult.data.folderPath;
+        ensureFolder(activeSyncFolder);
+        startSyncWatcher(activeSyncFolder);
+
+        return Response.json(getSyncStatus());
+      }
+    }
+
+    if (url.pathname === "/api/sync/trigger") {
+      if (req.method === "POST") {
+        const files = await Array.fromAsync(
+          new Bun.Glob("*.xlsx").scan({ cwd: activeSyncFolder, onlyFiles: true })
+        );
+
+        let totalImported = 0;
+        let totalSkipped = 0;
+
+        for (const file of files) {
+          const filePath = `${activeSyncFolder}/${file}`;
+          try {
+            const content = await Bun.file(filePath).arrayBuffer();
+            const result = await importExcelFile(filePath, content, db);
+            totalImported += result.imported;
+            totalSkipped += result.skipped;
+          } catch (err) {
+            console.error(`[sync] Manual trigger failed for ${filePath}:`, err);
+          }
+        }
+
+        return Response.json({ scanned: true, imported: totalImported, skipped: totalSkipped });
+      }
+    }
 
     if (url.pathname === "/api/backlog") {
       if (req.method === "GET") {
@@ -131,7 +215,7 @@ const server = Bun.serve({
 });
 
 console.log("Scrumbag running at http://localhost:3000");
-console.log(`[sync] Watching folder: ${DEFAULT_SYNC_FOLDER}`);
+console.log(`[sync] Watching folder: ${activeSyncFolder}`);
 
 process.on("SIGINT", () => {
   console.log("\nShutting down...");

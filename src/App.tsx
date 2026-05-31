@@ -2,16 +2,21 @@ import { useState, useEffect } from "react";
 import type { BacklogItem, NewBacklogItem } from "./domain/types";
 import BacklogForm from "./components/BacklogForm";
 import BacklogList from "./components/BacklogList";
+import SyncConfig from "./components/SyncConfig";
+
+type Tab = "backlog" | "sync";
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState<Tab>("backlog");
   const [items, setItems] = useState<BacklogItem[]>([]);
   const [editingItem, setEditingItem] = useState<BacklogItem | null>(null);
   const [loading, setLoading] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   async function refreshItems() {
-    const res = await fetch("/api/backlog");
+    const res = await fetch("/api/backlog?root=true");
     const data = await res.json();
-    setItems(data);
+    setItems(Array.isArray(data) ? data : []);
   }
 
   useEffect(() => {
@@ -26,6 +31,7 @@ export default function App() {
       body: JSON.stringify(item),
     });
     await refreshItems();
+    setRefreshKey((k) => k + 1);
     setLoading(false);
   }
 
@@ -39,6 +45,7 @@ export default function App() {
     });
     setEditingItem(null);
     await refreshItems();
+    setRefreshKey((k) => k + 1);
     setLoading(false);
   }
 
@@ -51,6 +58,7 @@ export default function App() {
       setEditingItem(null);
     }
     await refreshItems();
+    setRefreshKey((k) => k + 1);
     setLoading(false);
   }
 
@@ -68,21 +76,53 @@ export default function App() {
       <div className="mx-auto max-w-4xl">
         <h1 className="mb-6 text-2xl font-bold text-gray-900">Scrumbag</h1>
 
-        <BacklogForm
-          onSubmit={editingItem ? handleUpdate : handleCreate}
-          initialItem={editingItem}
-          onCancel={editingItem ? handleCancelEdit : undefined}
-        />
+        <div className="mb-6 border-b border-gray-200">
+          <nav className="-mb-px flex gap-6">
+            <button
+              onClick={() => setActiveTab("backlog")}
+              className={`pb-2 text-sm font-medium ${
+                activeTab === "backlog"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Backlog
+            </button>
+            <button
+              onClick={() => setActiveTab("sync")}
+              className={`pb-2 text-sm font-medium ${
+                activeTab === "sync"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Sincronização
+            </button>
+          </nav>
+        </div>
 
-        {loading && (
-          <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
+        {activeTab === "backlog" && (
+          <>
+            <BacklogForm
+              onSubmit={editingItem ? handleUpdate : handleCreate}
+              initialItem={editingItem}
+              onCancel={editingItem ? handleCancelEdit : undefined}
+            />
+
+            {loading && (
+              <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
+            )}
+
+            <BacklogList
+              items={items}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              refreshKey={refreshKey}
+            />
+          </>
         )}
 
-        <BacklogList
-          items={items}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        {activeTab === "sync" && <SyncConfig />}
       </div>
     </div>
   );
