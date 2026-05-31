@@ -70,8 +70,24 @@ Plans:
   3. User can view a sprint board with To Do, In Progress, and Done columns
   4. User can move items between board columns and prioritize backlog via drag-and-drop
 
-**Plans**: TBD
+**Plans**: 4 plans
 **UI hint**: yes
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Sprint & Estimation Foundation: sprint schema, sprint CRUD, estimate fields, API routes, and sprint list UI
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02-PLAN.md — Planning Workspace & Capacity: two-column backlog/sprint workspace, sprint membership, totals, and advisory capacity warnings
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-03-PLAN.md — Drag-and-Drop Planning: backlog priority reorder, sprint add/order drag-and-drop, and persisted ordering
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 03-04-PLAN.md — Sprint Board & Closure: three-column board, completion date prompt, board ordering, and close sprint action
 
 ### Phase 4: Forecasting, Velocity & Analytics
 
@@ -98,5 +114,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
 | 2. Squad & Capacity Engine | 1/3 | In Progress|  |
-| 3. Sprint Planning, Board & Estimation | 0/TBD | Not started | - |
+| 3. Sprint Planning, Board & Estimation | 0/4 | Planned    |  |
 | 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |
