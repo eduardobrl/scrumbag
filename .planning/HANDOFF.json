@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-31T13:41:09.030Z",
+  "phase": "02",
+  "phase_name": "squad-capacity-engine",
+  "phase_dir": ".planning/phases/02-squad-capacity-engine",
+  "plan": 1,
+  "task": 3,
+  "total_tasks": 5,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Install date-fns and extend schema", "status": "done", "commit": "ca69c34"},
+    {"id": 2, "name": "Create SquadRepository and AbsenceRepository", "status": "done", "commit": "87a591e"},
+    {"id": 3, "name": "Add REST API endpoints for squad and absences", "status": "in_progress", "progress": "Code written in server.ts with all routes and Zod schemas. Verification blocked by port TIME_WAIT and pre-existing sync watcher error. Needs clean test run and commit."}
+  ],
+  "remaining_tasks": [
+    {"id": 3, "name": "Add REST API endpoints for squad and absences", "status": "verify_and_commit"},
+    {"id": 4, "name": "Create React UI for squad members", "status": "not_started"},
+    {"id": 5, "name": "Create React UI for absences", "status": "not_started"}
+  ],
+  "blockers": [
+    {"description": "Port 3000 in TIME_WAIT state from previous server runs, causing EADDRINUSE during verification", "type": "technical", "workaround": "Use alternate port 3002 for verification, or wait 60s"},
+    {"description": "Pre-existing Bun.crypto.subtle undefined error in sync watcher on Windows distracts from API testing", "type": "technical", "workaround": "Ignore sync error; test endpoints directly on clean port"}
+  ],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "Install date-fns@4.4.0 for date math", "rationale": "Reliable working-day calculation and range iteration needed for capacity engine", "phase": "02"},
+    {"decision": "Model holidays as absences with member_id=NULL", "rationale": "Avoids duplicating records for squad-wide holidays; simpler schema", "phase": "02"},
+    {"decision": "Follow BacklogRepository patterns for new repositories", "rationale": "Maintains codebase consistency and reduces cognitive load", "phase": "02"}
+  ],
+  "uncommitted_files": ["server.ts", "bun.lock"],
+  "next_action": "Verify API endpoints on clean port, commit server.ts changes, then build SquadMemberForm + SquadMemberList React components",
+  "context_notes": "Mid-execution of 02-01. Code is solid but needs a clean server environment for curl-based verification. Do not let sync watcher errors distract from the actual API work. After committing Task 3, the React UI tasks are straightforward CRUD forms following existing BacklogForm/BacklogList patterns."
+}

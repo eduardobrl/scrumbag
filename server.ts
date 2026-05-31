@@ -3,6 +3,8 @@ import { z } from "zod";
 import { mkdirSync, existsSync } from "node:fs";
 import { initSchema } from "./src/data/schema";
 import { BacklogRepository } from "./src/data/backlog-repository";
+import { SquadRepository } from "./src/data/squad-repository";
+import { AbsenceRepository } from "./src/data/absence-repository";
 import { startWatcher, stopWatcher } from "./src/sync/watcher";
 import { importExcelFile } from "./src/sync/excel-importer";
 
@@ -10,6 +12,8 @@ const db = new Database("scrumbag.db");
 initSchema(db);
 
 const backlogRepo = new BacklogRepository(db);
+const squadRepo = new SquadRepository(db);
+const absenceRepo = new AbsenceRepository(db);
 
 let activeSyncFolder = process.env.SYNC_FOLDER || "./synced";
 
@@ -44,6 +48,20 @@ const folderPathSchema = z.object({
   ),
 });
 
+const squadMemberSchema = z.object({
+  name: z.string().min(1),
+  role: z.string().min(1),
+  daily_capacity_hours: z.number().positive().optional(),
+});
+
+const absenceSchema = z.object({
+  member_id: z.string().nullable().optional(),
+  type: z.enum(["vacation", "sick_leave", "unpaid_leave", "holiday", "other"]),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  description: z.string().optional(),
+});
+
 async function parseJson(req: Request): Promise<unknown | Response> {
   try {
     return await req.json();
@@ -69,7 +87,7 @@ function getSyncStatus() {
 }
 
 const server = Bun.serve({
-  port: 3000,
+  port: 3002,
   static: {
     "/": new Response(Bun.file("dist/index.html")),
     "/assets/*": (req) => {
@@ -202,6 +220,152 @@ const server = Bun.serve({
 
       if (req.method === "DELETE") {
         const deleted = backlogRepo.delete(id);
+        if (!deleted) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+        return new Response(null, { status: 204 });
+      }
+    }
+
+    if (url.pathname === "/api/squad") {
+      if (req.method === "GET") {
+        const members = squadRepo.findAll();
+        return Response.json(members);
+      }
+
+      if (req.method === "POST") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = squadMemberSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        try {
+          const created = squadRepo.create(parseResult.data);
+          return Response.json(created, { status: 201 });
+        } catch (err) {
+          return Response.json(
+            { error: "Failed to create squad member" },
+            { status: 500 }
+          );
+        }
+      }
+    }
+
+    const squadMemberMatch = url.pathname.match(/^\/api\/squad\/([^/]+)$/);
+    if (squadMemberMatch) {
+      const id = squadMemberMatch[1];
+
+      if (req.method === "GET") {
+        const member = squadRepo.findById(id);
+        if (!member) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+        return Response.json(member);
+      }
+
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        try {
+          const updated = squadRepo.update(id, body as Record<string, unknown>);
+          return Response.json(updated);
+        } catch {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+      }
+
+      if (req.method === "DELETE") {
+        const deleted = squadRepo.delete(id);
+        if (!deleted) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+        return new Response(null, { status: 204 });
+      }
+    }
+
+    if (url.pathname === "/api/absences") {
+      if (req.method === "GET") {
+        const memberId = url.searchParams.get("member_id");
+        if (memberId) {
+          const absences = absenceRepo.findByMember(memberId);
+          return Response.json(absences);
+        }
+        const absences = absenceRepo.findAll();
+        return Response.json(absences);
+      }
+
+      if (req.method === "POST") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = absenceSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        const data = parseResult.data;
+        if (data.start_date > data.end_date) {
+          return Response.json(
+            { error: "end_date must be >= start_date" },
+            { status: 400 }
+          );
+        }
+
+        try {
+          const created = absenceRepo.create(data);
+          return Response.json(created, { status: 201 });
+        } catch (err) {
+          return Response.json(
+            { error: "Failed to create absence" },
+            { status: 500 }
+          );
+        }
+      }
+    }
+
+    if (url.pathname === "/api/absences/holidays") {
+      if (req.method === "GET") {
+        const holidays = absenceRepo.findHolidays();
+        return Response.json(holidays);
+      }
+    }
+
+    const absenceMatch = url.pathname.match(/^\/api\/absences\/([^/]+)$/);
+    if (absenceMatch) {
+      const id = absenceMatch[1];
+
+      if (req.method === "GET") {
+        const absence = absenceRepo.findById(id);
+        if (!absence) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+        return Response.json(absence);
+      }
+
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        try {
+          const updated = absenceRepo.update(id, body as Record<string, unknown>);
+          return Response.json(updated);
+        } catch {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+      }
+
+      if (req.method === "DELETE") {
+        const deleted = absenceRepo.delete(id);
         if (!deleted) {
           return Response.json({ error: "Not found" }, { status: 404 });
         }
