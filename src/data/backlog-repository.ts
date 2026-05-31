@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite";
-import type { BacklogItem, NewBacklogItem } from "../domain/types";
+import type { BacklogItem, NewBacklogItem, UpdateBacklogItem } from "../domain/types";
 
 export class BacklogRepository {
   constructor(private db: Database) {}
@@ -8,6 +8,13 @@ export class BacklogRepository {
     return this.db
       .query<BacklogItem, []>("SELECT * FROM backlog_items ORDER BY created_at DESC")
       .all();
+  }
+
+  findById(id: string): BacklogItem | null {
+    const row = this.db
+      .query<BacklogItem, [string]>("SELECT * FROM backlog_items WHERE id = ?")
+      .get(id);
+    return row ?? null;
   }
 
   create(item: NewBacklogItem): BacklogItem {
@@ -41,5 +48,35 @@ export class BacklogRepository {
       created_at: now,
       updated_at: now,
     };
+  }
+
+  update(id: string, changes: UpdateBacklogItem): BacklogItem {
+    const fields: string[] = [];
+    const values: (string | number | null)[] = [];
+
+    for (const [key, value] of Object.entries(changes)) {
+      if (value !== undefined) {
+        fields.push(`${key} = ?`);
+        values.push(value as string | number | null);
+      }
+    }
+
+    fields.push("updated_at = CURRENT_TIMESTAMP");
+
+    const sql = `UPDATE backlog_items SET ${fields.join(", ")} WHERE id = ?`;
+    values.push(id);
+
+    this.db.run(sql, values);
+
+    const updated = this.findById(id);
+    if (!updated) {
+      throw new Error(`Backlog item ${id} not found after update`);
+    }
+    return updated;
+  }
+
+  delete(id: string): boolean {
+    const result = this.db.run("DELETE FROM backlog_items WHERE id = ?", [id]);
+    return result.changes > 0;
   }
 }
