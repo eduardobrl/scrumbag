@@ -1,15 +1,30 @@
 import { useState, useEffect } from "react";
-import type { BacklogItem, NewBacklogItem } from "./domain/types";
+import type {
+  Absence,
+  BacklogItem,
+  NewAbsence,
+  NewBacklogItem,
+  NewSquadMember,
+  SquadMember,
+} from "./domain/types";
 import BacklogForm from "./components/BacklogForm";
 import BacklogList from "./components/BacklogList";
 import SyncConfig from "./components/SyncConfig";
+import SquadMemberForm from "./components/SquadMemberForm";
+import SquadMemberList from "./components/SquadMemberList";
+import AbsenceForm from "./components/AbsenceForm";
+import AbsenceList from "./components/AbsenceList";
 
-type Tab = "backlog" | "sync";
+type Tab = "backlog" | "squad" | "absences" | "sync";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>("backlog");
   const [items, setItems] = useState<BacklogItem[]>([]);
   const [editingItem, setEditingItem] = useState<BacklogItem | null>(null);
+  const [squadMembers, setSquadMembers] = useState<SquadMember[]>([]);
+  const [editingMember, setEditingMember] = useState<SquadMember | null>(null);
+  const [absences, setAbsences] = useState<Absence[]>([]);
+  const [editingAbsence, setEditingAbsence] = useState<Absence | null>(null);
   const [loading, setLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -19,9 +34,32 @@ export default function App() {
     setItems(Array.isArray(data) ? data : []);
   }
 
+  async function refreshSquadMembers() {
+    const res = await fetch("/api/squad");
+    const data = await res.json();
+    setSquadMembers(Array.isArray(data) ? data : []);
+  }
+
+  async function refreshAbsences() {
+    const res = await fetch("/api/absences");
+    const data = await res.json();
+    setAbsences(Array.isArray(data) ? data : []);
+  }
+
   useEffect(() => {
     refreshItems();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === "squad") {
+      refreshSquadMembers();
+    }
+
+    if (activeTab === "absences") {
+      refreshSquadMembers();
+      refreshAbsences();
+    }
+  }, [activeTab]);
 
   async function handleCreate(item: NewBacklogItem) {
     setLoading(true);
@@ -71,6 +109,96 @@ export default function App() {
     setEditingItem(null);
   }
 
+  async function handleCreateMember(member: NewSquadMember) {
+    setLoading(true);
+    await fetch("/api/squad", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(member),
+    });
+    await refreshSquadMembers();
+    setLoading(false);
+  }
+
+  async function handleUpdateMember(member: NewSquadMember) {
+    if (!editingMember) return;
+    setLoading(true);
+    await fetch(`/api/squad/${editingMember.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(member),
+    });
+    setEditingMember(null);
+    await refreshSquadMembers();
+    setLoading(false);
+  }
+
+  async function handleDeleteMember(id: string) {
+    setLoading(true);
+    await fetch(`/api/squad/${id}`, {
+      method: "DELETE",
+    });
+    if (editingMember?.id === id) {
+      setEditingMember(null);
+    }
+    await refreshSquadMembers();
+    setLoading(false);
+  }
+
+  function handleEditMember(member: SquadMember) {
+    setEditingMember(member);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function handleCancelMemberEdit() {
+    setEditingMember(null);
+  }
+
+  async function handleCreateAbsence(absence: NewAbsence) {
+    setLoading(true);
+    await fetch("/api/absences", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(absence),
+    });
+    await refreshAbsences();
+    setLoading(false);
+  }
+
+  async function handleUpdateAbsence(absence: NewAbsence) {
+    if (!editingAbsence) return;
+    setLoading(true);
+    await fetch(`/api/absences/${editingAbsence.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(absence),
+    });
+    setEditingAbsence(null);
+    await refreshAbsences();
+    setLoading(false);
+  }
+
+  async function handleDeleteAbsence(id: string) {
+    setLoading(true);
+    await fetch(`/api/absences/${id}`, {
+      method: "DELETE",
+    });
+    if (editingAbsence?.id === id) {
+      setEditingAbsence(null);
+    }
+    await refreshAbsences();
+    setLoading(false);
+  }
+
+  function handleEditAbsence(absence: Absence) {
+    setEditingAbsence(absence);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function handleCancelAbsenceEdit() {
+    setEditingAbsence(null);
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-4xl">
@@ -87,6 +215,26 @@ export default function App() {
               }`}
             >
               Backlog
+            </button>
+            <button
+              onClick={() => setActiveTab("squad")}
+              className={`pb-2 text-sm font-medium ${
+                activeTab === "squad"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Squad
+            </button>
+            <button
+              onClick={() => setActiveTab("absences")}
+              className={`pb-2 text-sm font-medium ${
+                activeTab === "absences"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Ausências
             </button>
             <button
               onClick={() => setActiveTab("sync")}
@@ -118,6 +266,48 @@ export default function App() {
               onEdit={handleEdit}
               onDelete={handleDelete}
               refreshKey={refreshKey}
+            />
+          </>
+        )}
+
+        {activeTab === "squad" && (
+          <>
+            <SquadMemberForm
+              onSubmit={editingMember ? handleUpdateMember : handleCreateMember}
+              initialMember={editingMember}
+              onCancel={editingMember ? handleCancelMemberEdit : undefined}
+            />
+
+            {loading && (
+              <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
+            )}
+
+            <SquadMemberList
+              members={squadMembers}
+              onEdit={handleEditMember}
+              onDelete={handleDeleteMember}
+            />
+          </>
+        )}
+
+        {activeTab === "absences" && (
+          <>
+            <AbsenceForm
+              members={squadMembers}
+              onSubmit={editingAbsence ? handleUpdateAbsence : handleCreateAbsence}
+              initialAbsence={editingAbsence}
+              onCancel={editingAbsence ? handleCancelAbsenceEdit : undefined}
+            />
+
+            {loading && (
+              <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
+            )}
+
+            <AbsenceList
+              absences={absences}
+              members={squadMembers}
+              onEdit={handleEditAbsence}
+              onDelete={handleDeleteAbsence}
             />
           </>
         )}
