@@ -49,7 +49,13 @@ Plans:
   4. User can view a capacity calculation that accounts for waste/overhead (meetings, support, incidents)
   5. User can see a transparent breakdown of the capacity calculation and manually override the result
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+
+- [ ] 02-01-PLAN.md — Squad & Absences: squad member CRUD, absence tracking with holidays, REST API, and React UI
+- [ ] 02-02-PLAN.md — Capacity Engine: working-day calculation, absence/holiday deduction, per-member breakdown API and UI
+- [ ] 02-03-PLAN.md — Waste, Transparency & Override: configurable waste percentage, capacity breakdown with waste, manual override for specific members and dates
 
 ### Phase 3: Sprint Planning, Board & Estimation
 
@@ -91,6 +97,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
-| 2. Squad & Capacity Engine | 0/TBD | Not started | - |
+| 2. Squad & Capacity Engine | 0/3 | Planned    | - |
 | 3. Sprint Planning, Board & Estimation | 0/TBD | Not started | - |
 | 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |
