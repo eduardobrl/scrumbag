@@ -1,12 +1,24 @@
 import { Database } from "bun:sqlite";
 import { z } from "zod";
+import { mkdirSync, existsSync } from "node:fs";
 import { initSchema } from "./src/data/schema";
 import { BacklogRepository } from "./src/data/backlog-repository";
+import { startWatcher, stopWatcher } from "./src/sync/watcher";
 
 const db = new Database("scrumbag.db");
 initSchema(db);
 
 const backlogRepo = new BacklogRepository(db);
+
+const DEFAULT_SYNC_FOLDER = process.env.SYNC_FOLDER || "./synced";
+
+if (!existsSync(DEFAULT_SYNC_FOLDER)) {
+  mkdirSync(DEFAULT_SYNC_FOLDER, { recursive: true });
+}
+
+startWatcher(DEFAULT_SYNC_FOLDER, db, (event) => {
+  console.log(`[sync] Detected ${event.isNew ? "new" : "changed"} file: ${event.filePath}`);
+});
 
 const backlogItemSchema = z.object({
   type: z.enum(["epic", "feature", "story", "bug"]),
@@ -119,3 +131,11 @@ const server = Bun.serve({
 });
 
 console.log("Scrumbag running at http://localhost:3000");
+console.log(`[sync] Watching folder: ${DEFAULT_SYNC_FOLDER}`);
+
+process.on("SIGINT", () => {
+  console.log("\nShutting down...");
+  stopWatcher();
+  server.stop();
+  process.exit(0);
+});
