@@ -24,4 +24,27 @@ export function initSchema(db: Database): void {
       synced_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS squad_members (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      role TEXT NOT NULL,
+      daily_capacity_hours REAL NOT NULL DEFAULT 6.0,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS absences (
+      id TEXT PRIMARY KEY,
+      member_id TEXT REFERENCES squad_members(id) ON DELETE CASCADE,
+      type TEXT NOT NULL CHECK(type IN ('vacation','sick_leave','unpaid_leave','holiday','other')),
+      start_date TEXT NOT NULL,
+      end_date TEXT NOT NULL,
+      description TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 }
