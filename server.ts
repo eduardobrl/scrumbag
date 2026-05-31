@@ -16,6 +16,7 @@ const squadRepo = new SquadRepository(db);
 const absenceRepo = new AbsenceRepository(db);
 
 let activeSyncFolder = process.env.SYNC_FOLDER || "./synced";
+const port = Number(process.env.PORT ?? 3000);
 
 function ensureFolder(folderPath: string) {
   if (!existsSync(folderPath)) {
@@ -87,7 +88,7 @@ function getSyncStatus() {
 }
 
 const server = Bun.serve({
-  port: 3002,
+  port,
   static: {
     "/": new Response(Bun.file("dist/index.html")),
     "/assets/*": (req) => {
@@ -378,7 +379,7 @@ const server = Bun.serve({
   },
 });
 
-console.log("Scrumbag running at http://localhost:3000");
+console.log(`Scrumbag running at http://localhost:${port}`);
 console.log(`[sync] Watching folder: ${activeSyncFolder}`);
 
 process.on("SIGINT", () => {
