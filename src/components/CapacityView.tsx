@@ -228,7 +228,7 @@ export default function CapacityView() {
                 Membro
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Bruta (h)
+                Capacidade Bruta (h)
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
                 Ausencias (h)
@@ -240,7 +240,7 @@ export default function CapacityView() {
                 Desperdicio (h)
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Real (h)
+                Capacidade Real (h)
               </th>
             </tr>
           </thead>
