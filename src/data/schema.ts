@@ -1,6 +1,8 @@
 import { Database } from "bun:sqlite";
 
 export function initSchema(db: Database): void {
+  db.run("PRAGMA foreign_keys = ON");
+
   db.run(`
     CREATE TABLE IF NOT EXISTS backlog_items (
       id TEXT PRIMARY KEY,
