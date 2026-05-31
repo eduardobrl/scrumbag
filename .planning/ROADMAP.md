@@ -23,7 +23,13 @@ Scrumbag is a local-first, single-executable Scrum capacity planning tool. The r
   2. User can create and manage backlog items (stories, features, bugs, epics)
   3. User can organize work items in hierarchy (epics → features → stories)
   4. User can place Excel files in the synced folder and the app automatically detects and imports the data
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [x] 01-01-PLAN.md — Walking Skeleton: project scaffold, SQLite schema, Bun server, minimal React SPA with one DB read/write and one UI interaction
+- [ ] 01-02-PLAN.md — Backlog CRUD: domain types, full repository CRUD, REST API with validation, rich React list and form UI
+- [ ] 01-03-PLAN.md — Hierarchy: parent-child relationships, recursive queries, nested backlog tree view, parent assignment in forms
+- [ ] 01-04-PLAN.md — Excel Sync: chokidar file watcher, SHA-256 content hashing, SheetJS parser, import service, sync config UI
 
 ### Phase 2: Squad & Capacity Engine
 **Goal**: Users can manage their squad, register absences and holidays, and view realistic sprint capacity adjusted for availability and waste.
@@ -71,7 +77,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Ingestion | 0/TBD | Not started | - |
+| 1. Foundation & Data Ingestion | 1/4 | In progress | - |
 | 2. Squad & Capacity Engine | 0/TBD | Not started | - |
 | 3. Sprint Planning, Board & Estimation | 0/TBD | Not started | - |
 | 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |
