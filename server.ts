@@ -5,6 +5,7 @@ import { initSchema } from "./src/data/schema";
 import { BacklogRepository } from "./src/data/backlog-repository";
 import { SquadRepository } from "./src/data/squad-repository";
 import { AbsenceRepository } from "./src/data/absence-repository";
+import { CapacityService } from "./src/services/capacity-service";
 import { startWatcher, stopWatcher } from "./src/sync/watcher";
 import { importExcelFile } from "./src/sync/excel-importer";
 
@@ -14,6 +15,7 @@ initSchema(db);
 const backlogRepo = new BacklogRepository(db);
 const squadRepo = new SquadRepository(db);
 const absenceRepo = new AbsenceRepository(db);
+const capacityService = new CapacityService(db);
 
 let activeSyncFolder = process.env.SYNC_FOLDER || "./synced";
 const port = Number(process.env.PORT ?? 3000);
@@ -63,12 +65,49 @@ const absenceSchema = z.object({
   description: z.string().optional(),
 });
 
+const dateRangeSchema = z
+  .object({
+    start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  })
+  .refine((data) => data.end_date >= data.start_date, {
+    message: "end_date must be >= start_date",
+    path: ["end_date"],
+  })
+  .refine((data) => daysBetween(data.start_date, data.end_date) <= 365, {
+    message: "date range cannot exceed 365 days",
+    path: ["end_date"],
+  });
+
+const wasteConfigSchema = z.object({
+  waste_percentage: z.number().min(0).max(100),
+});
+
+const capacityOverrideSchema = z
+  .object({
+    member_id: z.string().min(1),
+    start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    override_hours: z.number().positive(),
+    reason: z.string().optional(),
+  })
+  .refine((data) => data.end_date >= data.start_date, {
+    message: "end_date must be >= start_date",
+    path: ["end_date"],
+  });
+
 async function parseJson(req: Request): Promise<unknown | Response> {
   try {
     return await req.json();
   } catch {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
+}
+
+function daysBetween(start: string, end: string): number {
+  const startDate = new Date(`${start}T00:00:00`);
+  const endDate = new Date(`${end}T00:00:00`);
+  return Math.floor((endDate.getTime() - startDate.getTime()) / 86_400_000) + 1;
 }
 
 function getSyncStatus() {
@@ -338,6 +377,108 @@ const server = Bun.serve({
       if (req.method === "GET") {
         const holidays = absenceRepo.findHolidays();
         return Response.json(holidays);
+      }
+    }
+
+    if (url.pathname === "/api/capacity") {
+      if (req.method === "GET") {
+        const parseResult = dateRangeSchema.safeParse({
+          start_date: url.searchParams.get("start_date"),
+          end_date: url.searchParams.get("end_date"),
+        });
+
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        return Response.json(
+          capacityService.calculate(parseResult.data.start_date, parseResult.data.end_date)
+        );
+      }
+    }
+
+    if (url.pathname === "/api/config/waste") {
+      if (req.method === "GET") {
+        return Response.json({ waste_percentage: capacityService.getWastePercentage() });
+      }
+
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = wasteConfigSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        return Response.json(capacityService.setWastePercentage(parseResult.data.waste_percentage));
+      }
+    }
+
+    if (url.pathname === "/api/capacity-overrides") {
+      if (req.method === "GET") {
+        return Response.json(capacityService.getAllOverrides());
+      }
+
+      if (req.method === "POST") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = capacityOverrideSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        if (!squadRepo.findById(parseResult.data.member_id)) {
+          return Response.json({ error: "member_id not found" }, { status: 400 });
+        }
+
+        return Response.json(capacityService.createOverride(parseResult.data), { status: 201 });
+      }
+    }
+
+    const capacityOverrideMatch = url.pathname.match(/^\/api\/capacity-overrides\/([^/]+)$/);
+    if (capacityOverrideMatch) {
+      const id = capacityOverrideMatch[1];
+
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = capacityOverrideSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        if (!squadRepo.findById(parseResult.data.member_id)) {
+          return Response.json({ error: "member_id not found" }, { status: 400 });
+        }
+
+        const updated = capacityService.updateOverride(id, parseResult.data);
+        if (!updated) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+        return Response.json(updated);
+      }
+
+      if (req.method === "DELETE") {
+        const deleted = capacityService.deleteOverride(id);
+        if (!deleted) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+        return new Response(null, { status: 204 });
       }
     }
 

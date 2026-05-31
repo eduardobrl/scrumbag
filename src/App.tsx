@@ -14,8 +14,9 @@ import SquadMemberForm from "./components/SquadMemberForm";
 import SquadMemberList from "./components/SquadMemberList";
 import AbsenceForm from "./components/AbsenceForm";
 import AbsenceList from "./components/AbsenceList";
+import CapacityView from "./components/CapacityView";
 
-type Tab = "backlog" | "squad" | "absences" | "sync";
+type Tab = "backlog" | "squad" | "absences" | "capacity" | "sync";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>("backlog");
@@ -237,6 +238,16 @@ export default function App() {
               Ausências
             </button>
             <button
+              onClick={() => setActiveTab("capacity")}
+              className={`pb-2 text-sm font-medium ${
+                activeTab === "capacity"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Capacidade
+            </button>
+            <button
               onClick={() => setActiveTab("sync")}
               className={`pb-2 text-sm font-medium ${
                 activeTab === "sync"
@@ -311,6 +322,8 @@ export default function App() {
             />
           </>
         )}
+
+        {activeTab === "capacity" && <CapacityView />}
 
         {activeTab === "sync" && <SyncConfig />}
       </div>

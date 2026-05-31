@@ -47,4 +47,28 @@ export function initSchema(db: Database): void {
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS app_config (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+  `);
+
+  db.run(`
+    INSERT OR IGNORE INTO app_config (key, value)
+    VALUES ('waste_percentage', '15');
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS capacity_overrides (
+      id TEXT PRIMARY KEY,
+      member_id TEXT NOT NULL REFERENCES squad_members(id) ON DELETE CASCADE,
+      start_date TEXT NOT NULL,
+      end_date TEXT NOT NULL,
+      override_hours REAL NOT NULL,
+      reason TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
 }
