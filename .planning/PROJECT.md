@@ -1,0 +1,84 @@
+# Scrumbag
+
+## What This Is
+
+Um app web leve de **capacity planning e sprint management** para times Scrum. Lê planilhas Excel de uma pasta sincronizada no OneDrive, permite planejar features, histórias e épicos com estimativas, calcula capacity real da squad considerando ausências e desperdícios, e prevê entregas. Inclui um servidor MCP para que agentes de IA possam consultar os dados e auxiliar na tomada de decisões. Desenvolvido para uso de Tech Lead, PM e gestora de portfólio em ambiente corporativo com restrições de instalação de software.
+
+## Core Value
+
+Permitir o planejamento realista de sprints com capacity ajustada à realidade da squad (ausências, desperdício), gerando previsões confiáveis de entrega de épicos.
+
+## Requirements
+
+### Validated
+
+(None yet — ship to validate)
+
+### Active
+
+- [ ] Ler e sincronizar planilhas Excel de pasta no OneDrive
+- [ ] Cadastrar e gerenciar membros da squad
+- [ ] Registrar ausências, férias, folgas não compensadas e feriados
+- [ ] Criar e gerenciar features, histórias e backlog
+- [ ] Estimar histórias em story points e dias de trabalho
+- [ ] Calcular capacity real da sprint com ajustes de disponibilidade
+- [ ] Calcular desperdícios (reuniões, suporte, incidentes) com tolerância configurável
+- [ ] Visualizar board de sprint (Kanban/Scrum board)
+- [ ] Visualizar épicos com previsão de entrega
+- [ ] Sugerir histórias que cabem na capacity da sprint
+- [ ] Expor dados via servidor MCP para agentes de IA
+- [ ] Funcionar sem instalação (web app) em ambiente corporativo restrito
+
+### Out of Scope
+
+- Integração direta com Jira/Azure DevOps — a ferramenta interna da empresa não permite APIs
+- Mobile app nativo — web app responsivo é suficiente
+- Autenticação multiusuário complexa — uso interno entre 3 pessoas
+- Edição colaborativa em tempo real — sincronização via OneDrive já resolve
+- Notificações automáticas — fora do escopo de MVP
+- Relatórios avançados/BI — dashboards básicos são suficientes
+
+## Context
+
+- Ambiente corporativo com restrições de instalação de software
+- Ferramenta interna da empresa não oferece capacity planning nem previsão de épicos
+- Dados de entrada vêm de planilhas Excel em pasta sincronizada no OneDrive
+- Squad atual não tem acesso a ferramentas de mercado (Jira, etc.)
+- Três usuários principais: Tech Lead (você), PM e gestora de portfólio
+
+## Constraints
+
+- **Instalação**: Não pode instalar apps desktop por política de segurança — deve rodar no navegador ou ser executável sem instalação
+- **Dados**: Fonte primária são arquivos Excel em pasta do OneDrive; o app deve detectar mudanças nos arquivos
+- **Público**: Uso interno entre 3 pessoas; não precisa de escalabilidade massiva
+- **Offline-first**: Deve funcionar localmente mesmo com conectividade intermitente
+
+## Key Decisions
+
+| Decision | Rationale | Outcome |
+|----------|-----------|---------|
+| Web app sem instalação | Restrições de segurança corporativa | — Pending |
+| Excel/OneDrive como fonte de dados | Ferramenta interna não tem API; Excel é o formato usado hoje | — Pending |
+| Estimativa em story points + dias | Time já familiarizado com story points; dias ajudam na previsão de calendário | — Pending |
+| Servidor MCP embutido | Permitir que agentes de IA consultem dados para decisões de planejamento | — Pending |
+| Manual entry para histórias | Não há integração automática disponível com a ferramenta interna | — Pending |
+
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
+---
+*Last updated: 2025-05-30 after initialization*
