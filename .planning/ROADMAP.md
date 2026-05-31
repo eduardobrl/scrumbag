@@ -53,7 +53,7 @@ Plans:
 
 Plans:
 
-- [ ] 02-01-PLAN.md — Squad & Absences: squad member CRUD, absence tracking with holidays, REST API, and React UI
+- [x] 02-01-PLAN.md — Squad & Absences: squad member CRUD, absence tracking with holidays, REST API, and React UI
 - [ ] 02-02-PLAN.md — Capacity Engine: working-day calculation, absence/holiday deduction, per-member breakdown API and UI
 - [ ] 02-03-PLAN.md — Waste, Transparency & Override: configurable waste percentage, capacity breakdown with waste, manual override for specific members and dates
 
@@ -97,6 +97,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
-| 2. Squad & Capacity Engine | 0/3 | Planned    | - |
+| 2. Squad & Capacity Engine | 1/3 | In Progress|  |
 | 3. Sprint Planning, Board & Estimation | 0/TBD | Not started | - |
 | 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |

@@ -27,8 +27,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Squad & Capacity
 
-- [ ] **TEAM-01**: User can register squad members with name, role, and typical daily capacity
-- [ ] **TEAM-02**: User can register absences, vacations, unpaid leave, and holidays
+- [x] **TEAM-01**: User can register squad members with name, role, and typical daily capacity
+- [x] **TEAM-02**: User can register absences, vacations, unpaid leave, and holidays
 - [ ] **CAP-01**: System calculates realistic sprint capacity adjusting for absences and holidays
 - [ ] **CAP-02**: System calculates capacity considering waste/overhead (meetings, support, incidents)
 - [ ] **CAP-03**: System shows transparent capacity breakdown with manual override option
@@ -100,8 +100,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SPRT-04 | Phase 3 | Pending |
 | EST-01 | Phase 3 | Pending |
 | EST-02 | Phase 3 | Pending |
-| TEAM-01 | Phase 2 | Pending |
-| TEAM-02 | Phase 2 | Pending |
+| TEAM-01 | Phase 2 | Complete |
+| TEAM-02 | Phase 2 | Complete |
 | CAP-01 | Phase 2 | Pending |
 | CAP-02 | Phase 2 | Pending |
 | CAP-03 | Phase 2 | Pending |
@@ -113,6 +113,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SYNC-02 | Phase 1 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 20 total
 - Mapped to phases: 20
 - Unmapped: 0 ✓
