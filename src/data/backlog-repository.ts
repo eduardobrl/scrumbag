@@ -79,4 +79,34 @@ export class BacklogRepository {
     const result = this.db.run("DELETE FROM backlog_items WHERE id = ?", [id]);
     return result.changes > 0;
   }
+
+  findRootItems(): BacklogItem[] {
+    return this.db
+      .query<BacklogItem, []>(
+        "SELECT * FROM backlog_items WHERE parent_id IS NULL ORDER BY priority DESC, created_at DESC"
+      )
+      .all();
+  }
+
+  findChildren(parentId: string): BacklogItem[] {
+    return this.db
+      .query<BacklogItem, [string]>(
+        "SELECT * FROM backlog_items WHERE parent_id = ? ORDER BY priority DESC, created_at DESC"
+      )
+      .all(parentId);
+  }
+
+  findDescendants(rootId: string): BacklogItem[] {
+    return this.db
+      .query<BacklogItem, [string, string]>(
+        `WITH RECURSIVE descendants AS (
+          SELECT * FROM backlog_items WHERE id = ?
+          UNION ALL
+          SELECT b.* FROM backlog_items b
+          JOIN descendants d ON b.parent_id = d.id
+        )
+        SELECT * FROM descendants WHERE id != ?`
+      )
+      .all(rootId, rootId);
+  }
 }

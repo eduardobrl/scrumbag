@@ -39,6 +39,19 @@ const server = Bun.serve({
 
     if (url.pathname === "/api/backlog") {
       if (req.method === "GET") {
+        const root = url.searchParams.get("root");
+        const parentId = url.searchParams.get("parent_id");
+
+        if (root === "true") {
+          const items = backlogRepo.findRootItems();
+          return Response.json(items);
+        }
+
+        if (parentId) {
+          const items = backlogRepo.findChildren(parentId);
+          return Response.json(items);
+        }
+
         const items = backlogRepo.findAll();
         return Response.json(items);
       }
