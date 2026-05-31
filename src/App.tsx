@@ -1,10 +1,11 @@
-import { useState, useEffect, FormEvent } from "react";
-import type { BacklogItem } from "./domain/types";
+import { useState, useEffect } from "react";
+import type { BacklogItem, NewBacklogItem } from "./domain/types";
+import BacklogForm from "./components/BacklogForm";
+import BacklogList from "./components/BacklogList";
 
 export default function App() {
   const [items, setItems] = useState<BacklogItem[]>([]);
-  const [type, setType] = useState("story");
-  const [title, setTitle] = useState("");
+  const [editingItem, setEditingItem] = useState<BacklogItem | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function refreshItems() {
@@ -17,94 +18,71 @@ export default function App() {
     refreshItems();
   }, []);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!title.trim()) return;
-
+  async function handleCreate(item: NewBacklogItem) {
     setLoading(true);
     await fetch("/api/backlog", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type, title }),
+      body: JSON.stringify(item),
     });
-    setTitle("");
     await refreshItems();
     setLoading(false);
   }
 
+  async function handleUpdate(item: NewBacklogItem) {
+    if (!editingItem) return;
+    setLoading(true);
+    await fetch(`/api/backlog/${editingItem.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(item),
+    });
+    setEditingItem(null);
+    await refreshItems();
+    setLoading(false);
+  }
+
+  async function handleDelete(id: string) {
+    setLoading(true);
+    await fetch(`/api/backlog/${id}`, {
+      method: "DELETE",
+    });
+    if (editingItem?.id === id) {
+      setEditingItem(null);
+    }
+    await refreshItems();
+    setLoading(false);
+  }
+
+  function handleEdit(item: BacklogItem) {
+    setEditingItem(item);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function handleCancelEdit() {
+    setEditingItem(null);
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-4xl">
         <h1 className="mb-6 text-2xl font-bold text-gray-900">Scrumbag</h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mb-8 rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
-        >
-          <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Tipo
-            </label>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-            >
-              <option value="epic">Épico</option>
-              <option value="feature">Feature</option>
-              <option value="story">História</option>
-              <option value="bug">Bug</option>
-            </select>
-          </div>
+        <BacklogForm
+          onSubmit={editingItem ? handleUpdate : handleCreate}
+          initialItem={editingItem}
+          onCancel={editingItem ? handleCancelEdit : undefined}
+        />
 
-          <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium text-gray-700">
-              Título
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Digite o título do item..."
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-            />
-          </div>
+        {loading && (
+          <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
+        )}
 
-          <button
-            type="submit"
-            disabled={loading || !title.trim()}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? "Criando..." : "Criar Item"}
-          </button>
-        </form>
-
-        <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
-          <h2 className="border-b border-gray-200 px-4 py-3 text-lg font-semibold text-gray-900">
-            Backlog
-          </h2>
-
-          {items.length === 0 ? (
-            <p className="px-4 py-6 text-sm text-gray-500">
-              Nenhum item no backlog ainda.
-            </p>
-          ) : (
-            <ul className="divide-y divide-gray-200">
-              {items.map((item) => (
-                <li key={item.id} className="px-4 py-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">
-                      {item.title}
-                    </span>
-                    <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">
-                      {item.type}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <BacklogList
+          items={items}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       </div>
     </div>
   );
