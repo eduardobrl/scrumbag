@@ -16,7 +16,10 @@ export default function BacklogForm({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<NewBacklogItem["status"]>("backlog");
+  const [parentId, setParentId] = useState<string | null>(null);
+  const [rootItems, setRootItems] = useState<BacklogItem[]>([]);
   const [error, setError] = useState("");
+  const [descendantIds, setDescendantIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (initialItem) {
@@ -24,9 +27,43 @@ export default function BacklogForm({
       setTitle(initialItem.title);
       setDescription(initialItem.description ?? "");
       setStatus(initialItem.status);
+      setParentId(initialItem.parent_id);
     } else {
       resetForm();
     }
+  }, [initialItem]);
+
+  useEffect(() => {
+    fetch("/api/backlog?root=true")
+      .then((res) => res.json())
+      .then((data) => setRootItems(Array.isArray(data) ? data : []))
+      .catch(() => setRootItems([]));
+  }, []);
+
+  useEffect(() => {
+    if (!initialItem) {
+      setDescendantIds(new Set());
+      return;
+    }
+    const exclude = new Set<string>();
+    exclude.add(initialItem.id);
+
+    async function collectChildren(parentId: string) {
+      const res = await fetch(`/api/backlog?parent_id=${parentId}`);
+      const children: BacklogItem[] = await res.json();
+      for (const child of children) {
+        if (!exclude.has(child.id)) {
+          exclude.add(child.id);
+          await collectChildren(child.id);
+        }
+      }
+    }
+
+    collectChildren(initialItem.id).then(() => {
+      setDescendantIds(exclude);
+    }).catch(() => {
+      setDescendantIds(new Set([initialItem.id]));
+    });
   }, [initialItem]);
 
   function resetForm() {
@@ -34,6 +71,7 @@ export default function BacklogForm({
     setTitle("");
     setDescription("");
     setStatus("backlog");
+    setParentId(null);
     setError("");
   }
 
@@ -55,12 +93,17 @@ export default function BacklogForm({
       title: title.trim(),
       description: description.trim() || undefined,
       status,
+      parent_id: parentId,
     });
 
     if (!initialItem) {
       resetForm();
     }
   }
+
+  const parentOptions = rootItems.filter(
+    (item) => !descendantIds.has(item.id)
+  );
 
   return (
     <form
@@ -71,7 +114,7 @@ export default function BacklogForm({
         {initialItem ? "Editar Item" : "Novo Item"}
       </h2>
 
-      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
             Tipo
@@ -102,6 +145,26 @@ export default function BacklogForm({
             <option value="backlog">Backlog</option>
             <option value="in_progress">Em Progresso</option>
             <option value="done">Concluído</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="mb-1 block text-sm font-medium text-gray-700">
+            Pai
+          </label>
+          <select
+            value={parentId ?? ""}
+            onChange={(e) =>
+              setParentId(e.target.value ? e.target.value : null)
+            }
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          >
+            <option value="">Sem pai</option>
+            {parentOptions.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.title} ({item.type})
+              </option>
+            ))}
           </select>
         </div>
       </div>
