@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+scrumbag
+scrumbag.exe
+
+# Local database and synced input files
+*.db
+*.db-*
+synced/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun-debug.log*
+
+# Environment files
+.env
+.env.*
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local agent/tooling state
+.agents/
+.claude/
+.codex/
+.opencode/
