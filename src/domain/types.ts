@@ -1,5 +1,7 @@
 export type BacklogItemType = "epic" | "feature" | "story" | "bug";
 export type BacklogItemStatus = "backlog" | "in_progress" | "done";
+export const FIBONACCI_POINTS = [1, 2, 3, 5, 8, 13, 21] as const;
+export type StoryPoint = typeof FIBONACCI_POINTS[number];
 
 export interface BacklogItem {
   id: string;
@@ -9,6 +11,9 @@ export interface BacklogItem {
   parent_id: string | null;
   status: BacklogItemStatus;
   priority: number;
+  story_points: StoryPoint | null;
+  estimate_days: number | null;
+  completed_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -20,11 +25,59 @@ export interface NewBacklogItem {
   parent_id?: string | null;
   status?: BacklogItemStatus;
   priority?: number;
+  story_points?: StoryPoint | null;
+  estimate_days?: number | null;
 }
 
 export type UpdateBacklogItem = Partial<
   Omit<BacklogItem, "id" | "created_at" | "updated_at">
 >;
+
+export type SprintStatus = "planned" | "active" | "closed";
+
+export interface Sprint {
+  id: string;
+  goal: string;
+  start_date: string;
+  end_date: string;
+  status: SprintStatus;
+  closed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NewSprint {
+  goal: string;
+  start_date: string;
+  end_date: string;
+  status?: SprintStatus;
+}
+
+export type UpdateSprint = Partial<
+  Omit<Sprint, "id" | "created_at" | "updated_at">
+>;
+
+export interface SprintItem {
+  id: string;
+  sprint_id: string;
+  backlog_item_id: string;
+  sprint_order: number;
+  board_order: number;
+  created_at: string;
+  backlog_item?: BacklogItem;
+}
+
+export interface NewSprintItem {
+  sprint_id: string;
+  backlog_item_id: string;
+  sprint_order?: number;
+  board_order?: number;
+}
+
+export interface AggregateEstimate {
+  story_points: number;
+  estimate_days: number;
+}
 
 export interface SquadMember {
   id: string;

@@ -5,7 +5,9 @@ import type {
   NewAbsence,
   NewBacklogItem,
   NewSquadMember,
+  NewSprint,
   SquadMember,
+  Sprint,
 } from "./domain/types";
 import BacklogForm from "./components/BacklogForm";
 import BacklogList from "./components/BacklogList";
@@ -15,13 +17,18 @@ import SquadMemberList from "./components/SquadMemberList";
 import AbsenceForm from "./components/AbsenceForm";
 import AbsenceList from "./components/AbsenceList";
 import CapacityView from "./components/CapacityView";
+import SprintForm from "./components/SprintForm";
+import SprintList from "./components/SprintList";
 
-type Tab = "backlog" | "squad" | "absences" | "capacity" | "sync";
+type Tab = "backlog" | "sprints" | "squad" | "absences" | "capacity" | "sync";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>("backlog");
   const [items, setItems] = useState<BacklogItem[]>([]);
   const [editingItem, setEditingItem] = useState<BacklogItem | null>(null);
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+  const [selectedSprint, setSelectedSprint] = useState<Sprint | null>(null);
+  const [editingSprint, setEditingSprint] = useState<Sprint | null>(null);
   const [squadMembers, setSquadMembers] = useState<SquadMember[]>([]);
   const [editingMember, setEditingMember] = useState<SquadMember | null>(null);
   const [absences, setAbsences] = useState<Absence[]>([]);
@@ -47,6 +54,17 @@ export default function App() {
     setAbsences(Array.isArray(data) ? data : []);
   }
 
+  async function refreshSprints() {
+    const res = await fetch("/api/sprints");
+    const data = await res.json();
+    const nextSprints = Array.isArray(data) ? data : [];
+    setSprints(nextSprints);
+
+    if (selectedSprint && !nextSprints.some((sprint) => sprint.id === selectedSprint.id)) {
+      setSelectedSprint(null);
+    }
+  }
+
   useEffect(() => {
     refreshItems();
   }, []);
@@ -54,6 +72,10 @@ export default function App() {
   useEffect(() => {
     if (activeTab === "squad") {
       refreshSquadMembers();
+    }
+
+    if (activeTab === "sprints") {
+      refreshSprints();
     }
 
     if (activeTab === "absences") {
@@ -108,6 +130,58 @@ export default function App() {
 
   function handleCancelEdit() {
     setEditingItem(null);
+  }
+
+  async function handleCreateSprint(sprint: NewSprint) {
+    setLoading(true);
+    await fetch("/api/sprints", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sprint),
+    });
+    await refreshSprints();
+    setLoading(false);
+  }
+
+  async function handleUpdateSprint(sprint: NewSprint) {
+    if (!editingSprint) return;
+    setLoading(true);
+    await fetch(`/api/sprints/${editingSprint.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sprint),
+    });
+    setEditingSprint(null);
+    await refreshSprints();
+    setLoading(false);
+  }
+
+  async function handleDeleteSprint(id: string) {
+    setLoading(true);
+    await fetch(`/api/sprints/${id}`, {
+      method: "DELETE",
+    });
+    if (editingSprint?.id === id) {
+      setEditingSprint(null);
+    }
+    if (selectedSprint?.id === id) {
+      setSelectedSprint(null);
+    }
+    await refreshSprints();
+    setLoading(false);
+  }
+
+  function handleEditSprint(sprint: Sprint) {
+    setEditingSprint(sprint);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function handleSelectSprint(sprint: Sprint) {
+    setSelectedSprint(sprint);
+  }
+
+  function handleCancelSprintEdit() {
+    setEditingSprint(null);
   }
 
   async function handleCreateMember(member: NewSquadMember) {
@@ -218,6 +292,16 @@ export default function App() {
               Backlog
             </button>
             <button
+              onClick={() => setActiveTab("sprints")}
+              className={`pb-2 text-sm font-medium ${
+                activeTab === "sprints"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Sprints
+            </button>
+            <button
               onClick={() => setActiveTab("squad")}
               className={`pb-2 text-sm font-medium ${
                 activeTab === "squad"
@@ -277,6 +361,34 @@ export default function App() {
               onEdit={handleEdit}
               onDelete={handleDelete}
               refreshKey={refreshKey}
+            />
+          </>
+        )}
+
+        {activeTab === "sprints" && (
+          <>
+            <SprintForm
+              onSubmit={editingSprint ? handleUpdateSprint : handleCreateSprint}
+              initialSprint={editingSprint}
+              onCancel={editingSprint ? handleCancelSprintEdit : undefined}
+            />
+
+            {loading && (
+              <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
+            )}
+
+            {selectedSprint && (
+              <p className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+                Sprint selecionado: {selectedSprint.goal}
+              </p>
+            )}
+
+            <SprintList
+              sprints={sprints}
+              selectedSprintId={selectedSprint?.id ?? null}
+              onSelect={handleSelectSprint}
+              onEdit={handleEditSprint}
+              onDelete={handleDeleteSprint}
             />
           </>
         )}

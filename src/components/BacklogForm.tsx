@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent } from "react";
-import type { BacklogItem, NewBacklogItem } from "../domain/types";
+import { FIBONACCI_POINTS } from "../domain/types";
+import type { BacklogItem, NewBacklogItem, StoryPoint } from "../domain/types";
 
 interface BacklogFormProps {
   onSubmit: (item: NewBacklogItem) => void;
@@ -17,6 +18,8 @@ export default function BacklogForm({
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<NewBacklogItem["status"]>("backlog");
   const [parentId, setParentId] = useState<string | null>(null);
+  const [storyPoints, setStoryPoints] = useState("");
+  const [estimateDays, setEstimateDays] = useState("");
   const [rootItems, setRootItems] = useState<BacklogItem[]>([]);
   const [error, setError] = useState("");
   const [descendantIds, setDescendantIds] = useState<Set<string>>(new Set());
@@ -28,6 +31,8 @@ export default function BacklogForm({
       setDescription(initialItem.description ?? "");
       setStatus(initialItem.status);
       setParentId(initialItem.parent_id);
+      setStoryPoints(initialItem.story_points?.toString() ?? "");
+      setEstimateDays(initialItem.estimate_days?.toString() ?? "");
     } else {
       resetForm();
     }
@@ -72,6 +77,8 @@ export default function BacklogForm({
     setDescription("");
     setStatus("backlog");
     setParentId(null);
+    setStoryPoints("");
+    setEstimateDays("");
     setError("");
   }
 
@@ -88,12 +95,18 @@ export default function BacklogForm({
     }
     setError("");
 
+    const executable = type === "story" || type === "bug";
+    const parsedStoryPoints = storyPoints ? (Number(storyPoints) as StoryPoint) : null;
+    const parsedEstimateDays = estimateDays === "" ? null : Number(estimateDays);
+
     onSubmit({
       type,
       title: title.trim(),
       description: description.trim() || undefined,
       status,
       parent_id: parentId,
+      story_points: executable ? parsedStoryPoints : null,
+      estimate_days: executable ? parsedEstimateDays : null,
     });
 
     if (!initialItem) {
@@ -104,6 +117,7 @@ export default function BacklogForm({
   const parentOptions = rootItems.filter(
     (item) => !descendantIds.has(item.id)
   );
+  const showsEstimateFields = type === "story" || type === "bug";
 
   return (
     <form
@@ -195,6 +209,47 @@ export default function BacklogForm({
           className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
         />
       </div>
+
+      {showsEstimateFields ? (
+        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Story points
+            </label>
+            <select
+              value={storyPoints}
+              onChange={(e) => setStoryPoints(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            >
+              <option value="">Sem estimativa</option>
+              {FIBONACCI_POINTS.map((point) => (
+                <option key={point} value={point}>
+                  {point}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Dias de trabalho
+            </label>
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              value={estimateDays}
+              onChange={(e) => setEstimateDays(e.target.value)}
+              placeholder="0"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            />
+          </div>
+        </div>
+      ) : (
+        <p className="mb-4 rounded-md bg-gray-50 px-3 py-2 text-xs text-gray-600">
+          Epicos e features agregam estimativas das historias e bugs filhos.
+        </p>
+      )}
 
       <div className="flex gap-2">
         <button

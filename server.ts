@@ -3,6 +3,7 @@ import { z } from "zod";
 import { mkdirSync, existsSync } from "node:fs";
 import { initSchema } from "./src/data/schema";
 import { BacklogRepository } from "./src/data/backlog-repository";
+import { SprintRepository } from "./src/data/sprint-repository";
 import { SquadRepository } from "./src/data/squad-repository";
 import { AbsenceRepository } from "./src/data/absence-repository";
 import { CapacityService } from "./src/services/capacity-service";
@@ -13,6 +14,7 @@ const db = new Database("scrumbag.db");
 initSchema(db);
 
 const backlogRepo = new BacklogRepository(db);
+const sprintRepo = new SprintRepository(db);
 const squadRepo = new SquadRepository(db);
 const absenceRepo = new AbsenceRepository(db);
 const capacityService = new CapacityService(db);
@@ -43,6 +45,55 @@ const backlogItemSchema = z.object({
   parent_id: z.string().nullable().optional(),
   status: z.enum(["backlog", "in_progress", "done"]).optional(),
   priority: z.number().optional(),
+  story_points: z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(5),
+    z.literal(8),
+    z.literal(13),
+    z.literal(21),
+  ]).nullable().optional(),
+  estimate_days: z.number().nonnegative().nullable().optional(),
+});
+
+const backlogUpdateSchema = backlogItemSchema.partial();
+
+const sprintBaseSchema = z.object({
+  goal: z.string().min(1),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  status: z.enum(["planned", "active", "closed"]).optional(),
+});
+
+const sprintSchema = sprintBaseSchema
+  .refine((data) => data.end_date >= data.start_date, {
+    message: "end_date must be >= start_date",
+    path: ["end_date"],
+  });
+
+const sprintUpdateSchema = sprintBaseSchema.partial().refine(
+  (data) => {
+    if (!data.start_date || !data.end_date) return true;
+    return data.end_date >= data.start_date;
+  },
+  {
+    message: "end_date must be >= start_date",
+    path: ["end_date"],
+  }
+);
+
+const estimateSchema = z.object({
+  story_points: z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(5),
+    z.literal(8),
+    z.literal(13),
+    z.literal(21),
+  ]).nullable().optional(),
+  estimate_days: z.number().nonnegative().nullable().optional(),
 });
 
 const folderPathSchema = z.object({
@@ -191,6 +242,78 @@ const server = Bun.serve({
       }
     }
 
+    if (url.pathname === "/api/sprints") {
+      if (req.method === "GET") {
+        return Response.json(sprintRepo.findAll());
+      }
+
+      if (req.method === "POST") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = sprintSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        const created = sprintRepo.create(parseResult.data);
+        return Response.json(created, { status: 201 });
+      }
+    }
+
+    const sprintMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)$/);
+    if (sprintMatch) {
+      const id = sprintMatch[1];
+
+      if (req.method === "GET") {
+        const sprint = sprintRepo.findById(id);
+        if (!sprint) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+        return Response.json(sprint);
+      }
+
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = sprintUpdateSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        const existing = sprintRepo.findById(id);
+        if (!existing) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+
+        const merged = {
+          start_date: parseResult.data.start_date ?? existing.start_date,
+          end_date: parseResult.data.end_date ?? existing.end_date,
+        };
+        if (merged.end_date < merged.start_date) {
+          return Response.json({ error: "end_date must be >= start_date" }, { status: 400 });
+        }
+
+        const updated = sprintRepo.update(id, parseResult.data);
+        return Response.json(updated);
+      }
+
+      if (req.method === "DELETE") {
+        const deleted = sprintRepo.delete(id);
+        if (!deleted) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+        return new Response(null, { status: 204 });
+      }
+    }
+
     if (url.pathname === "/api/backlog") {
       if (req.method === "GET") {
         const root = url.searchParams.get("root");
@@ -234,6 +357,49 @@ const server = Bun.serve({
       }
     }
 
+    const backlogEstimateMatch = url.pathname.match(/^\/api\/backlog\/([^/]+)\/estimate$/);
+    if (backlogEstimateMatch) {
+      const id = backlogEstimateMatch[1];
+
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = estimateSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        try {
+          const updated = backlogRepo.updateEstimate(
+            id,
+            parseResult.data.story_points,
+            parseResult.data.estimate_days
+          );
+          return Response.json(updated);
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Failed to update estimate";
+          const status = message.includes("not found") ? 404 : 400;
+          return Response.json({ error: message }, { status });
+        }
+      }
+    }
+
+    const backlogAggregateMatch = url.pathname.match(/^\/api\/backlog\/([^/]+)\/aggregate-estimate$/);
+    if (backlogAggregateMatch) {
+      const id = backlogAggregateMatch[1];
+
+      if (req.method === "GET") {
+        if (!backlogRepo.findById(id)) {
+          return Response.json({ error: "Not found" }, { status: 404 });
+        }
+        return Response.json(backlogRepo.aggregateEstimate(id));
+      }
+    }
+
     const backlogItemMatch = url.pathname.match(/^\/api\/backlog\/([^/]+)$/);
     if (backlogItemMatch) {
       const id = backlogItemMatch[1];
@@ -250,8 +416,16 @@ const server = Bun.serve({
         const body = await parseJson(req);
         if (body instanceof Response) return body;
 
+        const parseResult = backlogUpdateSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
         try {
-          const updated = backlogRepo.update(id, body as Record<string, unknown>);
+          const updated = backlogRepo.update(id, parseResult.data);
           return Response.json(updated);
         } catch {
           return Response.json({ error: "Not found" }, { status: 404 });

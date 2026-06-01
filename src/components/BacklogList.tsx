@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import type { BacklogItem } from "../domain/types";
+import type { AggregateEstimate, BacklogItem } from "../domain/types";
 
 interface BacklogListProps {
   items: BacklogItem[];
@@ -37,6 +37,7 @@ interface TreeItemProps {
 
 function BacklogTreeItem({ item, depth, onEdit, onDelete, refreshKey }: TreeItemProps) {
   const [children, setChildren] = useState<BacklogItem[]>([]);
+  const [aggregate, setAggregate] = useState<AggregateEstimate | null>(null);
   const [expanded, setExpanded] = useState(true);
 
   const fetchChildren = useCallback(async () => {
@@ -53,6 +54,18 @@ function BacklogTreeItem({ item, depth, onEdit, onDelete, refreshKey }: TreeItem
     fetchChildren();
   }, [fetchChildren, refreshKey]);
 
+  useEffect(() => {
+    if (item.type === "story" || item.type === "bug") {
+      setAggregate(null);
+      return;
+    }
+
+    fetch(`/api/backlog/${item.id}/aggregate-estimate`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setAggregate(data))
+      .catch(() => setAggregate(null));
+  }, [item.id, item.type, refreshKey]);
+
   function handleDelete(id: string) {
     if (window.confirm("Tem certeza que deseja excluir este item?")) {
       onDelete(id);
@@ -61,6 +74,12 @@ function BacklogTreeItem({ item, depth, onEdit, onDelete, refreshKey }: TreeItem
 
   const indentClass = depth === 0 ? "" : `pl-${Math.min(depth * 4, 12)}`;
   const hasChildren = children.length > 0;
+  const estimateText =
+    item.type === "story" || item.type === "bug"
+      ? formatEstimate(item.story_points, item.estimate_days)
+      : aggregate
+        ? formatEstimate(aggregate.story_points, aggregate.estimate_days)
+        : "Sem estimativa";
 
   return (
     <>
@@ -94,6 +113,9 @@ function BacklogTreeItem({ item, depth, onEdit, onDelete, refreshKey }: TreeItem
           >
             {statusLabels[item.status] ?? item.status}
           </span>
+        </td>
+        <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+          {estimateText}
         </td>
         <td className="whitespace-nowrap px-4 py-3 text-right text-sm">
           <button
@@ -140,6 +162,9 @@ export default function BacklogList({ items, onEdit, onDelete, refreshKey }: Bac
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
               Status
             </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+              Estimativa
+            </th>
             <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
               Ações
             </th>
@@ -148,7 +173,7 @@ export default function BacklogList({ items, onEdit, onDelete, refreshKey }: Bac
         <tbody className="divide-y divide-gray-200">
           {items.length === 0 ? (
             <tr>
-              <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-500">
+              <td colSpan={5} className="px-4 py-6 text-center text-sm text-gray-500">
                 Nenhum item no backlog ainda.
               </td>
             </tr>
@@ -168,4 +193,19 @@ export default function BacklogList({ items, onEdit, onDelete, refreshKey }: Bac
       </table>
     </div>
   );
+}
+
+function formatEstimate(storyPoints: number | null, estimateDays: number | null): string {
+  if (!storyPoints && !estimateDays) {
+    return "Sem estimativa";
+  }
+
+  const parts: string[] = [];
+  if (storyPoints) {
+    parts.push(`${storyPoints} pts`);
+  }
+  if (estimateDays) {
+    parts.push(`${estimateDays} dias`);
+  }
+  return parts.join(" / ");
 }
