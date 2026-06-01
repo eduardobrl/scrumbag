@@ -20,6 +20,7 @@ import CapacityView from "./components/CapacityView";
 import SprintForm from "./components/SprintForm";
 import SprintList from "./components/SprintList";
 import SprintPlanningWorkspace from "./components/SprintPlanningWorkspace";
+import SprintBoard from "./components/SprintBoard";
 
 type Tab = "backlog" | "sprints" | "squad" | "absences" | "capacity" | "sync";
 
@@ -183,6 +184,13 @@ export default function App() {
 
   function handleCancelSprintEdit() {
     setEditingSprint(null);
+  }
+
+  function handleSprintChanged(sprint: Sprint) {
+    setSelectedSprint(sprint);
+    setSprints((current) =>
+      current.map((item) => (item.id === sprint.id ? sprint : item))
+    );
   }
 
   async function handleCreateMember(member: NewSquadMember) {
@@ -392,8 +400,21 @@ export default function App() {
               onDelete={handleDeleteSprint}
             />
 
-            {selectedSprint && (
+            {selectedSprint && selectedSprint.status !== "closed" && (
               <SprintPlanningWorkspace sprint={selectedSprint} />
+            )}
+
+            {selectedSprint && selectedSprint.status === "closed" && (
+              <p className="mt-6 rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-600">
+                Sprint fechado. Planejamento em modo somente leitura.
+              </p>
+            )}
+
+            {selectedSprint && (
+              <SprintBoard
+                sprint={selectedSprint}
+                onSprintChanged={handleSprintChanged}
+              />
             )}
           </>
         )}

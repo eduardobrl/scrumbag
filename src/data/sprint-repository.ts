@@ -224,6 +224,92 @@ export class SprintRepository {
     return updated;
   }
 
+  findBoard(sprintId: string): SprintItem[] {
+    const statusOrder = "CASE b.status WHEN 'backlog' THEN 0 WHEN 'in_progress' THEN 1 ELSE 2 END";
+    const rows = this.db
+      .query<SprintItemRow, [string]>(
+        `SELECT
+          si.id,
+          si.sprint_id,
+          si.backlog_item_id,
+          si.sprint_order,
+          si.board_order,
+          si.created_at,
+          b.id as item_id,
+          b.type as item_type,
+          b.title as item_title,
+          b.description as item_description,
+          b.parent_id as item_parent_id,
+          b.status as item_status,
+          b.priority as item_priority,
+          b.story_points as item_story_points,
+          b.estimate_days as item_estimate_days,
+          b.completed_at as item_completed_at,
+          b.created_at as item_created_at,
+          b.updated_at as item_updated_at
+        FROM sprint_items si
+        JOIN backlog_items b ON b.id = si.backlog_item_id
+        WHERE si.sprint_id = ?
+        ORDER BY ${statusOrder}, si.board_order ASC`
+      )
+      .all(sprintId);
+
+    return rows.map((row) => this.mapSprintItemRow(row));
+  }
+
+  updateBoard(
+    sprintId: string,
+    updates: {
+      backlog_item_id: string;
+      status: BacklogItem["status"];
+      board_order: number;
+      completed_at?: string | null;
+    }[]
+  ): number {
+    let updated = 0;
+    const updateBacklog = this.db.prepare(
+      `UPDATE backlog_items
+       SET status = ?, completed_at = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`
+    );
+    const updateBoardOrder = this.db.prepare(
+      `UPDATE sprint_items
+       SET board_order = ?
+       WHERE sprint_id = ? AND backlog_item_id = ?`
+    );
+
+    const apply = this.db.transaction((rows: typeof updates) => {
+      for (const item of rows) {
+        const completedAt = item.status === "done" ? item.completed_at ?? null : null;
+        updateBacklog.run(item.status, completedAt, item.backlog_item_id);
+        const result = updateBoardOrder.run(
+          item.board_order,
+          sprintId,
+          item.backlog_item_id
+        );
+        updated += result.changes;
+      }
+    });
+
+    apply(updates);
+    return updated;
+  }
+
+  closeSprint(id: string): Sprint {
+    this.db.run(
+      `UPDATE sprints
+       SET status = 'closed', closed_at = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [new Date().toISOString(), id]
+    );
+
+    const sprint = this.findById(id);
+    if (!sprint) {
+      throw new Error(`Sprint ${id} not found after close`);
+    }
+    return sprint;
+  }
+
   findItems(sprintId: string): SprintItem[] {
     const rows = this.db
       .query<SprintItemRow, [string]>(
@@ -253,7 +339,11 @@ export class SprintRepository {
       )
       .all(sprintId);
 
-    return rows.map((row) => ({
+    return rows.map((row) => this.mapSprintItemRow(row));
+  }
+
+  private mapSprintItemRow(row: SprintItemRow): SprintItem {
+    return {
       id: row.id,
       sprint_id: row.sprint_id,
       backlog_item_id: row.backlog_item_id,
@@ -274,7 +364,7 @@ export class SprintRepository {
         created_at: row.item_created_at,
         updated_at: row.item_updated_at,
       },
-    }));
+    };
   }
 
   private nextSprintOrder(sprintId: string): number {

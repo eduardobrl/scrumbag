@@ -114,6 +114,18 @@ const sprintReorderSchema = z.object({
   })).min(1),
 });
 
+const boardUpdateSchema = z.object({
+  items: z.array(z.object({
+    backlog_item_id: z.string().min(1),
+    status: z.enum(["backlog", "in_progress", "done"]),
+    board_order: z.number().int().nonnegative(),
+    completed_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  }).refine((item) => item.status !== "done" || Boolean(item.completed_at), {
+    message: "completed_at is required when status is done",
+    path: ["completed_at"],
+  })).min(1),
+});
+
 const folderPathSchema = z.object({
   folderPath: z.string().refine(
     (val) => !val.startsWith("/") && !val.startsWith("\\") && !val.includes("..")
@@ -335,7 +347,8 @@ const server = Bun.serve({
     const sprintItemsMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/items$/);
     if (sprintItemsMatch) {
       const sprintId = sprintItemsMatch[1];
-      if (!sprintRepo.findById(sprintId)) {
+      const sprint = sprintRepo.findById(sprintId);
+      if (!sprint) {
         return Response.json({ error: "Sprint not found" }, { status: 404 });
       }
 
@@ -344,6 +357,10 @@ const server = Bun.serve({
       }
 
       if (req.method === "POST") {
+        if (sprint.status === "closed") {
+          return Response.json({ error: "Closed sprint is read-only" }, { status: 400 });
+        }
+
         const body = await parseJson(req);
         if (body instanceof Response) return body;
 
@@ -369,11 +386,16 @@ const server = Bun.serve({
     const sprintItemReorderMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/items\/reorder$/);
     if (sprintItemReorderMatch) {
       const sprintId = sprintItemReorderMatch[1];
-      if (!sprintRepo.findById(sprintId)) {
+      const sprint = sprintRepo.findById(sprintId);
+      if (!sprint) {
         return Response.json({ error: "Sprint not found" }, { status: 404 });
       }
 
       if (req.method === "PUT") {
+        if (sprint.status === "closed") {
+          return Response.json({ error: "Closed sprint is read-only" }, { status: 400 });
+        }
+
         const body = await parseJson(req);
         if (body instanceof Response) return body;
 
@@ -394,11 +416,16 @@ const server = Bun.serve({
     if (sprintItemDeleteMatch) {
       const sprintId = sprintItemDeleteMatch[1];
       const itemId = sprintItemDeleteMatch[2];
-      if (!sprintRepo.findById(sprintId)) {
+      const sprint = sprintRepo.findById(sprintId);
+      if (!sprint) {
         return Response.json({ error: "Sprint not found" }, { status: 404 });
       }
 
       if (req.method === "DELETE") {
+        if (sprint.status === "closed") {
+          return Response.json({ error: "Closed sprint is read-only" }, { status: 400 });
+        }
+
         const removed = sprintRepo.removeItem(sprintId, itemId);
         if (!removed) {
           return Response.json({ error: "Sprint item not found" }, { status: 404 });
@@ -428,6 +455,51 @@ const server = Bun.serve({
 
       if (req.method === "GET") {
         return Response.json(sprintRepo.getSprintTotals(sprintId));
+      }
+    }
+
+    const sprintBoardMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/board$/);
+    if (sprintBoardMatch) {
+      const sprintId = sprintBoardMatch[1];
+      const sprint = sprintRepo.findById(sprintId);
+      if (!sprint) {
+        return Response.json({ error: "Sprint not found" }, { status: 404 });
+      }
+
+      if (req.method === "GET") {
+        return Response.json(sprintRepo.findBoard(sprintId));
+      }
+
+      if (req.method === "PUT") {
+        if (sprint.status === "closed") {
+          return Response.json({ error: "Closed sprint is read-only" }, { status: 400 });
+        }
+
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = boardUpdateSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        const updated = sprintRepo.updateBoard(sprintId, parseResult.data.items);
+        return Response.json({ updated });
+      }
+    }
+
+    const sprintCloseMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/close$/);
+    if (sprintCloseMatch) {
+      const sprintId = sprintCloseMatch[1];
+      if (!sprintRepo.findById(sprintId)) {
+        return Response.json({ error: "Sprint not found" }, { status: 404 });
+      }
+
+      if (req.method === "POST") {
+        return Response.json(sprintRepo.closeSprint(sprintId));
       }
     }
 

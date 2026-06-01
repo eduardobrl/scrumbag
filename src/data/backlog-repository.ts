@@ -151,6 +151,26 @@ export class BacklogRepository {
     return updated;
   }
 
+  updateStatus(
+    id: string,
+    status: BacklogItem["status"],
+    completedAt?: string | null
+  ): BacklogItem {
+    const completedValue = status === "done" ? completedAt ?? null : null;
+    this.db.run(
+      `UPDATE backlog_items
+       SET status = ?, completed_at = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [status, completedValue, id]
+    );
+
+    const updated = this.findById(id);
+    if (!updated) {
+      throw new Error(`Backlog item ${id} not found after status update`);
+    }
+    return updated;
+  }
+
   aggregateEstimate(rootId: string): AggregateEstimate {
     const row = this.db
       .query<AggregateEstimate, [string, string]>(
