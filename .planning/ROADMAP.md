@@ -83,7 +83,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 03-03-PLAN.md — Drag-and-Drop Planning: backlog priority reorder, sprint add/order drag-and-drop, and persisted ordering
+- [x] 03-03-PLAN.md — Drag-and-Drop Planning: backlog priority reorder, sprint add/order drag-and-drop, and persisted ordering
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -114,5 +114,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
 | 2. Squad & Capacity Engine | 3/3 | Complete    | 2026-05-31 |
-| 3. Sprint Planning, Board & Estimation | 2/4 | In Progress|  |
+| 3. Sprint Planning, Board & Estimation | 3/4 | In Progress|  |
 | 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |

@@ -11,14 +11,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **BACK-01**: User can create and manage backlog items (stories, features, bugs, epics)
 - [ ] **BACK-02**: User can organize work items in hierarchy (epics → features → stories)
-- [ ] **BACK-03**: User can prioritize backlog items via drag-and-drop
+- [x] **BACK-03**: User can prioritize backlog items via drag-and-drop
 
 ### Sprint Planning & Board
 
 - [x] **SPRT-01**: User can create sprints with start date, end date, and goal
 - [x] **SPRT-02**: User can select backlog items to include in a sprint
 - [ ] **SPRT-03**: User can view and manage sprint board with columns (To Do, In Progress, Done)
-- [ ] **SPRT-04**: User can move items between board columns via drag-and-drop
+- [x] **SPRT-04**: User can move items between board columns via drag-and-drop
 
 ### Estimation
 
@@ -93,11 +93,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | BACK-01 | Phase 1 | Pending |
 | BACK-02 | Phase 1 | Pending |
-| BACK-03 | Phase 3 | Pending |
+| BACK-03 | Phase 3 | Complete |
 | SPRT-01 | Phase 3 | Complete |
 | SPRT-02 | Phase 3 | Complete |
 | SPRT-03 | Phase 3 | Pending |
-| SPRT-04 | Phase 3 | Pending |
+| SPRT-04 | Phase 3 | Complete |
 | EST-01 | Phase 3 | Complete |
 | EST-02 | Phase 3 | Complete |
 | TEAM-01 | Phase 2 | Complete |
