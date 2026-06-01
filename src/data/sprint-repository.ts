@@ -2,9 +2,10 @@ import { Database } from "bun:sqlite";
 import type {
   BacklogItem,
   NewSprint,
-  NewSprintItem,
   Sprint,
+  SprintBacklogCandidate,
   SprintItem,
+  SprintPlanningTotals,
   UpdateSprint,
 } from "../domain/types";
 
@@ -98,32 +99,104 @@ export class SprintRepository {
     return result.changes > 0;
   }
 
-  addItem(item: NewSprintItem): SprintItem {
+  addItem(sprintId: string, backlogItemId: string): SprintItem {
+    if (!this.findById(sprintId)) {
+      throw new Error(`Sprint ${sprintId} not found`);
+    }
+
+    const backlogItem = this.db
+      .query<BacklogItem, [string]>("SELECT * FROM backlog_items WHERE id = ?")
+      .get(backlogItemId);
+
+    if (!backlogItem) {
+      throw new Error(`Backlog item ${backlogItemId} not found`);
+    }
+
+    if (backlogItem.type !== "story" && backlogItem.type !== "bug") {
+      throw new Error("Only stories and bugs can be added to a sprint");
+    }
+
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
+    const sprintOrder = this.nextSprintOrder(sprintId);
+    const boardOrder = this.nextBoardOrder(sprintId, backlogItem.status);
 
-    this.db.run(
-      `INSERT INTO sprint_items (
-        id, sprint_id, backlog_item_id, sprint_order, board_order, created_at
-       )
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        id,
-        item.sprint_id,
-        item.backlog_item_id,
-        item.sprint_order ?? 0,
-        item.board_order ?? 0,
-        now,
-      ]
-    );
+    try {
+      this.db.run(
+        `INSERT INTO sprint_items (
+          id, sprint_id, backlog_item_id, sprint_order, board_order, created_at
+         )
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [id, sprintId, backlogItemId, sprintOrder, boardOrder, now]
+      );
+    } catch (err) {
+      if (err instanceof Error && err.message.includes("UNIQUE")) {
+        throw new Error("Backlog item is already in this sprint");
+      }
+      throw err;
+    }
 
     return {
       id,
-      sprint_id: item.sprint_id,
-      backlog_item_id: item.backlog_item_id,
-      sprint_order: item.sprint_order ?? 0,
-      board_order: item.board_order ?? 0,
+      sprint_id: sprintId,
+      backlog_item_id: backlogItemId,
+      sprint_order: sprintOrder,
+      board_order: boardOrder,
       created_at: now,
+      backlog_item: backlogItem,
+    };
+  }
+
+  removeItem(sprintId: string, backlogItemId: string): boolean {
+    const result = this.db.run(
+      "DELETE FROM sprint_items WHERE sprint_id = ? AND backlog_item_id = ?",
+      [sprintId, backlogItemId]
+    );
+
+    if (result.changes > 0) {
+      const nextPriority = this.nextBacklogPriority();
+      this.db.run(
+        "UPDATE backlog_items SET priority = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [nextPriority, backlogItemId]
+      );
+    }
+
+    return result.changes > 0;
+  }
+
+  findAvailableBacklogItems(sprintId: string): SprintBacklogCandidate[] {
+    return this.db
+      .query<SprintBacklogCandidate, [string]>(
+        `SELECT b.* FROM backlog_items b
+        WHERE b.type IN ('story', 'bug')
+          AND NOT EXISTS (
+            SELECT 1 FROM sprint_items si
+            WHERE si.sprint_id = ? AND si.backlog_item_id = b.id
+          )
+        ORDER BY b.priority DESC, b.created_at DESC`
+      )
+      .all(sprintId);
+  }
+
+  getSprintTotals(sprintId: string): SprintPlanningTotals {
+    const row = this.db
+      .query<SprintPlanningTotals, [string]>(
+        `SELECT
+          COALESCE(SUM(CASE WHEN b.story_points IS NOT NULL THEN b.story_points ELSE 0 END), 0) as total_story_points,
+          COALESCE(SUM(CASE WHEN b.estimate_days IS NOT NULL THEN b.estimate_days ELSE 0 END), 0) as total_estimate_days,
+          COALESCE(SUM(CASE WHEN b.story_points IS NULL OR b.estimate_days IS NULL THEN 1 ELSE 0 END), 0) as unestimated_count,
+          COUNT(*) as total_items
+        FROM sprint_items si
+        JOIN backlog_items b ON b.id = si.backlog_item_id
+        WHERE si.sprint_id = ?`
+      )
+      .get(sprintId);
+
+    return {
+      total_story_points: Number(row?.total_story_points ?? 0),
+      total_estimate_days: Number(row?.total_estimate_days ?? 0),
+      unestimated_count: Number(row?.unestimated_count ?? 0),
+      total_items: Number(row?.total_items ?? 0),
     };
   }
 
@@ -178,5 +251,35 @@ export class SprintRepository {
         updated_at: row.item_updated_at,
       },
     }));
+  }
+
+  private nextSprintOrder(sprintId: string): number {
+    const row = this.db
+      .query<{ max_order: number | null }, [string]>(
+        "SELECT MAX(sprint_order) as max_order FROM sprint_items WHERE sprint_id = ?"
+      )
+      .get(sprintId);
+    return Number(row?.max_order ?? -1) + 1;
+  }
+
+  private nextBoardOrder(sprintId: string, status: BacklogItem["status"]): number {
+    const row = this.db
+      .query<{ max_order: number | null }, [string, string]>(
+        `SELECT MAX(si.board_order) as max_order
+        FROM sprint_items si
+        JOIN backlog_items b ON b.id = si.backlog_item_id
+        WHERE si.sprint_id = ? AND b.status = ?`
+      )
+      .get(sprintId, status);
+    return Number(row?.max_order ?? -1) + 1;
+  }
+
+  private nextBacklogPriority(): number {
+    const row = this.db
+      .query<{ max_priority: number | null }, []>(
+        "SELECT MAX(priority) as max_priority FROM backlog_items"
+      )
+      .get();
+    return Number(row?.max_priority ?? 0) + 1;
   }
 }

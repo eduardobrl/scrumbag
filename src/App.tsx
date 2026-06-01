@@ -19,6 +19,7 @@ import AbsenceList from "./components/AbsenceList";
 import CapacityView from "./components/CapacityView";
 import SprintForm from "./components/SprintForm";
 import SprintList from "./components/SprintList";
+import SprintPlanningWorkspace from "./components/SprintPlanningWorkspace";
 
 type Tab = "backlog" | "sprints" | "squad" | "absences" | "capacity" | "sync";
 
@@ -390,6 +391,10 @@ export default function App() {
               onEdit={handleEditSprint}
               onDelete={handleDeleteSprint}
             />
+
+            {selectedSprint && (
+              <SprintPlanningWorkspace sprint={selectedSprint} />
+            )}
           </>
         )}
 

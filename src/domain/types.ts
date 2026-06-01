@@ -74,6 +74,15 @@ export interface NewSprintItem {
   board_order?: number;
 }
 
+export type SprintBacklogCandidate = BacklogItem;
+
+export interface SprintPlanningTotals {
+  total_story_points: number;
+  total_estimate_days: number;
+  unestimated_count: number;
+  total_items: number;
+}
+
 export interface AggregateEstimate {
   story_points: number;
   estimate_days: number;

@@ -96,6 +96,10 @@ const estimateSchema = z.object({
   estimate_days: z.number().nonnegative().nullable().optional(),
 });
 
+const sprintItemSchema = z.object({
+  backlog_item_id: z.string().min(1),
+});
+
 const folderPathSchema = z.object({
   folderPath: z.string().refine(
     (val) => !val.startsWith("/") && !val.startsWith("\\") && !val.includes("..")
@@ -311,6 +315,81 @@ const server = Bun.serve({
           return Response.json({ error: "Not found" }, { status: 404 });
         }
         return new Response(null, { status: 204 });
+      }
+    }
+
+    const sprintItemsMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/items$/);
+    if (sprintItemsMatch) {
+      const sprintId = sprintItemsMatch[1];
+      if (!sprintRepo.findById(sprintId)) {
+        return Response.json({ error: "Sprint not found" }, { status: 404 });
+      }
+
+      if (req.method === "GET") {
+        return Response.json(sprintRepo.findItems(sprintId));
+      }
+
+      if (req.method === "POST") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = sprintItemSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        try {
+          const created = sprintRepo.addItem(sprintId, parseResult.data.backlog_item_id);
+          return Response.json(created, { status: 201 });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Failed to add sprint item";
+          const status = message.includes("not found") ? 404 : 400;
+          return Response.json({ error: message }, { status });
+        }
+      }
+    }
+
+    const sprintItemDeleteMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/items\/([^/]+)$/);
+    if (sprintItemDeleteMatch) {
+      const sprintId = sprintItemDeleteMatch[1];
+      const itemId = sprintItemDeleteMatch[2];
+      if (!sprintRepo.findById(sprintId)) {
+        return Response.json({ error: "Sprint not found" }, { status: 404 });
+      }
+
+      if (req.method === "DELETE") {
+        const removed = sprintRepo.removeItem(sprintId, itemId);
+        if (!removed) {
+          return Response.json({ error: "Sprint item not found" }, { status: 404 });
+        }
+        return new Response(null, { status: 204 });
+      }
+    }
+
+    const sprintAvailableMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/available-backlog$/);
+    if (sprintAvailableMatch) {
+      const sprintId = sprintAvailableMatch[1];
+      if (!sprintRepo.findById(sprintId)) {
+        return Response.json({ error: "Sprint not found" }, { status: 404 });
+      }
+
+      if (req.method === "GET") {
+        return Response.json(sprintRepo.findAvailableBacklogItems(sprintId));
+      }
+    }
+
+    const sprintTotalsMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/totals$/);
+    if (sprintTotalsMatch) {
+      const sprintId = sprintTotalsMatch[1];
+      if (!sprintRepo.findById(sprintId)) {
+        return Response.json({ error: "Sprint not found" }, { status: 404 });
+      }
+
+      if (req.method === "GET") {
+        return Response.json(sprintRepo.getSprintTotals(sprintId));
       }
     }
 
