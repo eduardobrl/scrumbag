@@ -12,6 +12,9 @@ Permitir o planejamento realista de sprints com capacity ajustada à realidade d
 
 ### Validated
 
+- [x] Estimar historias em story points e dias de trabalho - Validated in Phase 3: Sprint Planning, Board & Estimation
+- [x] Visualizar e gerenciar board de sprint - Validated in Phase 3: Sprint Planning, Board & Estimation
+- [x] Priorizar backlog e sprint por drag-and-drop - Validated in Phase 3: Sprint Planning, Board & Estimation
 - [x] Cadastrar e gerenciar membros da squad - Validated in Phase 2: Squad & Capacity Engine
 - [x] Registrar ausências, férias, folgas não compensadas e feriados - Validated in Phase 2: Squad & Capacity Engine
 - [x] Calcular capacity real da sprint com ajustes de disponibilidade - Validated in Phase 2: Squad & Capacity Engine
@@ -65,6 +68,8 @@ Permitir o planejamento realista de sprints com capacity ajustada à realidade d
 
 ## Evolution
 
+Phase 3 completion note: sprint board closure now preserves status, estimates, and completed_at for Phase 4 velocity and analytics.
+
 This document evolves at phase transitions and milestone boundaries.
 
 **After each phase transition** (via `/gsd-transition`):
@@ -81,4 +86,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-31 after Phase 2 completion*
+*Last updated: 2026-06-01 after Phase 3 completion*
