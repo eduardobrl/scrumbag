@@ -37,6 +37,7 @@ export default function App() {
   const [editingAbsence, setEditingAbsence] = useState<Absence | null>(null);
   const [loading, setLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [boardRefreshKey, setBoardRefreshKey] = useState(0);
 
   async function refreshItems() {
     const res = await fetch("/api/backlog?root=true");
@@ -191,6 +192,10 @@ export default function App() {
     setSprints((current) =>
       current.map((item) => (item.id === sprint.id ? sprint : item))
     );
+  }
+
+  function handleSprintScopeChanged() {
+    setBoardRefreshKey((key) => key + 1);
   }
 
   async function handleCreateMember(member: NewSquadMember) {
@@ -401,7 +406,10 @@ export default function App() {
             />
 
             {selectedSprint && selectedSprint.status !== "closed" && (
-              <SprintPlanningWorkspace sprint={selectedSprint} />
+              <SprintPlanningWorkspace
+                sprint={selectedSprint}
+                onScopeChanged={handleSprintScopeChanged}
+              />
             )}
 
             {selectedSprint && selectedSprint.status === "closed" && (
@@ -413,6 +421,7 @@ export default function App() {
             {selectedSprint && (
               <SprintBoard
                 sprint={selectedSprint}
+                refreshKey={boardRefreshKey}
                 onSprintChanged={handleSprintChanged}
               />
             )}

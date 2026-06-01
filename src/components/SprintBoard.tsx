@@ -21,6 +21,7 @@ import SprintClosePanel from "./SprintClosePanel";
 
 interface SprintBoardProps {
   sprint: Sprint;
+  refreshKey?: number;
   onSprintChanged: (sprint: Sprint) => void;
 }
 
@@ -30,7 +31,11 @@ const columns: { status: BacklogItemStatus; title: string }[] = [
   { status: "done", title: "Done" },
 ];
 
-export function SprintBoard({ sprint, onSprintChanged }: SprintBoardProps) {
+export function SprintBoard({
+  sprint,
+  refreshKey = 0,
+  onSprintChanged,
+}: SprintBoardProps) {
   const [items, setItems] = useState<SprintItem[]>([]);
   const [totals, setTotals] = useState<SprintPlanningTotals | null>(null);
   const [pendingDone, setPendingDone] = useState<{
@@ -48,7 +53,7 @@ export function SprintBoard({ sprint, onSprintChanged }: SprintBoardProps) {
 
   useEffect(() => {
     refreshBoard();
-  }, [sprint.id]);
+  }, [sprint.id, refreshKey]);
 
   async function refreshBoard() {
     const [boardRes, totalsRes] = await Promise.all([

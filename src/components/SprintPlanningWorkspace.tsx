@@ -15,9 +15,13 @@ import SprintScopePanel from "./SprintScopePanel";
 
 interface SprintPlanningWorkspaceProps {
   sprint: Sprint;
+  onScopeChanged?: () => void;
 }
 
-export function SprintPlanningWorkspace({ sprint }: SprintPlanningWorkspaceProps) {
+export function SprintPlanningWorkspace({
+  sprint,
+  onScopeChanged,
+}: SprintPlanningWorkspaceProps) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [totals, setTotals] = useState<SprintPlanningTotals | null>(null);
   const [dropError, setDropError] = useState("");
@@ -37,6 +41,7 @@ export function SprintPlanningWorkspace({ sprint }: SprintPlanningWorkspaceProps
 
   function handleChanged() {
     setRefreshKey((key) => key + 1);
+    onScopeChanged?.();
   }
 
   async function handleDragEnd(event: DragEndEvent) {
