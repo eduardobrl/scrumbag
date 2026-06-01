@@ -100,6 +100,20 @@ const sprintItemSchema = z.object({
   backlog_item_id: z.string().min(1),
 });
 
+const backlogReorderSchema = z.object({
+  items: z.array(z.object({
+    id: z.string().min(1),
+    priority: z.number().int(),
+  })).min(1),
+});
+
+const sprintReorderSchema = z.object({
+  items: z.array(z.object({
+    backlog_item_id: z.string().min(1),
+    sprint_order: z.number().int().nonnegative(),
+  })).min(1),
+});
+
 const folderPathSchema = z.object({
   folderPath: z.string().refine(
     (val) => !val.startsWith("/") && !val.startsWith("\\") && !val.includes("..")
@@ -352,6 +366,30 @@ const server = Bun.serve({
       }
     }
 
+    const sprintItemReorderMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/items\/reorder$/);
+    if (sprintItemReorderMatch) {
+      const sprintId = sprintItemReorderMatch[1];
+      if (!sprintRepo.findById(sprintId)) {
+        return Response.json({ error: "Sprint not found" }, { status: 404 });
+      }
+
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = sprintReorderSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        const updated = sprintRepo.reorderItems(sprintId, parseResult.data.items);
+        return Response.json({ updated });
+      }
+    }
+
     const sprintItemDeleteMatch = url.pathname.match(/^\/api\/sprints\/([^/]+)\/items\/([^/]+)$/);
     if (sprintItemDeleteMatch) {
       const sprintId = sprintItemDeleteMatch[1];
@@ -433,6 +471,24 @@ const server = Bun.serve({
             { status: 500 }
           );
         }
+      }
+    }
+
+    if (url.pathname === "/api/backlog/reorder") {
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = backlogReorderSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        const updated = backlogRepo.reorder(parseResult.data.items);
+        return Response.json({ updated });
       }
     }
 

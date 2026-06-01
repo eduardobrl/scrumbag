@@ -200,6 +200,30 @@ export class SprintRepository {
     };
   }
 
+  reorderItems(
+    sprintId: string,
+    items: { backlog_item_id: string; sprint_order: number }[]
+  ): number {
+    let updated = 0;
+    const update = this.db.prepare(
+      `UPDATE sprint_items
+       SET sprint_order = ?
+       WHERE sprint_id = ? AND backlog_item_id = ?`
+    );
+
+    const apply = this.db.transaction(
+      (rows: { backlog_item_id: string; sprint_order: number }[]) => {
+        for (const item of rows) {
+          const result = update.run(item.sprint_order, sprintId, item.backlog_item_id);
+          updated += result.changes;
+        }
+      }
+    );
+
+    apply(items);
+    return updated;
+  }
+
   findItems(sprintId: string): SprintItem[] {
     const rows = this.db
       .query<SprintItemRow, [string]>(

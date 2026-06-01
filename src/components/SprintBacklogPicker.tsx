@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDraggable } from "@dnd-kit/core";
 import type { BacklogItem, Sprint } from "../domain/types";
 
 interface SprintBacklogPickerProps {
@@ -66,24 +67,58 @@ export function SprintBacklogPicker({
           </p>
         ) : (
           items.map((item) => (
-            <div key={item.id} className="flex items-center justify-between gap-3 px-4 py-3">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{item.title}</p>
-                <p className="mt-1 text-xs text-gray-500">
-                  {typeLabels[item.type]} - {formatEstimate(item)}
-                </p>
-              </div>
-              <button
-                onClick={() => handleAdd(item)}
-                className="shrink-0 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
-              >
-                Adicionar
-              </button>
-            </div>
+            <AvailableBacklogItem key={item.id} item={item} onAdd={handleAdd} />
           ))
         )}
       </div>
     </section>
+  );
+}
+
+function AvailableBacklogItem({
+  item,
+  onAdd,
+}: {
+  item: BacklogItem;
+  onAdd: (item: BacklogItem) => void;
+}) {
+  const draggable = useDraggable({
+    id: `candidate-${item.id}`,
+    data: { candidate: item },
+  });
+
+  const style = draggable.transform
+    ? {
+        transform: `translate3d(${draggable.transform.x}px, ${draggable.transform.y}px, 0)`,
+      }
+    : undefined;
+
+  return (
+    <div
+      ref={draggable.setNodeRef}
+      style={style}
+      className="flex items-center justify-between gap-3 px-4 py-3"
+    >
+      <div>
+        <button
+          type="button"
+          {...draggable.listeners}
+          {...draggable.attributes}
+          className="cursor-grab text-left active:cursor-grabbing"
+        >
+          <p className="text-sm font-medium text-gray-900">{item.title}</p>
+          <p className="mt-1 text-xs text-gray-500">
+            {typeLabels[item.type]} - {formatEstimate(item)}
+          </p>
+        </button>
+      </div>
+      <button
+        onClick={() => onAdd(item)}
+        className="shrink-0 rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
+      >
+        Adicionar
+      </button>
+    </div>
   );
 }
 

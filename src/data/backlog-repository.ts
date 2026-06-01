@@ -179,6 +179,23 @@ export class BacklogRepository {
     return result.changes > 0;
   }
 
+  reorder(items: { id: string; priority: number }[]): number {
+    let updated = 0;
+    const update = this.db.prepare(
+      "UPDATE backlog_items SET priority = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+    );
+
+    const apply = this.db.transaction((rows: { id: string; priority: number }[]) => {
+      for (const item of rows) {
+        const result = update.run(item.priority, item.id);
+        updated += result.changes;
+      }
+    });
+
+    apply(items);
+    return updated;
+  }
+
   findRootItems(): BacklogItem[] {
     return this.db
       .query<BacklogItem, []>(
