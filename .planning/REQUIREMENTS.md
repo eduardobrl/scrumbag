@@ -16,7 +16,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Sprint Planning & Board
 
 - [x] **SPRT-01**: User can create sprints with start date, end date, and goal
-- [ ] **SPRT-02**: User can select backlog items to include in a sprint
+- [x] **SPRT-02**: User can select backlog items to include in a sprint
 - [ ] **SPRT-03**: User can view and manage sprint board with columns (To Do, In Progress, Done)
 - [ ] **SPRT-04**: User can move items between board columns via drag-and-drop
 
@@ -95,7 +95,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BACK-02 | Phase 1 | Pending |
 | BACK-03 | Phase 3 | Pending |
 | SPRT-01 | Phase 3 | Complete |
-| SPRT-02 | Phase 3 | Pending |
+| SPRT-02 | Phase 3 | Complete |
 | SPRT-03 | Phase 3 | Pending |
 | SPRT-04 | Phase 3 | Pending |
 | EST-01 | Phase 3 | Complete |

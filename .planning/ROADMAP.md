@@ -79,7 +79,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02-PLAN.md — Planning Workspace & Capacity: two-column backlog/sprint workspace, sprint membership, totals, and advisory capacity warnings
+- [x] 03-02-PLAN.md — Planning Workspace & Capacity: two-column backlog/sprint workspace, sprint membership, totals, and advisory capacity warnings
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -114,5 +114,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
 | 2. Squad & Capacity Engine | 3/3 | Complete    | 2026-05-31 |
-| 3. Sprint Planning, Board & Estimation | 1/4 | In Progress|  |
+| 3. Sprint Planning, Board & Estimation | 2/4 | In Progress|  |
 | 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |
