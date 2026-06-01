@@ -75,7 +75,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Sprint & Estimation Foundation: sprint schema, sprint CRUD, estimate fields, API routes, and sprint list UI
+- [x] 03-01-PLAN.md — Sprint & Estimation Foundation: sprint schema, sprint CRUD, estimate fields, API routes, and sprint list UI
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -114,5 +114,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
 | 2. Squad & Capacity Engine | 3/3 | Complete    | 2026-05-31 |
-| 3. Sprint Planning, Board & Estimation | 0/4 | Planned    |  |
+| 3. Sprint Planning, Board & Estimation | 1/4 | In Progress|  |
 | 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |

@@ -15,15 +15,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Sprint Planning & Board
 
-- [ ] **SPRT-01**: User can create sprints with start date, end date, and goal
+- [x] **SPRT-01**: User can create sprints with start date, end date, and goal
 - [ ] **SPRT-02**: User can select backlog items to include in a sprint
 - [ ] **SPRT-03**: User can view and manage sprint board with columns (To Do, In Progress, Done)
 - [ ] **SPRT-04**: User can move items between board columns via drag-and-drop
 
 ### Estimation
 
-- [ ] **EST-01**: User can estimate stories using Fibonacci story points (1, 2, 3, 5, 8, 13, 21)
-- [ ] **EST-02**: User can estimate stories in work days
+- [x] **EST-01**: User can estimate stories using Fibonacci story points (1, 2, 3, 5, 8, 13, 21)
+- [x] **EST-02**: User can estimate stories in work days
 
 ### Squad & Capacity
 
@@ -94,12 +94,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BACK-01 | Phase 1 | Pending |
 | BACK-02 | Phase 1 | Pending |
 | BACK-03 | Phase 3 | Pending |
-| SPRT-01 | Phase 3 | Pending |
+| SPRT-01 | Phase 3 | Complete |
 | SPRT-02 | Phase 3 | Pending |
 | SPRT-03 | Phase 3 | Pending |
 | SPRT-04 | Phase 3 | Pending |
-| EST-01 | Phase 3 | Pending |
-| EST-02 | Phase 3 | Pending |
+| EST-01 | Phase 3 | Complete |
+| EST-02 | Phase 3 | Complete |
 | TEAM-01 | Phase 2 | Complete |
 | TEAM-02 | Phase 2 | Complete |
 | CAP-01 | Phase 2 | Complete |
