@@ -8,7 +8,7 @@ Scrumbag is a local-first, single-executable Scrum capacity planning tool. The r
 
 - [x] **Phase 1: Foundation & Data Ingestion** - Single executable scaffold, SQLite schema, Excel sync, and initial backlog management (completed 2026-05-31)
 - [x] **Phase 2: Squad & Capacity Engine** - Squad management, absence tracking, and realistic capacity calculation (completed 2026-05-31)
-- [ ] **Phase 3: Sprint Planning, Board & Estimation** - Sprint creation, Kanban board, story estimation, and drag-and-drop workflow
+- [x] **Phase 3: Sprint Planning, Board & Estimation** - Sprint creation, Kanban board, story estimation, and drag-and-drop workflow (completed 2026-06-01)
 - [ ] **Phase 4: Forecasting, Velocity & Analytics** - Velocity tracking, burndown chart, and probabilistic epic forecasting
 
 ## Phase Details
@@ -87,7 +87,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 03-04-PLAN.md — Sprint Board & Closure: three-column board, completion date prompt, board ordering, and close sprint action
+- [x] 03-04-PLAN.md — Sprint Board & Closure: three-column board, completion date prompt, board ordering, and close sprint action
 
 ### Phase 4: Forecasting, Velocity & Analytics
 
@@ -114,5 +114,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
 | 2. Squad & Capacity Engine | 3/3 | Complete    | 2026-05-31 |
-| 3. Sprint Planning, Board & Estimation | 3/4 | In Progress|  |
+| 3. Sprint Planning, Board & Estimation | 4/4 | Complete   | 2026-06-01 |
 | 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |
