@@ -9,7 +9,7 @@ Scrumbag is a local-first, single-executable Scrum capacity planning tool. The r
 - [x] **Phase 1: Foundation & Data Ingestion** - Single executable scaffold, SQLite schema, Excel sync, and initial backlog management (completed 2026-05-31)
 - [x] **Phase 2: Squad & Capacity Engine** - Squad management, absence tracking, and realistic capacity calculation (completed 2026-05-31)
 - [x] **Phase 3: Sprint Planning, Board & Estimation** - Sprint creation, Kanban board, story estimation, and drag-and-drop workflow (completed 2026-06-01)
-- [ ] **Phase 4: Release Planning & UX Redesign** - Release-first planning, feature timeline by sprint, dedicated sprint screens, and clearer backlog creation
+- [x] **Phase 4: Release Planning & UX Redesign** - Release-first planning, feature timeline by sprint, dedicated sprint screens, and clearer backlog creation (completed 2026-06-02)
 - [ ] **Phase 5: Forecasting, Velocity & Analytics** - Velocity tracking, burndown chart, and probabilistic release/feature forecasting
 
 ## Phase Details
@@ -114,23 +114,23 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md - Release Data Foundation: release schema, release-scoped sprints, feature membership, and story/bug parent guards
+- [x] 04-01-PLAN.md - Release Data Foundation: release schema, release-scoped sprints, feature membership, and story/bug parent guards
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 04-02-PLAN.md - Release Planning Service: board summary, feature allocation spans, predicted completion, capacity warnings, and split suggestions
+- [x] 04-02-PLAN.md - Release Planning Service: board summary, feature allocation spans, predicted completion, capacity warnings, and split suggestions
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 04-03-PLAN.md - Release-First Planning UI: Releases tab, release detail screen, feature backlog panel, and sprint-column timeline
+- [x] 04-03-PLAN.md - Release-First Planning UI: Releases tab, release detail screen, feature backlog panel, and sprint-column timeline
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 04-04-PLAN.md - Dedicated Sprint Screen: sprint drill-down with Board, Planning, Capacity, and Closure tabs
+- [x] 04-04-PLAN.md - Dedicated Sprint Screen: sprint drill-down with Board, Planning, Capacity, and Closure tabs
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 04-05-PLAN.md - Feature-First Backlog: feature-centered backlog management and child story/bug creation flow
+- [x] 04-05-PLAN.md - Feature-First Backlog: feature-centered backlog management and child story/bug creation flow
 
 ### Phase 5: Forecasting, Velocity & Analytics
 
@@ -158,5 +158,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
 | 2. Squad & Capacity Engine | 3/3 | Complete    | 2026-05-31 |
 | 3. Sprint Planning, Board & Estimation | 4/4 | Complete    | 2026-06-01 |
-| 4. Release Planning & UX Redesign | 0/5 | Ready to execute | - |
+| 4. Release Planning & UX Redesign | 5/5 | Complete   | 2026-06-02 |
 | 5. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |

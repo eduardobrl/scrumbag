@@ -22,14 +22,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Release Planning & UX
 
-- [ ] **REL-01**: User must create a release before creating or planning sprints for that release
-- [ ] **REL-02**: User can assign features to a release, including adding features while the release is already in execution
-- [ ] **REL-03**: System prevents orphan stories and bugs by requiring every story or bug to belong to a feature
-- [ ] **REL-04**: User can plan a release visually by dragging features into a release board/timeline organized by sprints
-- [ ] **REL-05**: User can expand or shrink a feature across one or more sprints and see the predicted sprint where the feature completes
-- [ ] **REL-06**: System warns when planned feature scope exceeds sprint or release capacity and suggests splitting oversized features
-- [ ] **UX-01**: User can open a sprint from the sprint list into a dedicated sprint screen with tabs for board, planning, capacity, and closure instead of rendering everything in one page
-- [ ] **UX-02**: User can manage backlog through a clearer feature-first flow where features contain stories and bugs, reducing ambiguity in item creation
+- [x] **REL-01**: User must create a release before creating or planning sprints for that release
+- [x] **REL-02**: User can assign features to a release, including adding features while the release is already in execution
+- [x] **REL-03**: System prevents orphan stories and bugs by requiring every story or bug to belong to a feature
+- [x] **REL-04**: User can plan a release visually by dragging features into a release board/timeline organized by sprints
+- [x] **REL-05**: User can expand or shrink a feature across one or more sprints and see the predicted sprint where the feature completes
+- [x] **REL-06**: System warns when planned feature scope exceeds sprint or release capacity and suggests splitting oversized features
+- [x] **UX-01**: User can open a sprint from the sprint list into a dedicated sprint screen with tabs for board, planning, capacity, and closure instead of rendering everything in one page
+- [x] **UX-02**: User can manage backlog through a clearer feature-first flow where features contain stories and bugs, reducing ambiguity in item creation
 
 ### Estimation
 
@@ -109,14 +109,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SPRT-02 | Phase 3 | Complete |
 | SPRT-03 | Phase 3 | Complete |
 | SPRT-04 | Phase 3 | Complete |
-| REL-01 | Phase 4 | Pending |
-| REL-02 | Phase 4 | Pending |
-| REL-03 | Phase 4 | Pending |
-| REL-04 | Phase 4 | Pending |
-| REL-05 | Phase 4 | Pending |
-| REL-06 | Phase 4 | Pending |
-| UX-01 | Phase 4 | Pending |
-| UX-02 | Phase 4 | Pending |
+| REL-01 | Phase 4 | Complete |
+| REL-02 | Phase 4 | Complete |
+| REL-03 | Phase 4 | Complete |
+| REL-04 | Phase 4 | Complete |
+| REL-05 | Phase 4 | Complete |
+| REL-06 | Phase 4 | Complete |
+| UX-01 | Phase 4 | Complete |
+| UX-02 | Phase 4 | Complete |
 | EST-01 | Phase 3 | Complete |
 | EST-02 | Phase 3 | Complete |
 | TEAM-01 | Phase 2 | Complete |
