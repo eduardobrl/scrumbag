@@ -2,14 +2,15 @@
 
 ## Overview
 
-Scrumbag is a local-first, single-executable Scrum capacity planning tool. The roadmap delivers the app in four phases: first the foundation and data ingestion, then the core capacity engine, followed by sprint planning and board workflow, and finally forecasting and analytics. Each phase builds on the previous to deliver realistic sprint capacity planning and epic forecasting.
+Scrumbag is a local-first, single-executable Scrum capacity planning tool. The roadmap delivers the app in five phases: first the foundation and data ingestion, then the core capacity engine, followed by sprint planning and board workflow, then release-centered planning and UX redesign, and finally forecasting and analytics. Each phase builds on the previous to deliver realistic release and sprint capacity planning with delivery forecasting.
 
 ## Phases
 
 - [x] **Phase 1: Foundation & Data Ingestion** - Single executable scaffold, SQLite schema, Excel sync, and initial backlog management (completed 2026-05-31)
 - [x] **Phase 2: Squad & Capacity Engine** - Squad management, absence tracking, and realistic capacity calculation (completed 2026-05-31)
 - [x] **Phase 3: Sprint Planning, Board & Estimation** - Sprint creation, Kanban board, story estimation, and drag-and-drop workflow (completed 2026-06-01)
-- [ ] **Phase 4: Forecasting, Velocity & Analytics** - Velocity tracking, burndown chart, and probabilistic epic forecasting
+- [ ] **Phase 4: Release Planning & UX Redesign** - Release-first planning, feature timeline by sprint, dedicated sprint screens, and clearer backlog creation
+- [ ] **Phase 5: Forecasting, Velocity & Analytics** - Velocity tracking, burndown chart, and probabilistic release/feature forecasting
 
 ## Phase Details
 
@@ -89,18 +90,39 @@ Plans:
 
 - [x] 03-04-PLAN.md — Sprint Board & Closure: three-column board, completion date prompt, board ordering, and close sprint action
 
-### Phase 4: Forecasting, Velocity & Analytics
+### Phase 4: Release Planning & UX Redesign
 
-**Goal**: Users can track team velocity, view a burndown chart, and receive probabilistic forecasts for epic delivery with confidence intervals.
+**Goal**: Users plan work from a release-first view: releases contain features, features contain stories and bugs, sprints belong to releases, and the UI makes sprint boards and backlog creation unambiguous.
 **Mode:** mvp
 **Depends on**: Phase 3
+**Requirements**: REL-01, REL-02, REL-03, REL-04, REL-05, REL-06, UX-01, UX-02
+**Success Criteria** (what must be TRUE):
+
+  1. User creates a release before creating or planning its sprints
+  2. User adds features to a release, including during release execution
+  3. System prevents stories and bugs from existing without a parent feature
+  4. User sees a release planning board/timeline with features across sprint columns and predicted completion by sprint
+  5. User can expand or shrink feature allocation across sprints and receives capacity warnings when scope exceeds available capacity
+  6. System suggests splitting a feature when its scope is too large for the release
+  7. User opens a sprint into a dedicated sprint screen with tabs instead of seeing all sprint UI on the list page
+  8. User manages backlog through a clearer feature-first creation flow
+
+**Plans**: TBD
+**UI hint**: yes
+**Sketch needed**: release board/timeline with feature drag/drop, resizable feature spans, capacity alerts, and sprint drill-down tabs
+
+### Phase 5: Forecasting, Velocity & Analytics
+
+**Goal**: Users can track team velocity, view a burndown chart, and receive probabilistic forecasts for release and feature delivery with confidence intervals.
+**Mode:** mvp
+**Depends on**: Phase 4
 **Requirements**: VEL-01, BURN-01, FORE-01, FORE-02
 **Success Criteria** (what must be TRUE):
 
   1. System displays rolling average velocity based on completed story points from recent sprints
   2. System displays a burndown chart comparing ideal vs actual remaining effort
-  3. System forecasts epic delivery with confidence intervals (ranges, not single dates)
-  4. System automatically updates forecasts when epic scope changes
+  3. System forecasts release and feature delivery with confidence intervals (ranges, not single dates)
+  4. System automatically updates forecasts when release or feature scope changes
 
 **Plans**: TBD
 **UI hint**: yes
@@ -108,11 +130,12 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
 | 2. Squad & Capacity Engine | 3/3 | Complete    | 2026-05-31 |
 | 3. Sprint Planning, Board & Estimation | 4/4 | Complete    | 2026-06-01 |
-| 4. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |
+| 4. Release Planning & UX Redesign | 0/TBD | Not started | - |
+| 5. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |

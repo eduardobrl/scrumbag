@@ -20,6 +20,17 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **SPRT-03**: User can view and manage sprint board with columns (To Do, In Progress, Done)
 - [x] **SPRT-04**: User can move items between board columns via drag-and-drop
 
+### Release Planning & UX
+
+- [ ] **REL-01**: User must create a release before creating or planning sprints for that release
+- [ ] **REL-02**: User can assign features to a release, including adding features while the release is already in execution
+- [ ] **REL-03**: System prevents orphan stories and bugs by requiring every story or bug to belong to a feature
+- [ ] **REL-04**: User can plan a release visually by dragging features into a release board/timeline organized by sprints
+- [ ] **REL-05**: User can expand or shrink a feature across one or more sprints and see the predicted sprint where the feature completes
+- [ ] **REL-06**: System warns when planned feature scope exceeds sprint or release capacity and suggests splitting oversized features
+- [ ] **UX-01**: User can open a sprint from the sprint list into a dedicated sprint screen with tabs for board, planning, capacity, and closure instead of rendering everything in one page
+- [ ] **UX-02**: User can manage backlog through a clearer feature-first flow where features contain stories and bugs, reducing ambiguity in item creation
+
 ### Estimation
 
 - [x] **EST-01**: User can estimate stories using Fibonacci story points (1, 2, 3, 5, 8, 13, 21)
@@ -98,6 +109,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SPRT-02 | Phase 3 | Complete |
 | SPRT-03 | Phase 3 | Complete |
 | SPRT-04 | Phase 3 | Complete |
+| REL-01 | Phase 4 | Pending |
+| REL-02 | Phase 4 | Pending |
+| REL-03 | Phase 4 | Pending |
+| REL-04 | Phase 4 | Pending |
+| REL-05 | Phase 4 | Pending |
+| REL-06 | Phase 4 | Pending |
+| UX-01 | Phase 4 | Pending |
+| UX-02 | Phase 4 | Pending |
 | EST-01 | Phase 3 | Complete |
 | EST-02 | Phase 3 | Complete |
 | TEAM-01 | Phase 2 | Complete |
@@ -105,10 +124,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CAP-01 | Phase 2 | Complete |
 | CAP-02 | Phase 2 | Complete |
 | CAP-03 | Phase 2 | Complete |
-| VEL-01 | Phase 4 | Pending |
-| BURN-01 | Phase 4 | Pending |
-| FORE-01 | Phase 4 | Pending |
-| FORE-02 | Phase 4 | Pending |
+| VEL-01 | Phase 5 | Pending |
+| BURN-01 | Phase 5 | Pending |
+| FORE-01 | Phase 5 | Pending |
+| FORE-02 | Phase 5 | Pending |
 | SYNC-01 | Phase 1 | Pending |
 | SYNC-02 | Phase 1 | Pending |
 | MCP-01 | v2 | Deferred |
@@ -120,10 +139,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 
-- v1 requirements: 20 total
-- Mapped to phases: 20
+- v1 requirements: 28 total
+- Mapped to phases: 28
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-30*
-*Last updated: 2026-05-30 after roadmap creation*
+*Last updated: 2026-06-01 after release planning UX exploration*
