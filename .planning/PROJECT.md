@@ -15,6 +15,10 @@ Permitir o planejamento realista de sprints com capacity ajustada à realidade d
 - [x] Estimar historias em story points e dias de trabalho - Validated in Phase 3: Sprint Planning, Board & Estimation
 - [x] Visualizar e gerenciar board de sprint - Validated in Phase 3: Sprint Planning, Board & Estimation
 - [x] Priorizar backlog e sprint por drag-and-drop - Validated in Phase 3: Sprint Planning, Board & Estimation
+- [x] Planejar releases antes dos sprints, com sprints pertencendo a uma release - Validated in Phase 4: Release Planning UX Redesign
+- [x] Planejar features em uma timeline de release por sprints, com avisos de capacidade - Validated in Phase 4: Release Planning UX Redesign
+- [x] Criar historias e bugs dentro de features, evitando itens orfaos - Validated in Phase 4: Release Planning UX Redesign
+- [x] Abrir sprint em tela dedicada com abas de Board, Planning, Capacity e Closure - Validated in Phase 4: Release Planning UX Redesign
 - [x] Cadastrar e gerenciar membros da squad - Validated in Phase 2: Squad & Capacity Engine
 - [x] Registrar ausências, férias, folgas não compensadas e feriados - Validated in Phase 2: Squad & Capacity Engine
 - [x] Calcular capacity real da sprint com ajustes de disponibilidade - Validated in Phase 2: Squad & Capacity Engine
@@ -23,9 +27,6 @@ Permitir o planejamento realista de sprints com capacity ajustada à realidade d
 ### Active
 
 - [ ] Ler e sincronizar planilhas Excel de pasta no OneDrive
-- [ ] Criar e gerenciar features, histórias e backlog
-- [ ] Estimar histórias em story points e dias de trabalho
-- [ ] Visualizar board de sprint (Kanban/Scrum board)
 - [ ] Visualizar épicos com previsão de entrega
 - [ ] Sugerir histórias que cabem na capacity da sprint
 - [ ] Expor dados via servidor MCP para agentes de IA
@@ -70,6 +71,8 @@ Permitir o planejamento realista de sprints com capacity ajustada à realidade d
 
 Phase 3 completion note: sprint board closure now preserves status, estimates, and completed_at for Phase 4 velocity and analytics.
 
+Phase 4 completion note: release-first planning is now the primary workflow, with release-scoped sprints, feature timelines, capacity warnings, and feature-first child backlog rules.
+
 This document evolves at phase transitions and milestone boundaries.
 
 **After each phase transition** (via `/gsd-transition`):
@@ -86,4 +89,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-01 after Phase 3 completion*
+*Last updated: 2026-06-02 after Phase 4 completion*
