@@ -33,6 +33,14 @@ export class SprintRepository {
       .all();
   }
 
+  findByRelease(releaseId: string): Sprint[] {
+    return this.db
+      .query<Sprint, [string]>(
+        "SELECT * FROM sprints WHERE release_id = ? ORDER BY start_date ASC"
+      )
+      .all(releaseId);
+  }
+
   findById(id: string): Sprint | null {
     const row = this.db
       .query<Sprint, [string]>("SELECT * FROM sprints WHERE id = ?")
@@ -45,10 +53,11 @@ export class SprintRepository {
     const now = new Date().toISOString();
 
     this.db.run(
-      `INSERT INTO sprints (id, goal, start_date, end_date, status, closed_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO sprints (id, release_id, goal, start_date, end_date, status, closed_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
+        sprint.release_id ?? null,
         sprint.goal,
         sprint.start_date,
         sprint.end_date,
@@ -61,6 +70,7 @@ export class SprintRepository {
 
     return {
       id,
+      release_id: sprint.release_id ?? null,
       goal: sprint.goal,
       start_date: sprint.start_date,
       end_date: sprint.end_date,
@@ -116,6 +126,11 @@ export class SprintRepository {
       throw new Error("Only stories and bugs can be added to a sprint");
     }
 
+    const sprint = this.findById(sprintId);
+    if (sprint?.release_id && !this.itemBelongsToRelease(sprint.release_id, backlogItem)) {
+      throw new Error("Backlog item does not belong to this sprint release");
+    }
+
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const sprintOrder = this.nextSprintOrder(sprintId);
@@ -165,6 +180,23 @@ export class SprintRepository {
   }
 
   findAvailableBacklogItems(sprintId: string): SprintBacklogCandidate[] {
+    const sprint = this.findById(sprintId);
+    if (sprint?.release_id) {
+      return this.db
+        .query<SprintBacklogCandidate, [string, string]>(
+          `SELECT b.* FROM backlog_items b
+          JOIN release_features rf ON rf.feature_id = b.parent_id
+          WHERE rf.release_id = ?
+            AND b.type IN ('story', 'bug')
+            AND NOT EXISTS (
+              SELECT 1 FROM sprint_items si
+              WHERE si.sprint_id = ? AND si.backlog_item_id = b.id
+            )
+          ORDER BY b.priority DESC, b.created_at DESC`
+        )
+        .all(sprint.release_id, sprintId);
+    }
+
     return this.db
       .query<SprintBacklogCandidate, [string]>(
         `SELECT b.* FROM backlog_items b
@@ -395,5 +427,19 @@ export class SprintRepository {
       )
       .get();
     return Number(row?.max_priority ?? 0) + 1;
+  }
+
+  private itemBelongsToRelease(releaseId: string, item: BacklogItem): boolean {
+    if (!item.parent_id) return false;
+
+    const row = this.db
+      .query<{ count: number }, [string, string]>(
+        `SELECT COUNT(*) as count
+        FROM release_features
+        WHERE release_id = ? AND feature_id = ?`
+      )
+      .get(releaseId, item.parent_id);
+
+    return Number(row?.count ?? 0) > 0;
   }
 }

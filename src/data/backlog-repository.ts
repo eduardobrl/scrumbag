@@ -25,6 +25,8 @@ export class BacklogRepository {
   }
 
   create(item: NewBacklogItem): BacklogItem {
+    this.validateExecutableParent(item.type, item.parent_id ?? null);
+
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const storyPoints = isExecutable(item.type) ? item.story_points ?? null : null;
@@ -75,6 +77,10 @@ export class BacklogRepository {
     }
 
     const nextType = changes.type ?? existing.type;
+    const nextParentId =
+      changes.parent_id !== undefined ? changes.parent_id : existing.parent_id;
+    this.validateExecutableParent(nextType, nextParentId);
+
     const normalizedChanges = { ...changes };
     if (!isExecutable(nextType)) {
       normalizedChanges.story_points = null;
@@ -195,8 +201,15 @@ export class BacklogRepository {
   }
 
   delete(id: string): boolean {
-    const result = this.db.run("DELETE FROM backlog_items WHERE id = ?", [id]);
-    return result.changes > 0;
+    try {
+      const result = this.db.run("DELETE FROM backlog_items WHERE id = ?", [id]);
+      return result.changes > 0;
+    } catch (err) {
+      if (err instanceof Error && err.message.includes("Cannot delete a feature")) {
+        throw new Error("Cannot delete a feature with stories or bugs");
+      }
+      throw err;
+    }
   }
 
   reorder(items: { id: string; priority: number }[]): number {
@@ -244,6 +257,21 @@ export class BacklogRepository {
         SELECT * FROM descendants WHERE id != ?`
       )
       .all(rootId, rootId);
+  }
+
+  private validateExecutableParent(
+    type: BacklogItem["type"],
+    parentId: string | null | undefined
+  ): void {
+    if (!isExecutable(type)) return;
+    if (!parentId) {
+      throw new Error("Stories and bugs must belong to a feature");
+    }
+
+    const parent = this.findById(parentId);
+    if (!parent || parent.type !== "feature") {
+      throw new Error("Stories and bugs must belong to a feature");
+    }
   }
 }
 

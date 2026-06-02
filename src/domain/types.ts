@@ -34,9 +34,34 @@ export type UpdateBacklogItem = Partial<
 >;
 
 export type SprintStatus = "planned" | "active" | "closed";
+export type ReleaseStatus = "planned" | "active" | "closed";
+
+export interface Release {
+  id: string;
+  name: string;
+  description: string | null;
+  start_date: string;
+  end_date: string;
+  status: ReleaseStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NewRelease {
+  name: string;
+  description?: string;
+  start_date: string;
+  end_date: string;
+  status?: ReleaseStatus;
+}
+
+export type UpdateRelease = Partial<
+  Omit<Release, "id" | "created_at" | "updated_at">
+>;
 
 export interface Sprint {
   id: string;
+  release_id: string | null;
   goal: string;
   start_date: string;
   end_date: string;
@@ -47,6 +72,7 @@ export interface Sprint {
 }
 
 export interface NewSprint {
+  release_id?: string | null;
   goal: string;
   start_date: string;
   end_date: string;
@@ -81,6 +107,52 @@ export interface SprintPlanningTotals {
   total_estimate_days: number;
   unestimated_count: number;
   total_items: number;
+}
+
+export interface ReleaseFeature {
+  id: string;
+  release_id: string;
+  feature_id: string;
+  start_sprint_id: string | null;
+  end_sprint_id: string | null;
+  board_order: number;
+  added_at: string;
+  added_during_execution?: boolean;
+  feature?: BacklogItem;
+}
+
+export type ReleaseBoardWarning =
+  | "missing_estimates"
+  | "sprint_over_capacity"
+  | "release_over_capacity";
+
+export interface ReleaseSprintCapacity {
+  sprint_id: string;
+  available_days: number | null;
+  planned_days: number;
+  warnings: ReleaseBoardWarning[];
+}
+
+export interface ReleaseFeatureBoardItem {
+  feature: BacklogItem;
+  allocation: ReleaseFeature;
+  story_points: number;
+  estimate_days: number;
+  story_count: number;
+  bug_count: number;
+  predicted_completion_sprint_id: string | null;
+  warnings: ReleaseBoardWarning[];
+  split_suggestion: string | null;
+}
+
+export interface ReleaseBoardSummary {
+  release: Release;
+  sprints: Sprint[];
+  sprint_capacities: ReleaseSprintCapacity[];
+  features: ReleaseFeatureBoardItem[];
+  total_estimate_days: number;
+  total_available_days: number | null;
+  warnings: ReleaseBoardWarning[];
 }
 
 export interface AggregateEstimate {

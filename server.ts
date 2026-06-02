@@ -3,10 +3,12 @@ import { z } from "zod";
 import { mkdirSync, existsSync } from "node:fs";
 import { initSchema } from "./src/data/schema";
 import { BacklogRepository } from "./src/data/backlog-repository";
+import { ReleaseRepository } from "./src/data/release-repository";
 import { SprintRepository } from "./src/data/sprint-repository";
 import { SquadRepository } from "./src/data/squad-repository";
 import { AbsenceRepository } from "./src/data/absence-repository";
 import { CapacityService } from "./src/services/capacity-service";
+import { ReleasePlanningService } from "./src/services/release-planning-service";
 import { startWatcher, stopWatcher } from "./src/sync/watcher";
 import { importExcelFile } from "./src/sync/excel-importer";
 
@@ -14,10 +16,12 @@ const db = new Database("scrumbag.db");
 initSchema(db);
 
 const backlogRepo = new BacklogRepository(db);
+const releaseRepo = new ReleaseRepository(db);
 const sprintRepo = new SprintRepository(db);
 const squadRepo = new SquadRepository(db);
 const absenceRepo = new AbsenceRepository(db);
 const capacityService = new CapacityService(db);
+const releasePlanningService = new ReleasePlanningService(db);
 
 let activeSyncFolder = process.env.SYNC_FOLDER || "./synced";
 const port = Number(process.env.PORT ?? 3000);
@@ -59,7 +63,49 @@ const backlogItemSchema = z.object({
 
 const backlogUpdateSchema = backlogItemSchema.partial();
 
+const releaseBaseSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().optional(),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  status: z.enum(["planned", "active", "closed"]).optional(),
+});
+
+const releaseSchema = releaseBaseSchema.refine((data) => data.end_date >= data.start_date, {
+  message: "end_date must be >= start_date",
+  path: ["end_date"],
+});
+
+const releaseUpdateSchema = releaseBaseSchema.partial().refine(
+  (data) => {
+    if (!data.start_date || !data.end_date) return true;
+    return data.end_date >= data.start_date;
+  },
+  {
+    message: "end_date must be >= start_date",
+    path: ["end_date"],
+  }
+);
+
+const releaseFeatureSchema = z.object({
+  feature_id: z.string().min(1),
+});
+
+const releaseFeatureReorderSchema = z.object({
+  items: z.array(z.object({
+    feature_id: z.string().min(1),
+    board_order: z.number().int().nonnegative(),
+  })).min(1),
+});
+
+const releaseFeatureAllocationSchema = z.object({
+  start_sprint_id: z.string().nullable().optional(),
+  end_sprint_id: z.string().nullable().optional(),
+  board_order: z.number().int().nonnegative().optional(),
+});
+
 const sprintBaseSchema = z.object({
+  release_id: z.string().nullable().optional(),
   goal: z.string().min(1),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -291,6 +337,216 @@ const server = Bun.serve({
 
         const created = sprintRepo.create(parseResult.data);
         return Response.json(created, { status: 201 });
+      }
+    }
+
+    if (url.pathname === "/api/releases") {
+      if (req.method === "GET") {
+        return Response.json(releaseRepo.findAll());
+      }
+
+      if (req.method === "POST") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = releaseSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        return Response.json(releaseRepo.create(parseResult.data), { status: 201 });
+      }
+    }
+
+    const releaseMatch = url.pathname.match(/^\/api\/releases\/([^/]+)$/);
+    if (releaseMatch) {
+      const releaseId = releaseMatch[1];
+
+      if (req.method === "GET") {
+        const release = releaseRepo.findById(releaseId);
+        if (!release) return Response.json({ error: "Not found" }, { status: 404 });
+        return Response.json(release);
+      }
+
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = releaseUpdateSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        const existing = releaseRepo.findById(releaseId);
+        if (!existing) return Response.json({ error: "Not found" }, { status: 404 });
+        const merged = {
+          start_date: parseResult.data.start_date ?? existing.start_date,
+          end_date: parseResult.data.end_date ?? existing.end_date,
+        };
+        if (merged.end_date < merged.start_date) {
+          return Response.json({ error: "end_date must be >= start_date" }, { status: 400 });
+        }
+        return Response.json(releaseRepo.update(releaseId, parseResult.data));
+      }
+
+      if (req.method === "DELETE") {
+        const deleted = releaseRepo.delete(releaseId);
+        if (!deleted) return Response.json({ error: "Not found" }, { status: 404 });
+        return new Response(null, { status: 204 });
+      }
+    }
+
+    const releaseBoardMatch = url.pathname.match(/^\/api\/releases\/([^/]+)\/board$/);
+    if (releaseBoardMatch) {
+      const releaseId = releaseBoardMatch[1];
+      if (req.method === "GET") {
+        try {
+          return Response.json(releasePlanningService.getBoardSummary(releaseId));
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Release not found";
+          const status = message.includes("not found") ? 404 : 400;
+          return Response.json({ error: message }, { status });
+        }
+      }
+    }
+
+    const releaseSprintsMatch = url.pathname.match(/^\/api\/releases\/([^/]+)\/sprints$/);
+    if (releaseSprintsMatch) {
+      const releaseId = releaseSprintsMatch[1];
+      if (!releaseRepo.findById(releaseId)) {
+        return Response.json({ error: "Release not found" }, { status: 404 });
+      }
+
+      if (req.method === "GET") {
+        return Response.json(releaseRepo.findSprints(releaseId));
+      }
+
+      if (req.method === "POST") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+
+        const parseResult = sprintSchema.safeParse({
+          ...(body as Record<string, unknown>),
+          release_id: releaseId,
+        });
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        return Response.json(sprintRepo.create(parseResult.data), { status: 201 });
+      }
+    }
+
+    const releaseFeaturesMatch = url.pathname.match(/^\/api\/releases\/([^/]+)\/features$/);
+    if (releaseFeaturesMatch) {
+      const releaseId = releaseFeaturesMatch[1];
+      if (!releaseRepo.findById(releaseId)) {
+        return Response.json({ error: "Release not found" }, { status: 404 });
+      }
+
+      if (req.method === "GET") {
+        const available = url.searchParams.get("available") === "true";
+        return Response.json(
+          available
+            ? releaseRepo.findAvailableFeatures(releaseId)
+            : releaseRepo.findFeatures(releaseId)
+        );
+      }
+
+      if (req.method === "POST") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+        const parseResult = releaseFeatureSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+
+        try {
+          return Response.json(
+            releaseRepo.addFeature(releaseId, parseResult.data.feature_id),
+            { status: 201 }
+          );
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Failed to add feature";
+          const status = message.includes("not found") ? 404 : 400;
+          return Response.json({ error: message }, { status });
+        }
+      }
+    }
+
+    const releaseFeatureReorderMatch = url.pathname.match(
+      /^\/api\/releases\/([^/]+)\/features\/reorder$/
+    );
+    if (releaseFeatureReorderMatch) {
+      const releaseId = releaseFeatureReorderMatch[1];
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+        const parseResult = releaseFeatureReorderSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+        return Response.json({
+          updated: releaseRepo.reorderFeatures(releaseId, parseResult.data.items),
+        });
+      }
+    }
+
+    const releaseFeatureMatch = url.pathname.match(
+      /^\/api\/releases\/([^/]+)\/features\/([^/]+)$/
+    );
+    if (releaseFeatureMatch) {
+      const releaseId = releaseFeatureMatch[1];
+      const featureId = releaseFeatureMatch[2];
+
+      if (req.method === "DELETE") {
+        const removed = releaseRepo.removeFeature(releaseId, featureId);
+        if (!removed) return Response.json({ error: "Feature not found" }, { status: 404 });
+        return new Response(null, { status: 204 });
+      }
+    }
+
+    const releaseFeatureAllocationMatch = url.pathname.match(
+      /^\/api\/releases\/([^/]+)\/features\/([^/]+)\/allocation$/
+    );
+    if (releaseFeatureAllocationMatch) {
+      const releaseId = releaseFeatureAllocationMatch[1];
+      const featureId = releaseFeatureAllocationMatch[2];
+
+      if (req.method === "PUT") {
+        const body = await parseJson(req);
+        if (body instanceof Response) return body;
+        const parseResult = releaseFeatureAllocationSchema.safeParse(body);
+        if (!parseResult.success) {
+          return Response.json(
+            { error: parseResult.error.errors.map((e) => e.message).join("; ") },
+            { status: 400 }
+          );
+        }
+        try {
+          return Response.json(
+            releaseRepo.updateFeatureAllocation(releaseId, featureId, parseResult.data)
+          );
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Failed to update allocation";
+          const status = message.includes("not found") ? 404 : 400;
+          return Response.json({ error: message }, { status });
+        }
       }
     }
 
@@ -538,8 +794,12 @@ const server = Bun.serve({
           const created = backlogRepo.create(parseResult.data);
           return Response.json(created, { status: 201 });
         } catch (err) {
+          const message = err instanceof Error ? err.message : "Failed to create backlog item";
+          if (message.includes("Stories and bugs")) {
+            return Response.json({ error: message }, { status: 400 });
+          }
           return Response.json(
-            { error: "Failed to create backlog item" },
+            { error: message },
             { status: 500 }
           );
         }
@@ -634,17 +894,29 @@ const server = Bun.serve({
         try {
           const updated = backlogRepo.update(id, parseResult.data);
           return Response.json(updated);
-        } catch {
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Not found";
+          if (message.includes("Stories and bugs")) {
+            return Response.json({ error: message }, { status: 400 });
+          }
           return Response.json({ error: "Not found" }, { status: 404 });
         }
       }
 
       if (req.method === "DELETE") {
-        const deleted = backlogRepo.delete(id);
-        if (!deleted) {
-          return Response.json({ error: "Not found" }, { status: 404 });
+        try {
+          const deleted = backlogRepo.delete(id);
+          if (!deleted) {
+            return Response.json({ error: "Not found" }, { status: 404 });
+          }
+          return new Response(null, { status: 204 });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Failed to delete backlog item";
+          if (message.includes("feature with stories or bugs")) {
+            return Response.json({ error: message }, { status: 409 });
+          }
+          return Response.json({ error: message }, { status: 500 });
         }
-        return new Response(null, { status: 204 });
       }
     }
 
