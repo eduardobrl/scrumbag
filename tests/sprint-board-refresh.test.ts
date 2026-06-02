@@ -9,6 +9,7 @@ function readSource(path: string) {
 describe("sprint board refresh after scope changes", () => {
   test("wires sprint scope mutations to a board reload", () => {
     const app = readSource("src/App.tsx");
+    const sprintDetail = readSource("src/components/SprintDetailScreen.tsx");
     const planningWorkspace = readSource("src/components/SprintPlanningWorkspace.tsx");
     const sprintBoard = readSource("src/components/SprintBoard.tsx");
 
@@ -25,12 +26,16 @@ describe("sprint board refresh after scope changes", () => {
       /useEffect\(\(\) => \{\s*refreshBoard\(\);\s*\}, \[sprint\.id, refreshKey\]\);/s
     );
 
-    expect(app).toContain("const [boardRefreshKey, setBoardRefreshKey] = useState(0);");
-    expect(app).toMatch(
-      /<SprintPlanningWorkspace\s+sprint=\{selectedSprint\}\s+onScopeChanged=\{handleSprintScopeChanged\}\s+\/>/s
+    expect(app).toContain("<SprintDetailScreen");
+    expect(sprintDetail).toContain("const [refreshKey, setRefreshKey] = useState(0);");
+    expect(sprintDetail).toMatch(
+      /function handleScopeChanged\(\) \{\s*setRefreshKey\(\(key\) => key \+ 1\);\s*\}/s
     );
-    expect(app).toMatch(
-      /<SprintBoard\s+sprint=\{selectedSprint\}\s+refreshKey=\{boardRefreshKey\}\s+onSprintChanged=\{handleSprintChanged\}/s
+    expect(sprintDetail).toMatch(
+      /<SprintPlanningWorkspace\s+sprint=\{sprint\}\s+onScopeChanged=\{handleScopeChanged\}\s+\/>/s
+    );
+    expect(sprintDetail).toMatch(
+      /<SprintBoard\s+sprint=\{sprint\}\s+refreshKey=\{refreshKey\}/s
     );
   });
 });

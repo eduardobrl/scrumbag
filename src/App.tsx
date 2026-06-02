@@ -1,48 +1,63 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import type {
   Absence,
   BacklogItem,
   NewAbsence,
   NewBacklogItem,
+  NewRelease,
   NewSquadMember,
-  NewSprint,
+  Release,
   SquadMember,
   Sprint,
 } from "./domain/types";
-import BacklogForm from "./components/BacklogForm";
-import BacklogList from "./components/BacklogList";
+import FeatureFirstBacklog from "./components/FeatureFirstBacklog";
 import SyncConfig from "./components/SyncConfig";
 import SquadMemberForm from "./components/SquadMemberForm";
 import SquadMemberList from "./components/SquadMemberList";
 import AbsenceForm from "./components/AbsenceForm";
 import AbsenceList from "./components/AbsenceList";
 import CapacityView from "./components/CapacityView";
-import SprintForm from "./components/SprintForm";
 import SprintList from "./components/SprintList";
-import SprintPlanningWorkspace from "./components/SprintPlanningWorkspace";
-import SprintBoard from "./components/SprintBoard";
+import ReleaseForm from "./components/ReleaseForm";
+import ReleaseList from "./components/ReleaseList";
+import ReleaseDetailScreen from "./components/ReleaseDetailScreen";
+import SprintDetailScreen from "./components/SprintDetailScreen";
 
-type Tab = "backlog" | "sprints" | "squad" | "absences" | "capacity" | "sync";
+type Tab = "releases" | "backlog" | "sprints" | "squad" | "absences" | "capacity" | "sync";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<Tab>("backlog");
+  const [activeTab, setActiveTab] = useState<Tab>("releases");
   const [items, setItems] = useState<BacklogItem[]>([]);
   const [editingItem, setEditingItem] = useState<BacklogItem | null>(null);
+  const [releases, setReleases] = useState<Release[]>([]);
+  const [selectedRelease, setSelectedRelease] = useState<Release | null>(null);
+  const [editingRelease, setEditingRelease] = useState<Release | null>(null);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [selectedSprint, setSelectedSprint] = useState<Sprint | null>(null);
-  const [editingSprint, setEditingSprint] = useState<Sprint | null>(null);
+  const [selectedSprintRelease, setSelectedSprintRelease] = useState<Release | null>(null);
   const [squadMembers, setSquadMembers] = useState<SquadMember[]>([]);
   const [editingMember, setEditingMember] = useState<SquadMember | null>(null);
   const [absences, setAbsences] = useState<Absence[]>([]);
   const [editingAbsence, setEditingAbsence] = useState<Absence | null>(null);
   const [loading, setLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [boardRefreshKey, setBoardRefreshKey] = useState(0);
 
   async function refreshItems() {
     const res = await fetch("/api/backlog?root=true");
     const data = await res.json();
     setItems(Array.isArray(data) ? data : []);
+  }
+
+  async function refreshReleases() {
+    const res = await fetch("/api/releases");
+    const data = await res.json();
+    setReleases(Array.isArray(data) ? data : []);
+  }
+
+  async function refreshSprints() {
+    const res = await fetch("/api/sprints");
+    const data = await res.json();
+    setSprints(Array.isArray(data) ? data : []);
   }
 
   async function refreshSquadMembers() {
@@ -57,30 +72,16 @@ export default function App() {
     setAbsences(Array.isArray(data) ? data : []);
   }
 
-  async function refreshSprints() {
-    const res = await fetch("/api/sprints");
-    const data = await res.json();
-    const nextSprints = Array.isArray(data) ? data : [];
-    setSprints(nextSprints);
-
-    if (selectedSprint && !nextSprints.some((sprint) => sprint.id === selectedSprint.id)) {
-      setSelectedSprint(null);
-    }
-  }
-
   useEffect(() => {
     refreshItems();
+    refreshReleases();
   }, []);
 
   useEffect(() => {
-    if (activeTab === "squad") {
-      refreshSquadMembers();
-    }
-
-    if (activeTab === "sprints") {
-      refreshSprints();
-    }
-
+    if (activeTab === "backlog") refreshItems();
+    if (activeTab === "releases") refreshReleases();
+    if (activeTab === "sprints") refreshSprints();
+    if (activeTab === "squad") refreshSquadMembers();
     if (activeTab === "absences") {
       refreshSquadMembers();
       refreshAbsences();
@@ -95,7 +96,7 @@ export default function App() {
       body: JSON.stringify(item),
     });
     await refreshItems();
-    setRefreshKey((k) => k + 1);
+    setRefreshKey((key) => key + 1);
     setLoading(false);
   }
 
@@ -109,93 +110,50 @@ export default function App() {
     });
     setEditingItem(null);
     await refreshItems();
-    setRefreshKey((k) => k + 1);
+    setRefreshKey((key) => key + 1);
     setLoading(false);
   }
 
   async function handleDelete(id: string) {
     setLoading(true);
-    await fetch(`/api/backlog/${id}`, {
-      method: "DELETE",
-    });
-    if (editingItem?.id === id) {
-      setEditingItem(null);
-    }
+    await fetch(`/api/backlog/${id}`, { method: "DELETE" });
+    if (editingItem?.id === id) setEditingItem(null);
     await refreshItems();
-    setRefreshKey((k) => k + 1);
+    setRefreshKey((key) => key + 1);
     setLoading(false);
   }
 
-  function handleEdit(item: BacklogItem) {
-    setEditingItem(item);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function handleCancelEdit() {
-    setEditingItem(null);
-  }
-
-  async function handleCreateSprint(sprint: NewSprint) {
+  async function handleCreateRelease(release: NewRelease) {
     setLoading(true);
-    await fetch("/api/sprints", {
+    await fetch("/api/releases", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(sprint),
+      body: JSON.stringify(release),
     });
-    await refreshSprints();
+    await refreshReleases();
     setLoading(false);
   }
 
-  async function handleUpdateSprint(sprint: NewSprint) {
-    if (!editingSprint) return;
+  async function handleUpdateRelease(release: NewRelease) {
+    if (!editingRelease) return;
     setLoading(true);
-    await fetch(`/api/sprints/${editingSprint.id}`, {
+    await fetch(`/api/releases/${editingRelease.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(sprint),
+      body: JSON.stringify(release),
     });
-    setEditingSprint(null);
-    await refreshSprints();
+    setEditingRelease(null);
+    await refreshReleases();
     setLoading(false);
   }
 
-  async function handleDeleteSprint(id: string) {
+  async function handleDeleteRelease(id: string) {
     setLoading(true);
-    await fetch(`/api/sprints/${id}`, {
-      method: "DELETE",
-    });
-    if (editingSprint?.id === id) {
-      setEditingSprint(null);
-    }
-    if (selectedSprint?.id === id) {
-      setSelectedSprint(null);
-    }
-    await refreshSprints();
+    await fetch(`/api/releases/${id}`, { method: "DELETE" });
+    if (selectedRelease?.id === id) setSelectedRelease(null);
+    if (editingRelease?.id === id) setEditingRelease(null);
+    await refreshReleases();
     setLoading(false);
-  }
-
-  function handleEditSprint(sprint: Sprint) {
-    setEditingSprint(sprint);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function handleSelectSprint(sprint: Sprint) {
-    setSelectedSprint(sprint);
-  }
-
-  function handleCancelSprintEdit() {
-    setEditingSprint(null);
-  }
-
-  function handleSprintChanged(sprint: Sprint) {
-    setSelectedSprint(sprint);
-    setSprints((current) =>
-      current.map((item) => (item.id === sprint.id ? sprint : item))
-    );
-  }
-
-  function handleSprintScopeChanged() {
-    setBoardRefreshKey((key) => key + 1);
   }
 
   async function handleCreateMember(member: NewSquadMember) {
@@ -224,23 +182,10 @@ export default function App() {
 
   async function handleDeleteMember(id: string) {
     setLoading(true);
-    await fetch(`/api/squad/${id}`, {
-      method: "DELETE",
-    });
-    if (editingMember?.id === id) {
-      setEditingMember(null);
-    }
+    await fetch(`/api/squad/${id}`, { method: "DELETE" });
+    if (editingMember?.id === id) setEditingMember(null);
     await refreshSquadMembers();
     setLoading(false);
-  }
-
-  function handleEditMember(member: SquadMember) {
-    setEditingMember(member);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function handleCancelMemberEdit() {
-    setEditingMember(null);
   }
 
   async function handleCreateAbsence(absence: NewAbsence) {
@@ -269,210 +214,190 @@ export default function App() {
 
   async function handleDeleteAbsence(id: string) {
     setLoading(true);
-    await fetch(`/api/absences/${id}`, {
-      method: "DELETE",
-    });
-    if (editingAbsence?.id === id) {
-      setEditingAbsence(null);
-    }
+    await fetch(`/api/absences/${id}`, { method: "DELETE" });
+    if (editingAbsence?.id === id) setEditingAbsence(null);
     await refreshAbsences();
     setLoading(false);
   }
 
-  function handleEditAbsence(absence: Absence) {
-    setEditingAbsence(absence);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  function openSprint(sprint: Sprint, release?: Release | null) {
+    setSelectedSprint(sprint);
+    setSelectedSprintRelease(release ?? null);
   }
 
-  function handleCancelAbsenceEdit() {
-    setEditingAbsence(null);
+  function closeSprintDetail() {
+    setSelectedSprint(null);
+    setSelectedSprintRelease(null);
+  }
+
+  if (selectedSprint) {
+    return (
+      <Shell activeTab={activeTab} setActiveTab={setActiveTab}>
+        <SprintDetailScreen
+          sprint={selectedSprint}
+          release={selectedSprintRelease}
+          onBack={closeSprintDetail}
+          onSprintChanged={setSelectedSprint}
+        />
+      </Shell>
+    );
+  }
+
+  if (selectedRelease) {
+    return (
+      <Shell activeTab={activeTab} setActiveTab={setActiveTab}>
+        <ReleaseDetailScreen
+          release={selectedRelease}
+          onBack={() => {
+            setSelectedRelease(null);
+            refreshReleases();
+          }}
+          onOpenSprint={openSprint}
+          onCreateFeature={() => {
+            setSelectedRelease(null);
+            setActiveTab("backlog");
+          }}
+        />
+      </Shell>
+    );
   }
 
   return (
+    <Shell activeTab={activeTab} setActiveTab={setActiveTab}>
+      {activeTab === "releases" && (
+        <>
+          <ReleaseForm
+            onSubmit={editingRelease ? handleUpdateRelease : handleCreateRelease}
+            initialRelease={editingRelease}
+            onCancel={editingRelease ? () => setEditingRelease(null) : undefined}
+          />
+
+          {loading && <p className="mb-4 text-sm text-gray-500">Atualizando...</p>}
+
+          <ReleaseList
+            releases={releases}
+            onOpen={setSelectedRelease}
+            onEdit={(release) => setEditingRelease(release)}
+            onDelete={handleDeleteRelease}
+          />
+        </>
+      )}
+
+      {activeTab === "backlog" && (
+        <>
+          {loading && <p className="mb-4 text-sm text-gray-500">Atualizando...</p>}
+          <FeatureFirstBacklog
+            items={items}
+            editingItem={editingItem}
+            onCreate={handleCreate}
+            onUpdate={handleUpdate}
+            onEdit={(item) => setEditingItem(item)}
+            onDelete={handleDelete}
+            onCancelEdit={() => setEditingItem(null)}
+            refreshKey={refreshKey}
+          />
+        </>
+      )}
+
+      {activeTab === "sprints" && (
+        <>
+          <p className="mb-4 rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-800">
+            Sprints sao criados dentro de uma release. Use esta lista apenas para abrir sprints existentes.
+          </p>
+          <SprintList
+            sprints={sprints}
+            selectedSprintId={null}
+            onSelect={(sprint) => openSprint(sprint)}
+            onEdit={() => undefined}
+            onDelete={() => undefined}
+          />
+        </>
+      )}
+
+      {activeTab === "squad" && (
+        <>
+          <SquadMemberForm
+            onSubmit={editingMember ? handleUpdateMember : handleCreateMember}
+            initialMember={editingMember}
+            onCancel={editingMember ? () => setEditingMember(null) : undefined}
+          />
+          {loading && <p className="mb-4 text-sm text-gray-500">Atualizando...</p>}
+          <SquadMemberList
+            members={squadMembers}
+            onEdit={(member) => setEditingMember(member)}
+            onDelete={handleDeleteMember}
+          />
+        </>
+      )}
+
+      {activeTab === "absences" && (
+        <>
+          <AbsenceForm
+            members={squadMembers}
+            onSubmit={editingAbsence ? handleUpdateAbsence : handleCreateAbsence}
+            initialAbsence={editingAbsence}
+            onCancel={editingAbsence ? () => setEditingAbsence(null) : undefined}
+          />
+          {loading && <p className="mb-4 text-sm text-gray-500">Atualizando...</p>}
+          <AbsenceList
+            absences={absences}
+            members={squadMembers}
+            onEdit={(absence) => setEditingAbsence(absence)}
+            onDelete={handleDeleteAbsence}
+          />
+        </>
+      )}
+
+      {activeTab === "capacity" && <CapacityView />}
+
+      {activeTab === "sync" && <SyncConfig />}
+    </Shell>
+  );
+}
+
+function Shell({
+  activeTab,
+  setActiveTab,
+  children,
+}: {
+  activeTab: Tab;
+  setActiveTab: (tab: Tab) => void;
+  children: ReactNode;
+}) {
+  const tabs: { id: Tab; label: string }[] = [
+    { id: "releases", label: "Releases" },
+    { id: "backlog", label: "Backlog" },
+    { id: "sprints", label: "Sprints" },
+    { id: "squad", label: "Squad" },
+    { id: "absences", label: "Ausencias" },
+    { id: "capacity", label: "Capacidade" },
+    { id: "sync", label: "Sincronizacao" },
+  ];
+
+  return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="mb-6 text-2xl font-bold text-gray-900">Scrumbag</h1>
+      <div className="mx-auto max-w-7xl">
+        <h1 className="mb-6 text-2xl font-semibold text-gray-900">Scrumbag</h1>
 
         <div className="mb-6 border-b border-gray-200">
-          <nav className="-mb-px flex gap-6">
-            <button
-              onClick={() => setActiveTab("backlog")}
-              className={`pb-2 text-sm font-medium ${
-                activeTab === "backlog"
-                  ? "border-b-2 border-blue-600 text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Backlog
-            </button>
-            <button
-              onClick={() => setActiveTab("sprints")}
-              className={`pb-2 text-sm font-medium ${
-                activeTab === "sprints"
-                  ? "border-b-2 border-blue-600 text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Sprints
-            </button>
-            <button
-              onClick={() => setActiveTab("squad")}
-              className={`pb-2 text-sm font-medium ${
-                activeTab === "squad"
-                  ? "border-b-2 border-blue-600 text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Squad
-            </button>
-            <button
-              onClick={() => setActiveTab("absences")}
-              className={`pb-2 text-sm font-medium ${
-                activeTab === "absences"
-                  ? "border-b-2 border-blue-600 text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Ausências
-            </button>
-            <button
-              onClick={() => setActiveTab("capacity")}
-              className={`pb-2 text-sm font-medium ${
-                activeTab === "capacity"
-                  ? "border-b-2 border-blue-600 text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Capacidade
-            </button>
-            <button
-              onClick={() => setActiveTab("sync")}
-              className={`pb-2 text-sm font-medium ${
-                activeTab === "sync"
-                  ? "border-b-2 border-blue-600 text-blue-600"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              Sincronização
-            </button>
+          <nav className="-mb-px flex flex-wrap gap-6">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`pb-2 text-sm font-medium ${
+                  activeTab === tab.id
+                    ? "border-b-2 border-blue-600 text-blue-600"
+                    : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </nav>
         </div>
 
-        {activeTab === "backlog" && (
-          <>
-            <BacklogForm
-              onSubmit={editingItem ? handleUpdate : handleCreate}
-              initialItem={editingItem}
-              onCancel={editingItem ? handleCancelEdit : undefined}
-            />
-
-            {loading && (
-              <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
-            )}
-
-            <BacklogList
-              items={items}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              refreshKey={refreshKey}
-            />
-          </>
-        )}
-
-        {activeTab === "sprints" && (
-          <>
-            <SprintForm
-              onSubmit={editingSprint ? handleUpdateSprint : handleCreateSprint}
-              initialSprint={editingSprint}
-              onCancel={editingSprint ? handleCancelSprintEdit : undefined}
-            />
-
-            {loading && (
-              <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
-            )}
-
-            {selectedSprint && (
-              <p className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
-                Sprint selecionado: {selectedSprint.goal}
-              </p>
-            )}
-
-            <SprintList
-              sprints={sprints}
-              selectedSprintId={selectedSprint?.id ?? null}
-              onSelect={handleSelectSprint}
-              onEdit={handleEditSprint}
-              onDelete={handleDeleteSprint}
-            />
-
-            {selectedSprint && selectedSprint.status !== "closed" && (
-              <SprintPlanningWorkspace
-                sprint={selectedSprint}
-                onScopeChanged={handleSprintScopeChanged}
-              />
-            )}
-
-            {selectedSprint && selectedSprint.status === "closed" && (
-              <p className="mt-6 rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-600">
-                Sprint fechado. Planejamento em modo somente leitura.
-              </p>
-            )}
-
-            {selectedSprint && (
-              <SprintBoard
-                sprint={selectedSprint}
-                refreshKey={boardRefreshKey}
-                onSprintChanged={handleSprintChanged}
-              />
-            )}
-          </>
-        )}
-
-        {activeTab === "squad" && (
-          <>
-            <SquadMemberForm
-              onSubmit={editingMember ? handleUpdateMember : handleCreateMember}
-              initialMember={editingMember}
-              onCancel={editingMember ? handleCancelMemberEdit : undefined}
-            />
-
-            {loading && (
-              <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
-            )}
-
-            <SquadMemberList
-              members={squadMembers}
-              onEdit={handleEditMember}
-              onDelete={handleDeleteMember}
-            />
-          </>
-        )}
-
-        {activeTab === "absences" && (
-          <>
-            <AbsenceForm
-              members={squadMembers}
-              onSubmit={editingAbsence ? handleUpdateAbsence : handleCreateAbsence}
-              initialAbsence={editingAbsence}
-              onCancel={editingAbsence ? handleCancelAbsenceEdit : undefined}
-            />
-
-            {loading && (
-              <p className="mb-4 text-sm text-gray-500">Atualizando...</p>
-            )}
-
-            <AbsenceList
-              absences={absences}
-              members={squadMembers}
-              onEdit={handleEditAbsence}
-              onDelete={handleDeleteAbsence}
-            />
-          </>
-        )}
-
-        {activeTab === "capacity" && <CapacityView />}
-
-        {activeTab === "sync" && <SyncConfig />}
+        {children}
       </div>
     </div>
   );

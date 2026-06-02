@@ -83,7 +83,7 @@ export default function SprintList({
                     onClick={() => onSelect(sprint)}
                     className="mr-2 rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-100"
                   >
-                    Selecionar
+                    Abrir sprint
                   </button>
                   <button
                     onClick={() => onEdit(sprint)}

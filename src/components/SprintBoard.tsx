@@ -14,10 +14,8 @@ import type {
   BacklogItemStatus,
   Sprint,
   SprintItem,
-  SprintPlanningTotals,
 } from "../domain/types";
 import CompletionDateDialog from "./CompletionDateDialog";
-import SprintClosePanel from "./SprintClosePanel";
 
 interface SprintBoardProps {
   sprint: Sprint;
@@ -37,7 +35,6 @@ export function SprintBoard({
   onSprintChanged,
 }: SprintBoardProps) {
   const [items, setItems] = useState<SprintItem[]>([]);
-  const [totals, setTotals] = useState<SprintPlanningTotals | null>(null);
   const [pendingDone, setPendingDone] = useState<{
     itemId: string;
     targetStatus: BacklogItemStatus;
@@ -56,12 +53,8 @@ export function SprintBoard({
   }, [sprint.id, refreshKey]);
 
   async function refreshBoard() {
-    const [boardRes, totalsRes] = await Promise.all([
-      fetch(`/api/sprints/${sprint.id}/board`),
-      fetch(`/api/sprints/${sprint.id}/totals`),
-    ]);
+    const boardRes = await fetch(`/api/sprints/${sprint.id}/board`);
     setItems(boardRes.ok ? await boardRes.json() : []);
-    setTotals(totalsRes.ok ? await totalsRes.json() : null);
   }
 
   function itemsFor(status: BacklogItemStatus) {
@@ -153,16 +146,6 @@ export function SprintBoard({
 
   return (
     <section className="mt-6">
-      <SprintClosePanel
-        sprint={sprint}
-        items={items}
-        totals={totals}
-        onClosed={(updated) => {
-          onSprintChanged(updated);
-          refreshBoard();
-        }}
-      />
-
       <h2 className="mb-3 text-lg font-semibold text-gray-900">Board do sprint</h2>
       {closed && (
         <p className="mb-3 rounded-md bg-gray-100 px-3 py-2 text-xs text-gray-600">
