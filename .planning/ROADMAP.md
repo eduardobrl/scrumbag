@@ -158,5 +158,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
 | 2. Squad & Capacity Engine | 3/3 | Complete    | 2026-05-31 |
 | 3. Sprint Planning, Board & Estimation | 4/4 | Complete    | 2026-06-01 |
-| 4. Release Planning & UX Redesign | 5/5 | Complete   | 2026-06-02 |
+| 4. Release Planning & UX Redesign | 5/5 | Complete    | 2026-06-02 |
 | 5. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |
