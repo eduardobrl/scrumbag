@@ -99,6 +99,8 @@ model Sprint {
   endDate    DateTime
   status     SprintStatus  @default(PLANNED)
   stories    Story[]
+  leakageOrigins LeakageHistory[] @relation("LeakageOriginSprint")
+  leakageDestinations LeakageHistory[] @relation("LeakageDestinationSprint")
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 }
@@ -129,11 +131,28 @@ model Story {
   storyPoints        Float?
   estimatedDays      Float?
   status             StoryStatus @default(BACKLOG)
+  leakageHistory     LeakageHistory[]
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
 
   @@index([featureId])
   @@index([currentSprintId])
+}
+
+model LeakageHistory {
+  id                  String      @id @default(cuid())
+  storyId             String
+  story               Story       @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  originSprintId      String
+  originSprint        Sprint      @relation("LeakageOriginSprint", fields: [originSprintId], references: [id], onDelete: Cascade)
+  destinationSprintId String
+  destinationSprint   Sprint      @relation("LeakageDestinationSprint", fields: [destinationSprintId], references: [id], onDelete: Cascade)
+  eventDate           DateTime    @default(now())
+  statusAtEvent       StoryStatus
+
+  @@index([storyId])
+  @@index([originSprintId])
+  @@map("leakage_history")
 }
 
 model AppSettings {

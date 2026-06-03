@@ -112,6 +112,21 @@ CREATE TABLE IF NOT EXISTS "Story" (
 CREATE INDEX IF NOT EXISTS "Feature_releaseId_idx" ON "Feature" ("releaseId");
 CREATE INDEX IF NOT EXISTS "Story_featureId_idx" ON "Story" ("featureId");
 CREATE INDEX IF NOT EXISTS "Story_currentSprintId_idx" ON "Story" ("currentSprintId");
+
+CREATE TABLE IF NOT EXISTS "leakage_history" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "storyId" TEXT NOT NULL,
+  "originSprintId" TEXT NOT NULL,
+  "destinationSprintId" TEXT NOT NULL,
+  "eventDate" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "statusAtEvent" TEXT NOT NULL,
+  CONSTRAINT "leakage_history_storyId_fkey" FOREIGN KEY ("storyId") REFERENCES "Story" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "leakage_history_originSprintId_fkey" FOREIGN KEY ("originSprintId") REFERENCES "Sprint" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "leakage_history_destinationSprintId_fkey" FOREIGN KEY ("destinationSprintId") REFERENCES "Sprint" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "leakage_history_storyId_idx" ON "leakage_history" ("storyId");
+CREATE INDEX IF NOT EXISTS "leakage_history_originSprintId_idx" ON "leakage_history" ("originSprintId");
 `);
 
 db.close();
