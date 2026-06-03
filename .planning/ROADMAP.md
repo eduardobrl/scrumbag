@@ -132,6 +132,17 @@ Cross-cutting constraints:
 
 **UI hint:** yes
 
+**Execution Plans:**
+
+**Wave 1**
+
+- `04-01` - Sprint board foundation: fixed columns, HTML5 drag-and-drop status changes, and backlog story assignment with capacity preview.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- `04-02` - Capacity engine: gross/net capacity from members, absences, holidays, meeting/support percentages, 8-hour day normalization, and over-capacity warnings.
+- `04-03` - Sprint closure and leakage: close/reopen rules, unfinished story migration, auto-create next sprint, leakage history recording, and board read-only mode.
+
 ### Phase 5: Release Intelligence, Reports, MCP, And AI
 
 **Goal:** A user can understand release health through dashboard/timeline/progress/reporting, export planning data, and ask a local AI assistant for MCP-grounded analysis and controlled suggestions.
