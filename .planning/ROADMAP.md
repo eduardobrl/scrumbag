@@ -174,8 +174,8 @@ Cross-cutting constraints:
 | Phase 1 | 11 | Complete |
 | Phase 2 | 7 | Complete |
 | Phase 3 | 10 | Complete |
-| Phase 4 | 13 | Ready to plan |
-| Phase 5 | 18 | Pending |
+| Phase 4 | 13 | Complete |
+| Phase 5 | 18 | Ready to plan |
 
 **Total v1 requirements:** 60
 **Mapped requirements:** 60

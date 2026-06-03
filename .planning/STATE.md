@@ -25,7 +25,7 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-06-03)
 
 **Core value:** A squad can see whether a release plan fits the team's real sprint capacity and adjust scope before delivery risk becomes invisible.
-**Current focus:** Phase 04 — sprint-board-capacity-engine-and-leakage
+**Current focus:** Phase 5 - Release Intelligence, Reports, MCP, And AI
 
 ## Roadmap Progress
 
@@ -34,8 +34,8 @@ See: `.planning/PROJECT.md` (updated 2026-06-03)
 | 1 | Local Foundation And Squad Setup | Complete | 100% |
 | 2 | Release And Sprint Planning Core | Complete | 100% |
 | 3 | Feature, Story, And Backlog Planning | Complete | 100% |
-| 4 | Sprint Board, Capacity Engine, And Leakage | Ready to execute | 0% |
-| 5 | Release Intelligence, Reports, MCP, And AI | Pending | 0% |
+| 4 | Sprint Board, Capacity Engine, And Leakage | Complete | 100% |
+| 5 | Release Intelligence, Reports, MCP, And AI | Ready to plan | 0% |
 
 ## Active Requirement Set
 
@@ -73,7 +73,8 @@ See `.planning/REQUIREMENTS.md`.
 - Phase 3 completed on 2026-06-03 with verification passed.
 - Phase 4 was planned without CONTEXT.md by user choice on 2026-06-03.
 - Phase 4 has 3 execution plans across 2 waves.
-- Next recommended command: `/gsd-execute-phase 4`
+- Phase 4 completed on 2026-06-03 with verification passed.
+- Next recommended command: `/gsd-discuss-phase 5`
 
 ---
 *State initialized: 2026-06-02*
