@@ -1,4 +1,7 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Eye, Pencil } from "lucide-react";
+import Link from "next/link";
 
 export type ReleaseListItem = {
   id: string;
@@ -8,6 +11,8 @@ export type ReleaseListItem = {
   endDate: string;
   status: string;
   sprintCount: number;
+  meetingPercentage: number;
+  supportPercentage: number;
 };
 
 const STATUS_TONE: Record<string, "neutral" | "success" | "warning" | "danger"> = {
@@ -38,6 +43,9 @@ export function ReleaseList({ releases }: { releases: ReleaseListItem[] }) {
             <th className="px-3 py-2">Period</th>
             <th className="px-3 py-2">Status</th>
             <th className="px-3 py-2">Sprints</th>
+            <th className="px-3 py-2">Meetings</th>
+            <th className="px-3 py-2">Support</th>
+            <th className="px-3 py-2">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-line bg-white">
@@ -56,6 +64,24 @@ export function ReleaseList({ releases }: { releases: ReleaseListItem[] }) {
                 </Badge>
               </td>
               <td className="px-3 py-3">{release.sprintCount}</td>
+              <td className="px-3 py-3">{release.meetingPercentage}%</td>
+              <td className="px-3 py-3">{release.supportPercentage}%</td>
+              <td className="px-3 py-3">
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" className="h-8 w-8 p-0" asChild>
+                    <Link href={`/releases/${release.id}`}>
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                      <span className="sr-only">View</span>
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" className="h-8 w-8 p-0" asChild>
+                    <Link href={`/releases/${release.id}/edit`}>
+                      <Pencil className="h-4 w-4" aria-hidden="true" />
+                      <span className="sr-only">Edit</span>
+                    </Link>
+                  </Button>
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
