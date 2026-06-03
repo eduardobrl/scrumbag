@@ -26,13 +26,13 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Releases And Sprints
 
-- [ ] **REL-01**: User can create, edit, list, and inspect releases with name, objective, optional description, dates, sprint length, meeting percentage, support percentage, and status.
-- [ ] **REL-02**: User cannot set more than one release to in-progress status.
-- [ ] **REL-03**: User can save a release and have sprints generated automatically from start date, end date, and default sprint length in business days.
-- [ ] **REL-04**: Generated sprints are sequential, non-overlapping, and make the final sprint absorb remaining days instead of creating a very small final sprint.
-- [ ] **SPR-01**: User can list sprints for a release with period, status, capacity, planned effort, remaining capacity, occupancy, and risk.
-- [ ] **SPR-02**: User can edit sprint goal and dates.
-- [ ] **SPR-03**: System prevents overlapping sprints, warns about release gaps, and recalculates affected capacity after sprint date changes.
+- [x] **REL-01**: User can create, edit, list, and inspect releases with name, objective, optional description, dates, sprint length, meeting percentage, support percentage, and status.
+- [x] **REL-02**: User cannot set more than one release to in-progress status.
+- [x] **REL-03**: User can save a release and have sprints generated automatically from start date, end date, and default sprint length in business days.
+- [x] **REL-04**: Generated sprints are sequential, non-overlapping, and make the final sprint absorb remaining days instead of creating a very small final sprint.
+- [x] **SPR-01**: User can list sprints for a release with period, status, capacity, planned effort, remaining capacity, occupancy, and risk.
+- [x] **SPR-02**: User can edit sprint goal and dates.
+- [x] **SPR-03**: System prevents overlapping sprints, warns about release gaps, and recalculates affected capacity after sprint date changes.
 
 ### Features, Stories, And Backlog
 
@@ -151,13 +151,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SQUAD-03 | Phase 1 | Complete |
 | SQUAD-04 | Phase 1 | Complete |
 | SQUAD-05 | Phase 1 | Complete |
-| REL-01 | Phase 2 | Pending |
-| REL-02 | Phase 2 | Pending |
-| REL-03 | Phase 2 | Pending |
-| REL-04 | Phase 2 | Pending |
-| SPR-01 | Phase 2 | Pending |
-| SPR-02 | Phase 2 | Pending |
-| SPR-03 | Phase 2 | Pending |
+| REL-01 | Phase 2 | Complete |
+| REL-02 | Phase 2 | Complete |
+| REL-03 | Phase 2 | Complete |
+| REL-04 | Phase 2 | Complete |
+| SPR-01 | Phase 2 | Complete |
+| SPR-02 | Phase 2 | Complete |
+| SPR-03 | Phase 2 | Complete |
 | FEAT-01 | Phase 3 | Pending |
 | FEAT-02 | Phase 3 | Pending |
 | FEAT-03 | Phase 3 | Pending |
