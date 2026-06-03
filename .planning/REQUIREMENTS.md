@@ -75,9 +75,9 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Reports, MCP, And AI Assistant
 
-- [ ] **REP-01**: User can generate release planning, sprint capacity, stories by sprint, feature progress, leakage, planned-versus-capacity, and timeline reports.
-- [ ] **REP-02**: User can export reports to CSV.
-- [ ] **REP-03**: User can export reports to Excel.
+- [x] **REP-01**: User can generate release planning, sprint capacity, stories by sprint, feature progress, leakage, planned-versus-capacity, and timeline reports.
+- [x] **REP-02**: User can export reports to CSV.
+- [x] **REP-03**: User can export reports to Excel.
 - [ ] **MCP-01**: Local MCP server listens only on localhost by default.
 - [ ] **MCP-02**: MCP exposes read tools for releases, active release, summaries, sprints, sprint capacity, features, stories, backlog, timeline, capacity report, and leakage report.
 - [ ] **MCP-03**: MCP exposes suggestion tools for scope adjustments, story redistribution, capacity risks, late features, and release status explanation.
@@ -188,9 +188,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DASH-04 | Phase 5 | Complete |
 | PROG-01 | Phase 5 | Complete |
 | PROG-02 | Phase 5 | Complete |
-| REP-01 | Phase 5 | Pending |
-| REP-02 | Phase 5 | Pending |
-| REP-03 | Phase 5 | Pending |
+| REP-01 | Phase 5 | Complete |
+| REP-02 | Phase 5 | Complete |
+| REP-03 | Phase 5 | Complete |
 | MCP-01 | Phase 5 | Pending |
 | MCP-02 | Phase 5 | Pending |
 | MCP-03 | Phase 5 | Pending |
