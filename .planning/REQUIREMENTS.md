@@ -58,11 +58,11 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [x] **CAP-03**: System applies meeting and support percentages to calculate net capacity.
 - [x] **CAP-04**: System normalizes net capacity hours into 8-hour days.
 - [x] **CAP-05**: System compares planned story estimated days with net capacity days and allows over-capacity planning with a clear warning.
-- [ ] **SPR-04**: User can close a sprint only when closure rules are satisfied.
-- [ ] **SPR-05**: System leaves finished stories in the closed sprint and moves unfinished stories to the next sprint while preserving status.
-- [ ] **SPR-06**: System creates a next sprint automatically when the last sprint is closed with unfinished stories.
-- [ ] **SPR-07**: System records story leakage history with origin sprint, destination sprint, event date, and status at event.
-- [ ] **SPR-08**: User can reopen a closed sprint while preserving leakage history.
+- [x] **SPR-04**: User can close a sprint only when closure rules are satisfied.
+- [x] **SPR-05**: System leaves finished stories in the closed sprint and moves unfinished stories to the next sprint while preserving status.
+- [x] **SPR-06**: System creates a next sprint automatically when the last sprint is closed with unfinished stories.
+- [x] **SPR-07**: System records story leakage history with origin sprint, destination sprint, event date, and status at event.
+- [x] **SPR-08**: User can reopen a closed sprint while preserving leakage history.
 
 ### Dashboard, Timeline, And Progress
 
@@ -177,11 +177,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CAP-03 | Phase 4 | Complete |
 | CAP-04 | Phase 4 | Complete |
 | CAP-05 | Phase 4 | Complete |
-| SPR-04 | Phase 4 | Pending |
-| SPR-05 | Phase 4 | Pending |
-| SPR-06 | Phase 4 | Pending |
-| SPR-07 | Phase 4 | Pending |
-| SPR-08 | Phase 4 | Pending |
+| SPR-04 | Phase 4 | Complete |
+| SPR-05 | Phase 4 | Complete |
+| SPR-06 | Phase 4 | Complete |
+| SPR-07 | Phase 4 | Complete |
+| SPR-08 | Phase 4 | Complete |
 | DASH-01 | Phase 5 | Pending |
 | DASH-02 | Phase 5 | Pending |
 | DASH-03 | Phase 5 | Pending |
