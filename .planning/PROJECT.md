@@ -22,6 +22,10 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 - [x] User can create features, split them into estimated stories, and plan stories into sprints with planned-effort impact preview. Validated in Phase 3: Feature, Story, And Backlog Planning.
 - [x] Phase 4 delivered the sprint board, story status movement, real capacity engine, capacity alerts, sprint close/reopen, and leakage history.
 - [x] User can operate a sprint board, compare planned effort against real net capacity, and preserve leakage history when closing or reopening sprints. Validated in Phase 4: Sprint Board, Capacity Engine, And Leakage.
+- [x] Phase 5 delivered dashboard cards, consolidated alerts, sprint progress, release timeline, report generation, CSV/Excel export, local MCP tools, and the assistant chat.
+- [x] User can view dashboard, timeline, progress, and capacity alerts for the active release. Validated in Phase 5: Release Intelligence, Reports, MCP, And AI.
+- [x] User can export release planning and tracking reports to CSV or Excel. Validated in Phase 5: Release Intelligence, Reports, MCP, And AI.
+- [x] AI agents can query local planning data through MCP and provide suggestions safely. Validated in Phase 5: Release Intelligence, Reports, MCP, And AI.
 
 ### Active
 
@@ -29,9 +33,6 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 - [x] User can configure squad members, work schedules, absences, and holidays. Validated in Phase 1: Local Foundation And Squad Setup.
 - [x] User can operate a sprint board and move stories through fixed workflow states. Validated in Phase 4: Sprint Board, Capacity Engine, And Leakage.
 - [x] User can close and reopen sprints while preserving leakage history. Validated in Phase 4: Sprint Board, Capacity Engine, And Leakage.
-- [ ] User can view dashboard, timeline, progress, and capacity alerts for the active release.
-- [ ] User can export release planning and tracking reports to CSV or Excel.
-- [ ] AI agents can query local planning data through MCP and provide suggestions safely.
 
 ### Out of Scope
 
@@ -53,7 +54,7 @@ The source context is captured in `spec.md` and `telas.md`. The product is meant
 
 The suggested stack is Next.js, TypeScript, SQLite, Prisma, Tailwind CSS, dnd-kit for drag-and-drop, Recharts or a similar chart/timeline library, XLSX/CSV export, and a local Node.js MCP server. The UI should feel like a modern management tool: quiet, information-dense, desktop-first, with side navigation, global release context, tables, badges, progress bars, alerts, and horizontal timelines.
 
-The first version should remain simple to run: `npm install` and `npm run dev`, or a local helper script. Offline operation is required for core planning features; AI quality can depend on whichever local agent/tool the user connects, but the MCP data surface itself must work locally.
+The first version now includes the local operational flow from setup through dashboard intelligence, reports, exports, MCP tools, and assistant chat. It should remain simple to run: `npm install` and `npm run dev`, with `npm run mcp:start` available for the local MCP server. Offline operation is required for core planning features; AI quality can depend on whichever local agent/tool the user connects, but the MCP data surface itself works locally.
 
 Expected scale is one squad, one active release, up to 20 sprints per release, up to 100 features, up to 1000 stories, and up to 30 members.
 
@@ -85,6 +86,8 @@ Expected scale is one squad, one active release, up to 20 sprints per release, u
 | Keep capacity placeholders pending in Phase 3 | Planned effort can use assigned story estimates now, while gross/net capacity remains Phase 4 scope. | - Accepted in Phase 3 |
 | Calculate capacity on demand from local planning data | Derived sprint capacity should stay consistent with squad, calendar, release, and story edits without a separate summary table. | - Accepted in Phase 4 |
 | Keep leakage history append-only | Closing and reopening sprints must preserve historical truth for Phase 5 reports and dashboards. | - Accepted in Phase 4 |
+| Share dashboard/report/MCP query logic | Release intelligence must stay consistent across UI, exports, and AI/tool surfaces. | - Accepted in Phase 5 |
+| Gate dangerous MCP and assistant actions with confirmation | Sensitive planning changes must remain explicit user actions. | - Accepted in Phase 5 |
 
 ## Evolution
 
@@ -104,4 +107,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-03 after Phase 4 completion*
+*Last updated: 2026-06-03 after Phase 5 completion*

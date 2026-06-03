@@ -14,7 +14,7 @@ This roadmap favors broad vertical phases. Each phase should leave the product m
 | 2 | 3/3 | Complete    | 2026-06-03 |
 | 3 | Feature, Story, And Backlog Planning | Let users model release scope as features and stories, aggregate estimates, and plan stories from backlog into sprints. | FEAT-01 to FEAT-06, BACK-01 to BACK-04 |
 | 4 | 3/3 | Complete    | 2026-06-03 |
-| 5 | 3/3 | Complete   | 2026-06-03 |
+| 5 | 3/3 | Complete    | 2026-06-03 |
 
 ## Phases
 
