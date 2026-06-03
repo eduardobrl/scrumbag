@@ -1,14 +1,22 @@
 import { prisma } from "@/lib/db";
 import { ReleaseStatus } from "@prisma/client";
 import { SprintList } from "@/features/sprints/sprint-list";
+import { ReleaseSelector } from "@/features/sprints/release-selector";
 
-export default async function SprintsPage() {
+export default async function SprintsPage({
+  searchParams
+}: {
+  searchParams?: Promise<{ releaseId?: string }>;
+}) {
   const releases = await prisma.release.findMany({
     orderBy: [{ status: "asc" }, { startDate: "desc" }]
   });
 
-  const activeRelease = releases.find((r) => r.status === ReleaseStatus.IN_PROGRESS);
-  const selectedRelease = activeRelease ?? releases[0];
+  const sp = searchParams ? await searchParams : {};
+  const selectedRelease =
+    sp.releaseId
+      ? releases.find((r) => r.id === sp.releaseId)
+      : (releases.find((r) => r.status === ReleaseStatus.IN_PROGRESS) ?? releases[0]);
 
   const sprints = selectedRelease
     ? await prisma.sprint.findMany({
@@ -21,6 +29,10 @@ export default async function SprintsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-normal text-ink">Sprints</h1>
+        <ReleaseSelector
+          releases={releases.map((r) => ({ id: r.id, name: r.name }))}
+          selectedId={selectedRelease?.id ?? ""}
+        />
       </div>
 
       {!selectedRelease ? (

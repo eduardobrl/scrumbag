@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Pencil } from "lucide-react";
 import Link from "next/link";
 import type { SprintPlanningSummary } from "@/lib/sprint-planning-summary";
+import type { ScheduleWarning } from "@/lib/sprints";
 
 export type SprintDetailView = {
   id: string;
@@ -32,10 +33,12 @@ const STATUS_LABEL: Record<string, string> = {
 
 export function SprintDetail({
   sprint,
-  summary
+  summary,
+  warnings = []
 }: {
   sprint: SprintDetailView;
   summary: SprintPlanningSummary;
+  warnings?: ScheduleWarning[];
 }) {
   return (
     <div className="space-y-6">
@@ -79,6 +82,17 @@ export function SprintDetail({
           {sprint.goal || "No goal set"}
         </p>
       </div>
+
+      {warnings.length > 0 && (
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <p className="font-medium">Schedule warnings:</p>
+          <ul className="mt-1 list-disc pl-4">
+            {warnings.map((w, i) => (
+              <li key={i}>{w.message}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="space-y-1">

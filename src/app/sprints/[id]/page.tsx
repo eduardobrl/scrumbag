@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getSprintDetails } from "@/lib/sprints";
+import { getSprintDetails, detectSprintScheduleWarnings } from "@/lib/sprints";
 import { getSprintPlanningSummary } from "@/lib/sprint-planning-summary";
 import { SprintDetail } from "@/features/sprints/sprint-detail";
 
@@ -12,6 +12,12 @@ export default async function SprintPage({ params }: { params: Promise<{ id: str
   }
 
   const summary = getSprintPlanningSummary(id);
+
+  const warnings = await detectSprintScheduleWarnings(sprint.releaseId, {
+    id: sprint.id,
+    startDate: sprint.startDate,
+    endDate: sprint.endDate
+  });
 
   return (
     <SprintDetail
@@ -26,6 +32,7 @@ export default async function SprintPage({ params }: { params: Promise<{ id: str
         releaseId: sprint.releaseId
       }}
       summary={summary}
+      warnings={warnings}
     />
   );
 }
