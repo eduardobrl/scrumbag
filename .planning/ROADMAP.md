@@ -143,6 +143,13 @@ Cross-cutting constraints:
 - `04-02` - Capacity engine: gross/net capacity from members, absences, holidays, meeting/support percentages, 8-hour day normalization, and over-capacity warnings.
 - `04-03` - Sprint closure and leakage: close/reopen rules, unfinished story migration, auto-create next sprint, leakage history recording, and board read-only mode.
 
+Cross-cutting constraints:
+
+- Sprint status (PLANNED / IN_PROGRESS / CLOSED) gates board editing, capacity display, and close/reopen actions across all plans.
+- Story status transitions (SPRINT_BACKLOG ↔ IN_PROGRESS ↔ DONE) must be consistent between board drag-and-drop (04-01) and closure migration (04-03).
+- Capacity metrics calculated in 04-02 must feed the add-story preview in 04-01 and leakage-aware summaries in 04-03.
+- LeakageHistory is append-only; no plan should create update or delete paths for leakage records.
+
 ### Phase 5: Release Intelligence, Reports, MCP, And AI
 
 **Goal:** A user can understand release health through dashboard/timeline/progress/reporting, export planning data, and ask a local AI assistant for MCP-grounded analysis and controlled suggestions.
