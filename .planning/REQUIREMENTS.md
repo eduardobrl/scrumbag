@@ -78,15 +78,15 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [x] **REP-01**: User can generate release planning, sprint capacity, stories by sprint, feature progress, leakage, planned-versus-capacity, and timeline reports.
 - [x] **REP-02**: User can export reports to CSV.
 - [x] **REP-03**: User can export reports to Excel.
-- [ ] **MCP-01**: Local MCP server listens only on localhost by default.
-- [ ] **MCP-02**: MCP exposes read tools for releases, active release, summaries, sprints, sprint capacity, features, stories, backlog, timeline, capacity report, and leakage report.
-- [ ] **MCP-03**: MCP exposes suggestion tools for scope adjustments, story redistribution, capacity risks, late features, and release status explanation.
-- [ ] **MCP-04**: MCP exposes explicit write tools for feature/story creation and updates, story movement, and story status changes.
-- [ ] **MCP-05**: Critical MCP operations such as closing sprints, reopening sprints, and canceling stories or features require confirmation or dangerous-operation marking.
-- [ ] **AI-01**: User can open a local AI assistant chat from the app.
-- [ ] **AI-02**: User can ask quick prompts about release fit, risky sprints, risky features, leaked stories, redistribution, management summaries, and stories without estimates.
-- [ ] **AI-03**: Assistant responses are grounded in app data through MCP.
-- [ ] **AI-04**: Assistant can suggest changes but does not apply sensitive changes without explicit user confirmation.
+- [x] **MCP-01**: Local MCP server listens only on localhost by default.
+- [x] **MCP-02**: MCP exposes read tools for releases, active release, summaries, sprints, sprint capacity, features, stories, backlog, timeline, capacity report, and leakage report.
+- [x] **MCP-03**: MCP exposes suggestion tools for scope adjustments, story redistribution, capacity risks, late features, and release status explanation.
+- [x] **MCP-04**: MCP exposes explicit write tools for feature/story creation and updates, story movement, and story status changes.
+- [x] **MCP-05**: Critical MCP operations such as closing sprints, reopening sprints, and canceling stories or features require confirmation or dangerous-operation marking.
+- [x] **AI-01**: User can open a local AI assistant chat from the app.
+- [x] **AI-02**: User can ask quick prompts about release fit, risky sprints, risky features, leaked stories, redistribution, management summaries, and stories without estimates.
+- [x] **AI-03**: Assistant responses are grounded in app data through MCP.
+- [x] **AI-04**: Assistant can suggest changes but does not apply sensitive changes without explicit user confirmation.
 
 ## v2 Requirements
 
@@ -191,15 +191,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REP-01 | Phase 5 | Complete |
 | REP-02 | Phase 5 | Complete |
 | REP-03 | Phase 5 | Complete |
-| MCP-01 | Phase 5 | Pending |
-| MCP-02 | Phase 5 | Pending |
-| MCP-03 | Phase 5 | Pending |
-| MCP-04 | Phase 5 | Pending |
-| MCP-05 | Phase 5 | Pending |
-| AI-01 | Phase 5 | Pending |
-| AI-02 | Phase 5 | Pending |
-| AI-03 | Phase 5 | Pending |
-| AI-04 | Phase 5 | Pending |
+| MCP-01 | Phase 5 | Complete |
+| MCP-02 | Phase 5 | Complete |
+| MCP-03 | Phase 5 | Complete |
+| MCP-04 | Phase 5 | Complete |
+| MCP-05 | Phase 5 | Complete |
+| AI-01 | Phase 5 | Complete |
+| AI-02 | Phase 5 | Complete |
+| AI-03 | Phase 5 | Complete |
+| AI-04 | Phase 5 | Complete |
 
 **Coverage:**
 
