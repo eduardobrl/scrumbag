@@ -94,10 +94,14 @@ export function SprintDetail({
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
         <Card className="space-y-1">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Capacity</p>
-          <p className="text-lg font-semibold text-slate-800">—</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Gross capacity</p>
+          <p className="text-lg font-semibold text-slate-800">{summary.grossCapacityDays.toFixed(1)}d</p>
+        </Card>
+        <Card className="space-y-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Net capacity</p>
+          <p className="text-lg font-semibold text-slate-800">{summary.netCapacityDays.toFixed(1)}d</p>
         </Card>
         <Card className="space-y-1">
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Planned effort</p>
@@ -105,18 +109,33 @@ export function SprintDetail({
         </Card>
         <Card className="space-y-1">
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Remaining</p>
-          <p className="text-lg font-semibold text-slate-800">—</p>
+          <p
+            className={`text-lg font-semibold ${
+              summary.remainingCapacityDays !== null && summary.remainingCapacityDays < 0
+                ? "text-red-700"
+                : "text-slate-800"
+            }`}
+          >
+            {summary.remainingCapacityDays?.toFixed(1) ?? "-"}d
+          </p>
         </Card>
         <Card className="space-y-1">
           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Occupancy</p>
-          <p className="text-lg font-semibold text-slate-800">—</p>
+          <p className="text-lg font-semibold text-slate-800">
+            {summary.occupancyPercentage !== null ? `${summary.occupancyPercentage.toFixed(0)}%` : "-"}
+          </p>
+        </Card>
+        <Card className="space-y-1">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Risk</p>
+          <Badge tone={riskTone(summary.riskLabel)}>{summary.riskLabel}</Badge>
         </Card>
       </div>
 
-      <Card className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Risk</p>
-        <Badge tone="neutral">{summary.riskLabel}</Badge>
-      </Card>
+      {summary.capacityDays !== null && summary.plannedEffortDays > summary.capacityDays && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-800">
+          Capacidade estourada em {(summary.plannedEffortDays - summary.capacityDays).toFixed(1)} dias
+        </div>
+      )}
 
       <div className="flex items-center gap-3">
         <Button variant="secondary" asChild>
@@ -125,4 +144,11 @@ export function SprintDetail({
       </div>
     </div>
   );
+}
+
+function riskTone(riskLabel: string): "neutral" | "success" | "warning" | "danger" {
+  if (riskLabel.startsWith("Over capacity")) return "danger";
+  if (riskLabel === "High risk" || riskLabel === "Medium risk") return "warning";
+  if (riskLabel === "On track") return "success";
+  return "neutral";
 }

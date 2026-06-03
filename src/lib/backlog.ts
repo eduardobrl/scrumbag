@@ -77,8 +77,12 @@ export async function previewStorySprintPlan(storyId: string, sprintId: string) 
         story.currentSprintId === sprintId
           ? summary.plannedEffortDays
           : summary.plannedEffortDays + storyEstimatedDays,
-      capacityDays: null as number | null,
-      riskLabel: "Pending capacity"
+      capacityDays: summary.capacityDays,
+      riskLabel:
+        summary.capacityDays !== null &&
+        summary.plannedEffortDays + storyEstimatedDays > summary.capacityDays
+          ? `Over capacity by ${(summary.plannedEffortDays + storyEstimatedDays - summary.capacityDays).toFixed(1)} days`
+          : summary.riskLabel
     }
   };
 }

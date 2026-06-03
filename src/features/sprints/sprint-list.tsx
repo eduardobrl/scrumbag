@@ -8,6 +8,10 @@ export type SprintListItem = {
   endDate: Date;
   status: string;
   plannedEffortDays: number;
+  capacityDays: number | null;
+  remainingCapacityDays: number | null;
+  occupancyPercentage: number | null;
+  riskLabel: string;
 };
 
 const STATUS_TONE: Record<string, "neutral" | "success" | "warning" | "danger"> = {
@@ -73,12 +77,22 @@ export function SprintList({ sprints }: { sprints: SprintListItem[] }) {
               <td className="px-3 py-3 text-slate-600">
                 {sprint.goal || "—"}
               </td>
-              <td className="px-3 py-3 text-slate-600">—</td>
+              <td className="px-3 py-3 text-slate-600">{sprint.capacityDays?.toFixed(1) ?? "-"}d</td>
               <td className="px-3 py-3 text-slate-600">{sprint.plannedEffortDays}d</td>
-              <td className="px-3 py-3 text-slate-600">—</td>
-              <td className="px-3 py-3 text-slate-600">—</td>
+              <td
+                className={`px-3 py-3 ${
+                  sprint.remainingCapacityDays !== null && sprint.remainingCapacityDays < 0
+                    ? "text-red-700"
+                    : "text-slate-600"
+                }`}
+              >
+                {sprint.remainingCapacityDays?.toFixed(1) ?? "-"}d
+              </td>
+              <td className="px-3 py-3 text-slate-600">
+                {sprint.occupancyPercentage !== null ? `${sprint.occupancyPercentage.toFixed(0)}%` : "-"}
+              </td>
               <td className="px-3 py-3">
-                <Badge tone="neutral">Pending capacity</Badge>
+                <Badge tone={riskTone(sprint.riskLabel)}>{sprint.riskLabel}</Badge>
               </td>
             </tr>
           ))}
@@ -86,4 +100,11 @@ export function SprintList({ sprints }: { sprints: SprintListItem[] }) {
       </table>
     </div>
   );
+}
+
+function riskTone(riskLabel: string): "neutral" | "success" | "warning" | "danger" {
+  if (riskLabel.startsWith("Over capacity")) return "danger";
+  if (riskLabel === "High risk" || riskLabel === "Medium risk") return "warning";
+  if (riskLabel === "On track") return "success";
+  return "neutral";
 }

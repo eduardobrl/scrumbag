@@ -26,10 +26,17 @@ export default async function SprintsPage({
       })
     : [];
   const sprints = await Promise.all(
-    sprintsRaw.map(async (sprint) => ({
-      ...sprint,
-      plannedEffortDays: (await getSprintPlanningSummary(sprint.id)).plannedEffortDays
-    }))
+    sprintsRaw.map(async (sprint) => {
+      const summary = await getSprintPlanningSummary(sprint.id);
+      return {
+        ...sprint,
+        plannedEffortDays: summary.plannedEffortDays,
+        capacityDays: summary.capacityDays,
+        remainingCapacityDays: summary.remainingCapacityDays,
+        occupancyPercentage: summary.occupancyPercentage,
+        riskLabel: summary.riskLabel
+      };
+    })
   );
 
   return (
