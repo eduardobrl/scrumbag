@@ -6,13 +6,23 @@ export type SprintPlanningSummary = {
   riskLabel: string;
 };
 
+import { prisma } from "@/lib/db";
+import { StoryStatus } from "@prisma/client";
+
 /**
- * Returns Phase 2 placeholder summary for a sprint.
- * Real capacity and effort calculations will be wired in Phase 4.
+ * Returns current planned effort for a sprint. Capacity remains a Phase 4 hook.
  */
-export function getSprintPlanningSummary(_sprintId: string): SprintPlanningSummary {
+export async function getSprintPlanningSummary(sprintId: string): Promise<SprintPlanningSummary> {
+  const stories = await prisma.story.findMany({
+    where: {
+      currentSprintId: sprintId,
+      status: { not: StoryStatus.CANCELLED }
+    },
+    select: { estimatedDays: true }
+  });
+
   return {
-    plannedEffortDays: 0,
+    plannedEffortDays: stories.reduce((sum, story) => sum + (story.estimatedDays ?? 0), 0),
     capacityDays: null,
     remainingCapacityDays: null,
     occupancyPercentage: null,
@@ -21,11 +31,9 @@ export function getSprintPlanningSummary(_sprintId: string): SprintPlanningSumma
 }
 
 /**
- * Recalculates sprint planning summary after date/goal edits.
- * Currently returns the same placeholder summary.
- * This is the explicit Phase 4 integration hook.
+ * Recalculates sprint planning summary after date/goal/story edits.
+ * Capacity is still the explicit Phase 4 integration hook.
  */
-export function recalculateSprintPlanningSummary(_sprintId: string): SprintPlanningSummary {
-  // Phase 4: wire real capacity and planned effort here
-  return getSprintPlanningSummary(_sprintId);
+export async function recalculateSprintPlanningSummary(sprintId: string): Promise<SprintPlanningSummary> {
+  return getSprintPlanningSummary(sprintId);
 }

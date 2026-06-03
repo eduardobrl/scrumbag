@@ -11,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Sprint not found" }, { status: 404 });
   }
 
-  const summary = getSprintPlanningSummary(id);
+  const summary = await getSprintPlanningSummary(id);
 
   return NextResponse.json({
     sprint: {
@@ -37,9 +37,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   // Trigger recalculation hook for affected sprint planning summary
-  recalculateSprintPlanningSummary(id);
+  await recalculateSprintPlanningSummary(id);
 
-  const summary = getSprintPlanningSummary(id);
+  const summary = await getSprintPlanningSummary(id);
 
   return NextResponse.json({
     sprint: {

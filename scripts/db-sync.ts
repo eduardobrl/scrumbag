@@ -81,6 +81,37 @@ CREATE TABLE IF NOT EXISTS "Sprint" (
 );
 
 CREATE INDEX IF NOT EXISTS "Sprint_releaseId_idx" ON "Sprint" ("releaseId");
+
+CREATE TABLE IF NOT EXISTS "Feature" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "releaseId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "description" TEXT,
+  "lifecycleStatus" TEXT NOT NULL DEFAULT 'ACTIVE',
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL,
+  CONSTRAINT "Feature_releaseId_fkey" FOREIGN KEY ("releaseId") REFERENCES "Release" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "Story" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "featureId" TEXT NOT NULL,
+  "currentSprintId" TEXT,
+  "title" TEXT NOT NULL,
+  "description" TEXT,
+  "acceptanceCriteria" TEXT,
+  "storyPoints" REAL,
+  "estimatedDays" REAL,
+  "status" TEXT NOT NULL DEFAULT 'BACKLOG',
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL,
+  CONSTRAINT "Story_featureId_fkey" FOREIGN KEY ("featureId") REFERENCES "Feature" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "Story_currentSprintId_fkey" FOREIGN KEY ("currentSprintId") REFERENCES "Sprint" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "Feature_releaseId_idx" ON "Feature" ("releaseId");
+CREATE INDEX IF NOT EXISTS "Story_featureId_idx" ON "Story" ("featureId");
+CREATE INDEX IF NOT EXISTS "Story_currentSprintId_idx" ON "Story" ("currentSprintId");
 `);
 
 db.close();

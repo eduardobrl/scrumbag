@@ -11,7 +11,7 @@ export default async function SprintPage({ params }: { params: Promise<{ id: str
     notFound();
   }
 
-  const summary = getSprintPlanningSummary(id);
+  const summary = await getSprintPlanningSummary(id);
 
   const warnings = await detectSprintScheduleWarnings(sprint.releaseId, {
     id: sprint.id,

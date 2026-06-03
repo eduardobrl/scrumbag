@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { ReleaseStatus } from "@prisma/client";
 import { SprintList } from "@/features/sprints/sprint-list";
 import { ReleaseSelector } from "@/features/sprints/release-selector";
+import { getSprintPlanningSummary } from "@/lib/sprint-planning-summary";
 
 export default async function SprintsPage({
   searchParams
@@ -18,12 +19,18 @@ export default async function SprintsPage({
       ? releases.find((r) => r.id === sp.releaseId)
       : (releases.find((r) => r.status === ReleaseStatus.IN_PROGRESS) ?? releases[0]);
 
-  const sprints = selectedRelease
+  const sprintsRaw = selectedRelease
     ? await prisma.sprint.findMany({
         where: { releaseId: selectedRelease.id },
         orderBy: { startDate: "asc" }
       })
     : [];
+  const sprints = await Promise.all(
+    sprintsRaw.map(async (sprint) => ({
+      ...sprint,
+      plannedEffortDays: (await getSprintPlanningSummary(sprint.id)).plannedEffortDays
+    }))
+  );
 
   return (
     <div className="space-y-6">

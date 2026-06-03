@@ -7,6 +7,7 @@ export type SprintListItem = {
   startDate: Date;
   endDate: Date;
   status: string;
+  plannedEffortDays: number;
 };
 
 const STATUS_TONE: Record<string, "neutral" | "success" | "warning" | "danger"> = {
@@ -73,7 +74,7 @@ export function SprintList({ sprints }: { sprints: SprintListItem[] }) {
                 {sprint.goal || "—"}
               </td>
               <td className="px-3 py-3 text-slate-600">—</td>
-              <td className="px-3 py-3 text-slate-600">0d</td>
+              <td className="px-3 py-3 text-slate-600">{sprint.plannedEffortDays}d</td>
               <td className="px-3 py-3 text-slate-600">—</td>
               <td className="px-3 py-3 text-slate-600">—</td>
               <td className="px-3 py-3">

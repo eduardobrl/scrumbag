@@ -1,5 +1,6 @@
 import { ReleaseDetail } from "@/features/releases/release-detail";
 import { getReleaseDetails, toReleaseView } from "@/lib/releases";
+import { getSprintPlanningSummary } from "@/lib/sprint-planning-summary";
 import { notFound } from "next/navigation";
 
 export default async function ReleaseDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -11,6 +12,12 @@ export default async function ReleaseDetailPage({ params }: { params: Promise<{ 
   }
 
   const view = toReleaseView(release);
+  const sprints = await Promise.all(
+    view.sprints.map(async (sprint) => ({
+      ...sprint,
+      plannedEffortDays: (await getSprintPlanningSummary(sprint.id)).plannedEffortDays
+    }))
+  );
 
-  return <ReleaseDetail release={view} />;
+  return <ReleaseDetail release={{ ...view, sprints }} />;
 }

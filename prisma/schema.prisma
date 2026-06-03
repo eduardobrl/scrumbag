@@ -29,6 +29,19 @@ enum SprintStatus {
   CLOSED
 }
 
+enum FeatureLifecycleStatus {
+  ACTIVE
+  CANCELLED
+}
+
+enum StoryStatus {
+  BACKLOG
+  SPRINT_BACKLOG
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
 model SquadMember {
   id        String    @id @default(cuid())
   name      String
@@ -71,6 +84,7 @@ model Release {
   supportPercentage         Float         @default(0)
   status                    ReleaseStatus @default(PLANNED)
   sprints                   Sprint[]
+  features                  Feature[]
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt
 }
@@ -84,8 +98,42 @@ model Sprint {
   startDate  DateTime
   endDate    DateTime
   status     SprintStatus  @default(PLANNED)
+  stories    Story[]
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
+}
+
+model Feature {
+  id              String                 @id @default(cuid())
+  releaseId       String
+  release         Release                @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  lifecycleStatus FeatureLifecycleStatus @default(ACTIVE)
+  stories         Story[]
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  @@index([releaseId])
+}
+
+model Story {
+  id                 String      @id @default(cuid())
+  featureId          String
+  feature            Feature     @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  currentSprintId    String?
+  currentSprint      Sprint?     @relation(fields: [currentSprintId], references: [id], onDelete: SetNull)
+  title              String
+  description        String?
+  acceptanceCriteria String?
+  storyPoints        Float?
+  estimatedDays      Float?
+  status             StoryStatus @default(BACKLOG)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@index([featureId])
+  @@index([currentSprintId])
 }
 
 model AppSettings {

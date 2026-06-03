@@ -11,6 +11,7 @@ export type SprintView = {
   endDate: string;
   status: string;
   goal?: string;
+  plannedEffortDays?: number;
 };
 
 export type ReleaseDetailView = {
@@ -134,7 +135,7 @@ export function ReleaseDetail({ release }: { release: ReleaseDetailView }) {
                     </Badge>
                   </td>
                   <td className="px-3 py-3 text-slate-500">{sprint.goal || "—"}</td>
-                  <td className="px-3 py-3">0d</td>
+                  <td className="px-3 py-3">{sprint.plannedEffortDays ?? 0}d</td>
                   <td className="px-3 py-3 text-slate-500">—</td>
                   <td className="px-3 py-3 text-slate-500">—</td>
                   <td className="px-3 py-3">
