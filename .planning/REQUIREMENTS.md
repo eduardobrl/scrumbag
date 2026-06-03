@@ -36,16 +36,16 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Features, Stories, And Backlog
 
-- [ ] **FEAT-01**: User can create, edit, list, inspect, and cancel features for a release.
-- [ ] **FEAT-02**: User can create, edit, list, inspect, and cancel stories for a feature.
-- [ ] **FEAT-03**: User can enter story title, description, acceptance criteria, story points, estimated business days, status, and current sprint.
-- [ ] **FEAT-04**: System calculates feature story points and estimated days from non-canceled stories.
-- [ ] **FEAT-05**: System calculates feature status from its stories as not started, in progress, or finished.
-- [ ] **FEAT-06**: System calculates feature progress by finished story points, falling back to story count when story points are absent.
-- [ ] **BACK-01**: User can view stories not assigned to any sprint in a general backlog.
-- [ ] **BACK-02**: User can filter backlog by release, feature, status, free text, unplanned stories, and canceled stories.
-- [ ] **BACK-03**: User can plan a backlog story into a sprint after seeing the sprint capacity impact.
-- [ ] **BACK-04**: User can remove a story from a sprint and return it to general backlog with Backlog status.
+- [x] **FEAT-01**: User can create, edit, list, inspect, and cancel features for a release.
+- [x] **FEAT-02**: User can create, edit, list, inspect, and cancel stories for a feature.
+- [x] **FEAT-03**: User can enter story title, description, acceptance criteria, story points, estimated business days, status, and current sprint.
+- [x] **FEAT-04**: System calculates feature story points and estimated days from non-canceled stories.
+- [x] **FEAT-05**: System calculates feature status from its stories as not started, in progress, or finished.
+- [x] **FEAT-06**: System calculates feature progress by finished story points, falling back to story count when story points are absent.
+- [x] **BACK-01**: User can view stories not assigned to any sprint in a general backlog.
+- [x] **BACK-02**: User can filter backlog by release, feature, status, free text, unplanned stories, and canceled stories.
+- [x] **BACK-03**: User can plan a backlog story into a sprint after seeing the sprint capacity impact.
+- [x] **BACK-04**: User can remove a story from a sprint and return it to general backlog with Backlog status.
 
 ### Sprint Execution And Capacity
 
@@ -158,16 +158,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SPR-01 | Phase 2 | Complete |
 | SPR-02 | Phase 2 | Complete |
 | SPR-03 | Phase 2 | Complete |
-| FEAT-01 | Phase 3 | Pending |
-| FEAT-02 | Phase 3 | Pending |
-| FEAT-03 | Phase 3 | Pending |
-| FEAT-04 | Phase 3 | Pending |
-| FEAT-05 | Phase 3 | Pending |
-| FEAT-06 | Phase 3 | Pending |
-| BACK-01 | Phase 3 | Pending |
-| BACK-02 | Phase 3 | Pending |
-| BACK-03 | Phase 3 | Pending |
-| BACK-04 | Phase 3 | Pending |
+| FEAT-01 | Phase 3 | Complete |
+| FEAT-02 | Phase 3 | Complete |
+| FEAT-03 | Phase 3 | Complete |
+| FEAT-04 | Phase 3 | Complete |
+| FEAT-05 | Phase 3 | Complete |
+| FEAT-06 | Phase 3 | Complete |
+| BACK-01 | Phase 3 | Complete |
+| BACK-02 | Phase 3 | Complete |
+| BACK-03 | Phase 3 | Complete |
+| BACK-04 | Phase 3 | Complete |
 | BOARD-01 | Phase 4 | Pending |
 | BOARD-02 | Phase 4 | Pending |
 | BOARD-03 | Phase 4 | Pending |
@@ -209,4 +209,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-06-02*
-*Last updated: 2026-06-02 after initial definition*
+*Last updated: 2026-06-03 after Phase 3 completion*
