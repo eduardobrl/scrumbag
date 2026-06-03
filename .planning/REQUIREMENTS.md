@@ -49,9 +49,9 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Sprint Execution And Capacity
 
-- [ ] **BOARD-01**: User can open a sprint board with fixed columns Backlog da Sprint, Em Execucao, and Finalizado.
-- [ ] **BOARD-02**: User can drag stories between board columns and have the story status update.
-- [ ] **BOARD-03**: User can add stories from backlog to a sprint from the sprint screen.
+- [x] **BOARD-01**: User can open a sprint board with fixed columns Backlog da Sprint, Em Execucao, and Finalizado.
+- [x] **BOARD-02**: User can drag stories between board columns and have the story status update.
+- [x] **BOARD-03**: User can add stories from backlog to a sprint from the sprint screen.
 - [ ] **BOARD-04**: User can see sprint gross capacity, net capacity, planned effort, remaining capacity, occupancy percentage, and over-capacity alerts.
 - [ ] **CAP-01**: System calculates gross sprint capacity from active members, work schedule, and business days.
 - [ ] **CAP-02**: System reduces capacity for vacations, day offs, and holidays.
@@ -168,9 +168,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BACK-02 | Phase 3 | Complete |
 | BACK-03 | Phase 3 | Complete |
 | BACK-04 | Phase 3 | Complete |
-| BOARD-01 | Phase 4 | Pending |
-| BOARD-02 | Phase 4 | Pending |
-| BOARD-03 | Phase 4 | Pending |
+| BOARD-01 | Phase 4 | Complete |
+| BOARD-02 | Phase 4 | Complete |
+| BOARD-03 | Phase 4 | Complete |
 | BOARD-04 | Phase 4 | Pending |
 | CAP-01 | Phase 4 | Pending |
 | CAP-02 | Phase 4 | Pending |
