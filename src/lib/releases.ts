@@ -132,6 +132,210 @@ export async function listReleases() {
   });
 }
 
+export async function getReleaseDetails(id: string) {
+  return prisma.release.findUnique({
+    where: { id },
+    include: { sprints: { orderBy: { startDate: "asc" } } }
+  });
+}
+
+export async function getActiveReleaseSummary() {
+  return prisma.release.findFirst({
+    where: { status: ReleaseStatus.IN_PROGRESS },
+    include: { sprints: { orderBy: { startDate: "asc" } } }
+  });
+}
+
+export async function reconcileGeneratedSprints(
+  releaseId: string,
+  generatedRanges: { name: string; startDate: Date; endDate: Date }[]
+) {
+  const existingSprints = await prisma.sprint.findMany({
+    where: { releaseId },
+    orderBy: { startDate: "asc" }
+  });
+
+  // In v1, we assume no stories exist yet (Phase 3 hasn't run), so we can safely
+  // remove extra generated sprints. In later phases, this check would need to
+  // verify no stories are assigned before deleting.
+  const safeToDelete = true; // v1: no story model yet
+
+  const updates: Promise<unknown>[] = [];
+
+  // Update existing sprints where possible
+  for (let i = 0; i < Math.min(existingSprints.length, generatedRanges.length); i++) {
+    const existing = existingSprints[i];
+    const generated = generatedRanges[i];
+
+    if (
+      existing.name !== generated.name ||
+      existing.startDate.getTime() !== generated.startDate.getTime() ||
+      existing.endDate.getTime() !== generated.endDate.getTime()
+    ) {
+      updates.push(
+        prisma.sprint.update({
+          where: { id: existing.id },
+          data: {
+            name: generated.name,
+            startDate: generated.startDate,
+            endDate: generated.endDate
+          }
+        })
+      );
+    }
+  }
+
+  // Create missing sprints
+  for (let i = existingSprints.length; i < generatedRanges.length; i++) {
+    const generated = generatedRanges[i];
+    updates.push(
+      prisma.sprint.create({
+        data: {
+          releaseId,
+          name: generated.name,
+          startDate: generated.startDate,
+          endDate: generated.endDate,
+          status: "PLANNED"
+        }
+      })
+    );
+  }
+
+  // Remove extra generated sprints only if safe (v1: always safe)
+  if (safeToDelete) {
+    for (let i = generatedRanges.length; i < existingSprints.length; i++) {
+      updates.push(prisma.sprint.delete({ where: { id: existingSprints[i].id } }));
+    }
+  }
+
+  await Promise.all(updates);
+}
+
+export async function updateRelease(id: string, input: ReleaseInput) {
+  const existing = await prisma.release.findUnique({
+    where: { id },
+    include: { sprints: { orderBy: { startDate: "asc" } } }
+  });
+
+  if (!existing) {
+    return { ok: false as const, errors: { general: "Release not found" } };
+  }
+
+  const validated = await validateReleaseInput(input);
+
+  if (!validated.ok) {
+    return validated;
+  }
+
+  const data = validated.data;
+
+  // Prevent multiple IN_PROGRESS releases (unless this release is already IN_PROGRESS)
+  if (data.status === ReleaseStatus.IN_PROGRESS && existing.status !== ReleaseStatus.IN_PROGRESS) {
+    const existingActive = await prisma.release.findFirst({
+      where: { status: ReleaseStatus.IN_PROGRESS }
+    });
+
+    if (existingActive && existingActive.id !== id) {
+      return {
+        ok: false as const,
+        errors: { status: "Only one release can be in progress at a time" }
+      };
+    }
+  }
+
+  const needsSprintReconciliation =
+    data.startDate.getTime() !== existing.startDate.getTime() ||
+    data.endDate.getTime() !== existing.endDate.getTime() ||
+    data.defaultSprintLengthBusinessDays !== existing.defaultSprintLengthBusinessDays;
+
+  let sprintInputs: { name: string; startDate: Date; endDate: Date }[] | undefined;
+
+  if (needsSprintReconciliation) {
+    const holidays = await prisma.holiday.findMany({
+      where: {
+        date: { gte: data.startDate, lte: data.endDate }
+      }
+    });
+
+    sprintInputs = generateSprintsForRelease({
+      startDate: data.startDate,
+      endDate: data.endDate,
+      defaultSprintLengthBusinessDays: data.defaultSprintLengthBusinessDays,
+      holidays: holidays.map((h) => h.date)
+    });
+  }
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const release = await tx.release.update({
+      where: { id },
+      data: {
+        name: data.name,
+        objective: data.objective,
+        description: data.description,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        defaultSprintLengthBusinessDays: data.defaultSprintLengthBusinessDays,
+        meetingPercentage: data.meetingPercentage,
+        supportPercentage: data.supportPercentage,
+        status: data.status
+      }
+    });
+
+    if (sprintInputs) {
+      const existingSprints = await tx.sprint.findMany({
+        where: { releaseId: id },
+        orderBy: { startDate: "asc" }
+      });
+
+      // Update existing sprints
+      for (let i = 0; i < Math.min(existingSprints.length, sprintInputs.length); i++) {
+        const existing = existingSprints[i];
+        const generated = sprintInputs[i];
+        if (
+          existing.name !== generated.name ||
+          existing.startDate.getTime() !== generated.startDate.getTime() ||
+          existing.endDate.getTime() !== generated.endDate.getTime()
+        ) {
+          await tx.sprint.update({
+            where: { id: existing.id },
+            data: {
+              name: generated.name,
+              startDate: generated.startDate,
+              endDate: generated.endDate
+            }
+          });
+        }
+      }
+
+      // Create missing sprints
+      for (let i = existingSprints.length; i < sprintInputs.length; i++) {
+        const generated = sprintInputs[i];
+        await tx.sprint.create({
+          data: {
+            releaseId: id,
+            name: generated.name,
+            startDate: generated.startDate,
+            endDate: generated.endDate,
+            status: "PLANNED"
+          }
+        });
+      }
+
+      // Remove extra sprints (safe in v1: no stories yet)
+      for (let i = sprintInputs.length; i < existingSprints.length; i++) {
+        await tx.sprint.delete({ where: { id: existingSprints[i].id } });
+      }
+    }
+
+    return tx.release.findUniqueOrThrow({
+      where: { id },
+      include: { sprints: { orderBy: { startDate: "asc" } } }
+    });
+  });
+
+  return { ok: true as const, data: updated };
+}
+
 export async function createRelease(input: ReleaseInput) {
   const validated = await validateReleaseInput(input);
 
@@ -223,7 +427,18 @@ export function toReleaseView(release: Awaited<ReturnType<typeof listReleases>>[
       name: s.name,
       startDate: s.startDate.toISOString().slice(0, 10),
       endDate: s.endDate.toISOString().slice(0, 10),
-      status: s.status
+      status: s.status,
+      goal: s.goal ?? ""
     }))
+  };
+}
+
+export function toActiveReleaseSummary(release: NonNullable<Awaited<ReturnType<typeof getActiveReleaseSummary>>>) {
+  return {
+    id: release.id,
+    name: release.name,
+    status: release.status,
+    startDate: release.startDate.toISOString().slice(0, 10),
+    endDate: release.endDate.toISOString().slice(0, 10)
   };
 }

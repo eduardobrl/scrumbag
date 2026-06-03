@@ -1,7 +1,14 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { prisma } from "@/lib/db";
 import { generateSprintsForRelease } from "@/lib/sprint-generation";
-import { createRelease, validateReleaseInput } from "@/lib/releases";
+import {
+  createRelease,
+  validateReleaseInput,
+  getReleaseDetails,
+  updateRelease,
+  getActiveReleaseSummary,
+  reconcileGeneratedSprints
+} from "@/lib/releases";
 import { ReleaseStatus } from "@prisma/client";
 
 describe("sprint generation", () => {
@@ -178,5 +185,240 @@ describe("release creation", () => {
     if (!second.ok) {
       expect(second.errors.status).toContain("Only one release can be in progress");
     }
+  });
+});
+
+describe("release detail", () => {
+  beforeEach(async () => {
+    await prisma.sprint.deleteMany();
+    await prisma.release.deleteMany();
+  });
+
+  it("returns release with ordered sprints", async () => {
+    const created = await createRelease({
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNED
+    });
+
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const release = await getReleaseDetails(created.data.id);
+    expect(release).toBeTruthy();
+    expect(release?.name).toBe("Release Q3 2026");
+    expect(release?.sprints.length).toBeGreaterThan(0);
+
+    // Verify sprints are ordered by startDate ascending
+    for (let i = 1; i < release!.sprints.length; i++) {
+      expect(release!.sprints[i].startDate.getTime()).toBeGreaterThanOrEqual(
+        release!.sprints[i - 1].startDate.getTime()
+      );
+    }
+  });
+});
+
+describe("release update", () => {
+  beforeEach(async () => {
+    await prisma.sprint.deleteMany();
+    await prisma.release.deleteMany();
+  });
+
+  it("updates release fields", async () => {
+    const created = await createRelease({
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNED
+    });
+
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const updated = await updateRelease(created.data.id, {
+      name: "Release Q3 2026 Updated",
+      objective: "Updated objective",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNED
+    });
+
+    expect(updated.ok).toBe(true);
+    if (updated.ok) {
+      expect(updated.data.name).toBe("Release Q3 2026 Updated");
+      expect(updated.data.objective).toBe("Updated objective");
+    }
+  });
+
+  it("rejects updating a second release to IN_PROGRESS", async () => {
+    const first = await createRelease({
+      name: "First",
+      objective: "First release",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.IN_PROGRESS
+    });
+    expect(first.ok).toBe(true);
+
+    const second = await createRelease({
+      name: "Second",
+      objective: "Second release",
+      startDate: "2026-08-01",
+      endDate: "2026-08-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNED
+    });
+    expect(second.ok).toBe(true);
+    if (!second.ok) return;
+
+    const updated = await updateRelease(second.data.id, {
+      name: "Second",
+      objective: "Second release",
+      startDate: "2026-08-01",
+      endDate: "2026-08-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.IN_PROGRESS
+    });
+
+    expect(updated.ok).toBe(false);
+    if (!updated.ok) {
+      expect(updated.errors.status).toContain("Only one release can be in progress");
+    }
+  });
+
+  it("reconciles sprints when end date changes", async () => {
+    const created = await createRelease({
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNED
+    });
+
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const originalSprintCount = created.data.sprints.length;
+
+    // Extend end date to August 15
+    const updated = await updateRelease(created.data.id, {
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-08-15",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNED
+    });
+
+    expect(updated.ok).toBe(true);
+    if (updated.ok) {
+      // More sprints should be generated for the extended period
+      expect(updated.data.sprints.length).toBeGreaterThanOrEqual(originalSprintCount);
+      // Verify sprints are ordered by startDate ascending
+      for (let i = 1; i < updated.data.sprints.length; i++) {
+        expect(updated.data.sprints[i].startDate.getTime()).toBeGreaterThanOrEqual(
+          updated.data.sprints[i - 1].startDate.getTime()
+        );
+      }
+    }
+  });
+});
+
+describe("active release summary", () => {
+  beforeEach(async () => {
+    await prisma.sprint.deleteMany();
+    await prisma.release.deleteMany();
+  });
+
+  it("returns the IN_PROGRESS release", async () => {
+    const created = await createRelease({
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.IN_PROGRESS
+    });
+
+    expect(created.ok).toBe(true);
+
+    const active = await getActiveReleaseSummary();
+    expect(active).toBeTruthy();
+    expect(active?.name).toBe("Release Q3 2026");
+    expect(active?.status).toBe(ReleaseStatus.IN_PROGRESS);
+  });
+
+  it("returns null when no IN_PROGRESS release exists", async () => {
+    const active = await getActiveReleaseSummary();
+    expect(active).toBeNull();
+  });
+});
+
+describe("sprint reconciliation", () => {
+  beforeEach(async () => {
+    await prisma.sprint.deleteMany();
+    await prisma.release.deleteMany();
+  });
+
+  it("updates existing sprints, creates missing, and removes extras", async () => {
+    const created = await createRelease({
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNED
+    });
+
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const originalSprints = created.data.sprints;
+
+    // Reconcile with modified ranges
+    const newRanges = [
+      { name: "Sprint 1", startDate: new Date("2026-07-01T00:00:00.000Z"), endDate: new Date("2026-07-10T00:00:00.000Z") },
+      { name: "Sprint 2", startDate: new Date("2026-07-11T00:00:00.000Z"), endDate: new Date("2026-07-20T00:00:00.000Z") },
+      { name: "Sprint 3", startDate: new Date("2026-07-21T00:00:00.000Z"), endDate: new Date("2026-07-31T00:00:00.000Z") }
+    ];
+
+    await reconcileGeneratedSprints(created.data.id, newRanges);
+
+    const release = await getReleaseDetails(created.data.id);
+    expect(release).toBeTruthy();
+    expect(release!.sprints.length).toBe(3);
+    expect(release!.sprints[0].name).toBe("Sprint 1");
+    expect(release!.sprints[0].startDate.toISOString().slice(0, 10)).toBe("2026-07-01");
+    expect(release!.sprints[0].endDate.toISOString().slice(0, 10)).toBe("2026-07-10");
+    expect(release!.sprints[1].name).toBe("Sprint 2");
+    expect(release!.sprints[2].name).toBe("Sprint 3");
   });
 });
