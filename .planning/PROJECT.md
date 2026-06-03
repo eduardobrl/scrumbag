@@ -14,12 +14,13 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 
 ### Validated
 
-(None yet - ship to validate)
+- [x] Phase 1 delivered a localhost-only Next.js app shell with SQLite persistence, navigation, global header context, settings, and squad/calendar management.
+- [x] User can create and maintain local squad members, absences, holidays, and capacity defaults with data persisted at `./data/squad-planner.db`.
 
 ### Active
 
-- [ ] User can run the app locally in a browser with a simple install/start flow.
-- [ ] User can configure squad members, work schedules, absences, and holidays.
+- [x] User can run the app locally in a browser with a simple install/start flow. Validated in Phase 1: Local Foundation And Squad Setup.
+- [x] User can configure squad members, work schedules, absences, and holidays. Validated in Phase 1: Local Foundation And Squad Setup.
 - [ ] User can create a release and have sprints generated from the release period.
 - [ ] User can create features and split them into estimated stories.
 - [ ] User can plan stories into sprints while seeing capacity impact.
@@ -75,6 +76,8 @@ Expected scale is one squad, one active release, up to 20 sprints per release, u
 | Move unfinished stories to the next sprint on close | Captures sprint leakage and preserves historical truth. | - Pending |
 | Include MCP and AI in v1 | AI assistance is part of the product value, but must stay controlled and local. | - Pending |
 | Use coarse MVP phases | User selected coarse planning; phases should deliver broad vertical slices. | - Pending |
+| Use Prisma 7 with better-sqlite3 adapter | The local machine runs Node 24, and Prisma 7 is the supported line for that runtime. | - Accepted in Phase 1 |
+| Prepare SQLite with a local sync script | Prisma schema validation and SQL generation worked, but schema-engine apply failed on this Windows/Node 24 host. | - Accepted in Phase 1 |
 
 ## Evolution
 
@@ -94,4 +97,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-02 after initialization*
+*Last updated: 2026-06-03 after Phase 1 completion*
