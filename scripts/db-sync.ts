@@ -51,6 +51,36 @@ CREATE TABLE IF NOT EXISTS "AppSettings" (
   "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" DATETIME NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS "Release" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "name" TEXT NOT NULL,
+  "objective" TEXT NOT NULL,
+  "description" TEXT,
+  "startDate" DATETIME NOT NULL,
+  "endDate" DATETIME NOT NULL,
+  "defaultSprintLengthBusinessDays" INTEGER NOT NULL DEFAULT 10,
+  "meetingPercentage" REAL NOT NULL DEFAULT 0,
+  "supportPercentage" REAL NOT NULL DEFAULT 0,
+  "status" TEXT NOT NULL DEFAULT 'PLANNED',
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "Sprint" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "releaseId" TEXT NOT NULL,
+  "name" TEXT NOT NULL,
+  "goal" TEXT,
+  "startDate" DATETIME NOT NULL,
+  "endDate" DATETIME NOT NULL,
+  "status" TEXT NOT NULL DEFAULT 'PLANNED',
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL,
+  CONSTRAINT "Sprint_releaseId_fkey" FOREIGN KEY ("releaseId") REFERENCES "Release" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "Sprint_releaseId_idx" ON "Sprint" ("releaseId");
 `);
 
 db.close();

@@ -16,6 +16,19 @@ enum AbsenceType {
   DAY_OFF
 }
 
+enum ReleaseStatus {
+  PLANNED
+  IN_PROGRESS
+  CLOSED
+  CANCELLED
+}
+
+enum SprintStatus {
+  PLANNED
+  IN_PROGRESS
+  CLOSED
+}
+
 model SquadMember {
   id        String    @id @default(cuid())
   name      String
@@ -44,6 +57,35 @@ model Holiday {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Release {
+  id                        String        @id @default(cuid())
+  name                      String
+  objective                 String
+  description               String?
+  startDate                 DateTime
+  endDate                   DateTime
+  defaultSprintLengthBusinessDays Int   @default(10)
+  meetingPercentage         Float         @default(0)
+  supportPercentage         Float         @default(0)
+  status                    ReleaseStatus @default(PLANNED)
+  sprints                   Sprint[]
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt
+}
+
+model Sprint {
+  id         String        @id @default(cuid())
+  releaseId  String
+  release    Release       @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  name       String
+  goal       String?
+  startDate  DateTime
+  endDate    DateTime
+  status     SprintStatus  @default(PLANNED)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 }
 
 model AppSettings {
