@@ -13,7 +13,7 @@ This roadmap favors broad vertical phases. Each phase should leave the product m
 | 1 | Local Foundation And Squad Setup | Establish the local app shell, persistence, navigation, settings, and squad/calendar data needed for capacity. | APP-01 to APP-06, SQUAD-01 to SQUAD-05 |
 | 2 | 3/3 | Complete    | 2026-06-03 |
 | 3 | Feature, Story, And Backlog Planning | Let users model release scope as features and stories, aggregate estimates, and plan stories from backlog into sprints. | FEAT-01 to FEAT-06, BACK-01 to BACK-04 |
-| 4 | 1/3 | In Progress|  |
+| 4 | 2/3 | In Progress|  |
 | 5 | Release Intelligence, Reports, MCP, And AI | Provide dashboard, timeline, progress, reports, exports, MCP tools, and the AI assistant. | DASH-01 to DASH-04, PROG-01 to PROG-02, REP-01 to REP-03, MCP-01 to MCP-05, AI-01 to AI-04 |
 
 ## Phases

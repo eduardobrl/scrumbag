@@ -52,12 +52,12 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [x] **BOARD-01**: User can open a sprint board with fixed columns Backlog da Sprint, Em Execucao, and Finalizado.
 - [x] **BOARD-02**: User can drag stories between board columns and have the story status update.
 - [x] **BOARD-03**: User can add stories from backlog to a sprint from the sprint screen.
-- [ ] **BOARD-04**: User can see sprint gross capacity, net capacity, planned effort, remaining capacity, occupancy percentage, and over-capacity alerts.
-- [ ] **CAP-01**: System calculates gross sprint capacity from active members, work schedule, and business days.
-- [ ] **CAP-02**: System reduces capacity for vacations, day offs, and holidays.
-- [ ] **CAP-03**: System applies meeting and support percentages to calculate net capacity.
-- [ ] **CAP-04**: System normalizes net capacity hours into 8-hour days.
-- [ ] **CAP-05**: System compares planned story estimated days with net capacity days and allows over-capacity planning with a clear warning.
+- [x] **BOARD-04**: User can see sprint gross capacity, net capacity, planned effort, remaining capacity, occupancy percentage, and over-capacity alerts.
+- [x] **CAP-01**: System calculates gross sprint capacity from active members, work schedule, and business days.
+- [x] **CAP-02**: System reduces capacity for vacations, day offs, and holidays.
+- [x] **CAP-03**: System applies meeting and support percentages to calculate net capacity.
+- [x] **CAP-04**: System normalizes net capacity hours into 8-hour days.
+- [x] **CAP-05**: System compares planned story estimated days with net capacity days and allows over-capacity planning with a clear warning.
 - [ ] **SPR-04**: User can close a sprint only when closure rules are satisfied.
 - [ ] **SPR-05**: System leaves finished stories in the closed sprint and moves unfinished stories to the next sprint while preserving status.
 - [ ] **SPR-06**: System creates a next sprint automatically when the last sprint is closed with unfinished stories.
@@ -171,12 +171,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOARD-01 | Phase 4 | Complete |
 | BOARD-02 | Phase 4 | Complete |
 | BOARD-03 | Phase 4 | Complete |
-| BOARD-04 | Phase 4 | Pending |
-| CAP-01 | Phase 4 | Pending |
-| CAP-02 | Phase 4 | Pending |
-| CAP-03 | Phase 4 | Pending |
-| CAP-04 | Phase 4 | Pending |
-| CAP-05 | Phase 4 | Pending |
+| BOARD-04 | Phase 4 | Complete |
+| CAP-01 | Phase 4 | Complete |
+| CAP-02 | Phase 4 | Complete |
+| CAP-03 | Phase 4 | Complete |
+| CAP-04 | Phase 4 | Complete |
+| CAP-05 | Phase 4 | Complete |
 | SPR-04 | Phase 4 | Pending |
 | SPR-05 | Phase 4 | Pending |
 | SPR-06 | Phase 4 | Pending |
