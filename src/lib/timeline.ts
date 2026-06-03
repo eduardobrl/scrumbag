@@ -73,7 +73,7 @@ export async function buildTimelineData(releaseId: string): Promise<TimelineData
       new Set(
         scopedStories
           .map((story) => story.currentSprintId)
-          .filter((id): id is string => Boolean(id) && sprintIndex.has(id))
+          .filter((id): id is string => typeof id === "string" && sprintIndex.has(id))
       )
     ).sort((left, right) => sprintIndex.get(left)! - sprintIndex.get(right)!);
 
