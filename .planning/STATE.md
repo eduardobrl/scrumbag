@@ -35,7 +35,7 @@ See: `.planning/PROJECT.md` (updated 2026-06-03)
 | 2 | Release And Sprint Planning Core | Complete | 100% |
 | 3 | Feature, Story, And Backlog Planning | Complete | 100% |
 | 4 | Sprint Board, Capacity Engine, And Leakage | Complete | 100% |
-| 5 | Release Intelligence, Reports, MCP, And AI | Planned | 0% |
+| 5 | Release Intelligence, Reports, MCP, And AI | Complete | 100% |
 
 ## Active Requirement Set
 
@@ -76,7 +76,8 @@ See `.planning/REQUIREMENTS.md`.
 - Phase 4 completed on 2026-06-03 with verification passed.
 - Phase 5 was planned on 2026-06-03 without CONTEXT.md by user choice (consistent with Phases 1–4).
 - Phase 5 has 3 execution plans across 2 waves: `05-01` (Dashboard/Timeline/Progress), `05-02` (Reports/Exports), `05-03` (MCP/AI Assistant).
-- Next recommended command: `/gsd-execute-phase 5`
+- Phase 5 completed on 2026-06-03 with verification passed.
+- Milestone v1.0 is complete; next recommended command: `$gsd-complete-milestone`
 
 ---
 *State initialized: 2026-06-02*
