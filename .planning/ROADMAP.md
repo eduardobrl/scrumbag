@@ -1,162 +1,117 @@
-# Roadmap: Scrumbag
+# Roadmap: Squad Planner
 
-## Overview
+**Created:** 2026-06-02
+**Granularity:** Coarse
+**Planning Mode:** MVP
 
-Scrumbag is a local-first, single-executable Scrum capacity planning tool. The roadmap delivers the app in five phases: first the foundation and data ingestion, then the core capacity engine, followed by sprint planning and board workflow, then release-centered planning and UX redesign, and finally forecasting and analytics. Each phase builds on the previous to deliver realistic release and sprint capacity planning with delivery forecasting.
+This roadmap favors broad vertical phases. Each phase should leave the product more usable end to end, while keeping implementation order aligned with data and workflow dependencies.
+
+## Phase Summary
+
+| Phase | Name | Goal | Requirements |
+|-------|------|------|--------------|
+| 1 | Local Foundation And Squad Setup | Establish the local app shell, persistence, navigation, settings, and squad/calendar data needed for capacity. | APP-01 to APP-06, SQUAD-01 to SQUAD-05 |
+| 2 | Release And Sprint Planning Core | Let users create releases, auto-generate sprints, edit sprint dates/goals, and see sprint-level planning context. | REL-01 to REL-04, SPR-01 to SPR-03 |
+| 3 | Feature, Story, And Backlog Planning | Let users model release scope as features and stories, aggregate estimates, and plan stories from backlog into sprints. | FEAT-01 to FEAT-06, BACK-01 to BACK-04 |
+| 4 | Sprint Board, Capacity Engine, And Leakage | Deliver the operational sprint board, full capacity calculations, over-capacity warnings, sprint closure, reopening, and leakage history. | BOARD-01 to BOARD-04, CAP-01 to CAP-05, SPR-04 to SPR-08 |
+| 5 | Release Intelligence, Reports, MCP, And AI | Provide dashboard, timeline, progress, reports, exports, MCP tools, and the AI assistant. | DASH-01 to DASH-04, PROG-01 to PROG-02, REP-01 to REP-03, MCP-01 to MCP-05, AI-01 to AI-04 |
 
 ## Phases
 
-- [x] **Phase 1: Foundation & Data Ingestion** - Single executable scaffold, SQLite schema, Excel sync, and initial backlog management (completed 2026-05-31)
-- [x] **Phase 2: Squad & Capacity Engine** - Squad management, absence tracking, and realistic capacity calculation (completed 2026-05-31)
-- [x] **Phase 3: Sprint Planning, Board & Estimation** - Sprint creation, Kanban board, story estimation, and drag-and-drop workflow (completed 2026-06-01)
-- [x] **Phase 4: Release Planning & UX Redesign** - Release-first planning, feature timeline by sprint, dedicated sprint screens, and clearer backlog creation (completed 2026-06-02)
-- [ ] **Phase 5: Forecasting, Velocity & Analytics** - Velocity tracking, burndown chart, and probabilistic release/feature forecasting
+### Phase 1: Local Foundation And Squad Setup
 
-## Phase Details
-
-### Phase 1: Foundation & Data Ingestion
-
-**Goal**: The app runs as a single executable, stores data locally in SQLite, and imports Excel files from the OneDrive-synced folder into the backlog.
+**Goal:** A user can run the local app, navigate the main shell, persist data in SQLite, configure core settings, and maintain squad/calendar data that future capacity calculations depend on.
 **Mode:** mvp
-**Depends on**: Nothing (first phase)
-**Requirements**: BACK-01, BACK-02, SYNC-01, SYNC-02
-**Success Criteria** (what must be TRUE):
 
-  1. User can launch the app by running a single file without installation
-  2. User can create and manage backlog items (stories, features, bugs, epics)
-  3. User can organize work items in hierarchy (epics → features → stories)
-  4. User can place Excel files in the synced folder and the app automatically detects and imports the data
+**Requirements:** APP-01, APP-02, APP-03, APP-04, APP-05, APP-06, SQUAD-01, SQUAD-02, SQUAD-03, SQUAD-04, SQUAD-05
 
-**Plans**: 4 plans
+**Success Criteria**:
+1. A fresh checkout can be installed and started locally, then opened in a browser on localhost.
+2. The app shell shows side navigation and global release context/header without broken routes.
+3. SQLite persistence stores app settings, squad members, absences, and holidays across restarts.
+4. The Squad screen supports member, absence, and holiday CRUD with validation and summary metrics.
+5. The Settings screen exposes capacity defaults and MCP host/port configuration.
 
-Plans:
+**UI hint:** yes
 
-- [x] 01-01-PLAN.md — Walking Skeleton: project scaffold, SQLite schema, Bun server, minimal React SPA with one DB read/write and one UI interaction
-- [x] 01-02-PLAN.md — Backlog CRUD: domain types, full repository CRUD, REST API with validation, rich React list and form UI
-- [x] 01-03-PLAN.md — Hierarchy: parent-child relationships, recursive queries, nested backlog tree view, parent assignment in forms
-- [x] 01-04-PLAN.md — Excel Sync: chokidar file watcher, SHA-256 content hashing, SheetJS parser, import service, sync config UI
+### Phase 2: Release And Sprint Planning Core
 
-### Phase 2: Squad & Capacity Engine
-
-**Goal**: Users can manage their squad, register absences and holidays, and view realistic sprint capacity adjusted for availability and waste.
+**Goal:** A user can create a release, have sprints generated automatically, inspect the release and sprint list, and adjust sprint dates/goals safely.
 **Mode:** mvp
-**Depends on**: Phase 1
-**Requirements**: TEAM-01, TEAM-02, CAP-01, CAP-02, CAP-03
-**Success Criteria** (what must be TRUE):
 
-  1. User can register squad members with name, role, and typical daily capacity
-  2. User can register absences, vacations, unpaid leave, and holidays for any member
-  3. User can view a realistic capacity calculation for any date range, adjusted for absences and holidays
-  4. User can view a capacity calculation that accounts for waste/overhead (meetings, support, incidents)
-  5. User can see a transparent breakdown of the capacity calculation and manually override the result
+**Requirements:** REL-01, REL-02, REL-03, REL-04, SPR-01, SPR-02, SPR-03
 
-**Plans**: 3 plans
+**Success Criteria**:
+1. Release create/edit/list/detail flows capture all required release fields and prevent multiple in-progress releases.
+2. Saving a release generates sequential, non-overlapping sprints from business-day dates.
+3. The final sprint absorbs remaining business days instead of creating an impractically small final sprint.
+4. Sprint list/detail surfaces period, status, goal, planned effort placeholders, capacity placeholders, and risk placeholders ready for later capacity wiring.
+5. Editing sprint dates prevents overlap, warns about gaps, and triggers recalculation hooks for affected sprint summaries.
 
-Plans:
+**UI hint:** yes
 
-- [x] 02-01-PLAN.md — Squad & Absences: squad member CRUD, absence tracking with holidays, REST API, and React UI
-- [x] 02-02-PLAN.md — Capacity Engine: working-day calculation, absence/holiday deduction, per-member breakdown API and UI
-- [x] 02-03-PLAN.md — Waste, Transparency & Override: configurable waste percentage, capacity breakdown with waste, manual override for specific members and dates
+### Phase 3: Feature, Story, And Backlog Planning
 
-### Phase 3: Sprint Planning, Board & Estimation
-
-**Goal**: Users can plan sprints, estimate work in story points and days, and manage daily workflow on a Kanban board.
+**Goal:** A user can break release scope into features and stories, keep estimates aggregated automatically, and move unplanned stories from backlog into selected sprints with impact preview.
 **Mode:** mvp
-**Depends on**: Phase 2
-**Requirements**: BACK-03, SPRT-01, SPRT-02, SPRT-03, SPRT-04, EST-01, EST-02
-**Success Criteria** (what must be TRUE):
 
-  1. User can create sprints with start date, end date, and goal, and select backlog items to include
-  2. User can estimate stories using Fibonacci story points (1, 2, 3, 5, 8, 13, 21) and work days
-  3. User can view a sprint board with To Do, In Progress, and Done columns
-  4. User can move items between board columns and prioritize backlog via drag-and-drop
+**Requirements:** FEAT-01, FEAT-02, FEAT-03, FEAT-04, FEAT-05, FEAT-06, BACK-01, BACK-02, BACK-03, BACK-04
 
-**Plans**: 4 plans
-**UI hint**: yes
-Plans:
-**Wave 1**
+**Success Criteria**:
+1. Feature and story CRUD flows capture all specified fields and use cancelation instead of destructive deletion for scoped items.
+2. Feature totals, calculated status, progress, and date/timeline placeholders update from associated non-canceled stories.
+3. Backlog screen lists unplanned stories and supports release, feature, status, text, unplanned, and canceled filters.
+4. Planning a backlog story into a sprint shows capacity impact before confirmation and then moves the story to sprint backlog.
+5. Removing a story from a sprint returns it to general backlog with Backlog status.
 
-- [x] 03-01-PLAN.md — Sprint & Estimation Foundation: sprint schema, sprint CRUD, estimate fields, API routes, and sprint list UI
+**UI hint:** yes
 
-**Wave 2** *(blocked on Wave 1 completion)*
+### Phase 4: Sprint Board, Capacity Engine, And Leakage
 
-- [x] 03-02-PLAN.md — Planning Workspace & Capacity: two-column backlog/sprint workspace, sprint membership, totals, and advisory capacity warnings
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
-- [x] 03-03-PLAN.md — Drag-and-Drop Planning: backlog priority reorder, sprint add/order drag-and-drop, and persisted ordering
-
-**Wave 4** *(blocked on Wave 3 completion)*
-
-- [x] 03-04-PLAN.md — Sprint Board & Closure: three-column board, completion date prompt, board ordering, and close sprint action
-
-### Phase 4: Release Planning & UX Redesign
-
-**Goal**: Users plan work from a release-first view: releases contain features, features contain stories and bugs, sprints belong to releases, and the UI makes sprint boards and backlog creation unambiguous.
+**Goal:** A user can execute a sprint on a drag-and-drop board while the system calculates real capacity, highlights over-capacity plans, closes/reopens sprints, and records leaked stories.
 **Mode:** mvp
-**Depends on**: Phase 3
-**Requirements**: REL-01, REL-02, REL-03, REL-04, REL-05, REL-06, UX-01, UX-02
-**Success Criteria** (what must be TRUE):
 
-  1. User creates a release before creating or planning its sprints
-  2. User adds features to a release, including during release execution
-  3. System prevents stories and bugs from existing without a parent feature
-  4. User sees a release planning board/timeline with features across sprint columns and predicted completion by sprint
-  5. User can expand or shrink feature allocation across sprints and receives capacity warnings when scope exceeds available capacity
-  6. System suggests splitting a feature when its scope is too large for the release
-  7. User opens a sprint into a dedicated sprint screen with tabs instead of seeing all sprint UI on the list page
-  8. User manages backlog through a clearer feature-first creation flow
+**Requirements:** BOARD-01, BOARD-02, BOARD-03, BOARD-04, CAP-01, CAP-02, CAP-03, CAP-04, CAP-05, SPR-04, SPR-05, SPR-06, SPR-07, SPR-08
 
-**Plans**: 5 plans
-**UI hint**: yes
-**Sketch needed**: release board/timeline with feature drag/drop, resizable feature spans, capacity alerts, and sprint drill-down tabs
+**Success Criteria**:
+1. Sprint detail shows fixed board columns and supports drag-and-drop status changes.
+2. Sprint capacity is calculated from active members, business days, absences, holidays, meeting percentage, support percentage, and 8-hour day normalization.
+3. Sprint screens display gross capacity, net capacity, planned effort, remaining capacity, occupancy, and visual overflow warnings while still allowing over-capacity planning.
+4. Closing a sprint leaves finished stories in place, moves unfinished stories to the next sprint, creates the next sprint when needed, and records leakage events.
+5. Reopening a sprint allows edits again without deleting leakage history.
 
-Plans:
-**Wave 1**
+**UI hint:** yes
 
-- [x] 04-01-PLAN.md - Release Data Foundation: release schema, release-scoped sprints, feature membership, and story/bug parent guards
+### Phase 5: Release Intelligence, Reports, MCP, And AI
 
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [x] 04-02-PLAN.md - Release Planning Service: board summary, feature allocation spans, predicted completion, capacity warnings, and split suggestions
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
-- [x] 04-03-PLAN.md - Release-First Planning UI: Releases tab, release detail screen, feature backlog panel, and sprint-column timeline
-
-**Wave 4** *(blocked on Wave 3 completion)*
-
-- [x] 04-04-PLAN.md - Dedicated Sprint Screen: sprint drill-down with Board, Planning, Capacity, and Closure tabs
-
-**Wave 5** *(blocked on Wave 4 completion)*
-
-- [x] 04-05-PLAN.md - Feature-First Backlog: feature-centered backlog management and child story/bug creation flow
-
-### Phase 5: Forecasting, Velocity & Analytics
-
-**Goal**: Users can track team velocity, view a burndown chart, and receive probabilistic forecasts for release and feature delivery with confidence intervals.
+**Goal:** A user can understand release health through dashboard/timeline/progress/reporting, export planning data, and ask a local AI assistant for MCP-grounded analysis and controlled suggestions.
 **Mode:** mvp
-**Depends on**: Phase 4
-**Requirements**: VEL-01, BURN-01, FORE-01, FORE-02
-**Success Criteria** (what must be TRUE):
 
-  1. System displays rolling average velocity based on completed story points from recent sprints
-  2. System displays a burndown chart comparing ideal vs actual remaining effort
-  3. System forecasts release and feature delivery with confidence intervals (ranges, not single dates)
-  4. System automatically updates forecasts when release or feature scope changes
+**Requirements:** DASH-01, DASH-02, DASH-03, DASH-04, PROG-01, PROG-02, REP-01, REP-02, REP-03, MCP-01, MCP-02, MCP-03, MCP-04, MCP-05, AI-01, AI-02, AI-03, AI-04
 
-**Plans**: TBD
-**UI hint**: yes
+**Success Criteria**:
+1. Dashboard summarizes active release progress, total capacity, planned effort, risk, feature/story counts, finished stories, leaked stories, alerts, timeline, and sprint table.
+2. Timeline shows feature spans across sprints, inactive gaps inside a span, completion progress, finished sprints, and leaked sprints.
+3. Reports screen generates the specified planning, capacity, sprint-story, feature-progress, leakage, planned-versus-capacity, and timeline reports in CSV and Excel.
+4. MCP server binds to localhost by default and exposes read, suggestion, explicit write, and critical-operation-safe tools.
+5. AI assistant chat and quick prompts answer using MCP data and require explicit confirmation before applying sensitive changes.
 
-## Progress
+**UI hint:** yes
 
-**Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+## Coverage
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Foundation & Data Ingestion | 4/4 | Complete   | 2026-05-31 |
-| 2. Squad & Capacity Engine | 3/3 | Complete    | 2026-05-31 |
-| 3. Sprint Planning, Board & Estimation | 4/4 | Complete    | 2026-06-01 |
-| 4. Release Planning & UX Redesign | 5/5 | Complete    | 2026-06-02 |
-| 5. Forecasting, Velocity & Analytics | 0/TBD | Not started | - |
+| Phase | Requirement Count | Status |
+|-------|-------------------|--------|
+| Phase 1 | 11 | Pending |
+| Phase 2 | 7 | Pending |
+| Phase 3 | 10 | Pending |
+| Phase 4 | 13 | Pending |
+| Phase 5 | 18 | Pending |
+
+**Total v1 requirements:** 60
+**Mapped requirements:** 60
+**Unmapped requirements:** 0
+
+---
+*Roadmap created: 2026-06-02*
+*Last updated: 2026-06-02 after initialization*

@@ -1,92 +1,97 @@
-# Scrumbag
+# Squad Planner
 
 ## What This Is
 
-Um app web leve de **capacity planning e sprint management** para times Scrum. Lê planilhas Excel de uma pasta sincronizada no OneDrive, permite planejar features, histórias e épicos com estimativas, calcula capacity real da squad considerando ausências e desperdícios, e prevê entregas. Inclui um servidor MCP para que agentes de IA possam consultar os dados e auxiliar na tomada de decisões. Desenvolvido para uso de Tech Lead, PM e gestora de portfólio em ambiente corporativo com restrições de instalação de software.
+Squad Planner is a local web app for planning and tracking a squad release from scope definition through sprint execution. It helps a squad register members, absences, holidays, releases, sprints, features, and stories, then compares planned effort against available capacity and highlights delivery risk.
+
+The first version is desktop-first, runs on localhost, stores data in SQLite, and includes a local MCP surface plus an AI assistant so agents can query the plan, explain risk, and suggest changes without applying sensitive actions automatically.
 
 ## Core Value
 
-Permitir o planejamento realista de sprints com capacity ajustada à realidade da squad (ausências, desperdício), gerando previsões confiáveis de entrega de épicos.
+A squad can see whether a release plan fits the team's real sprint capacity and adjust scope before delivery risk becomes invisible.
 
 ## Requirements
 
 ### Validated
 
-- [x] Estimar historias em story points e dias de trabalho - Validated in Phase 3: Sprint Planning, Board & Estimation
-- [x] Visualizar e gerenciar board de sprint - Validated in Phase 3: Sprint Planning, Board & Estimation
-- [x] Priorizar backlog e sprint por drag-and-drop - Validated in Phase 3: Sprint Planning, Board & Estimation
-- [x] Planejar releases antes dos sprints, com sprints pertencendo a uma release - Validated in Phase 4: Release Planning UX Redesign
-- [x] Planejar features em uma timeline de release por sprints, com avisos de capacidade - Validated in Phase 4: Release Planning UX Redesign
-- [x] Criar historias e bugs dentro de features, evitando itens orfaos - Validated in Phase 4: Release Planning UX Redesign
-- [x] Abrir sprint em tela dedicada com abas de Board, Planning, Capacity e Closure - Validated in Phase 4: Release Planning UX Redesign
-- [x] Cadastrar e gerenciar membros da squad - Validated in Phase 2: Squad & Capacity Engine
-- [x] Registrar ausências, férias, folgas não compensadas e feriados - Validated in Phase 2: Squad & Capacity Engine
-- [x] Calcular capacity real da sprint com ajustes de disponibilidade - Validated in Phase 2: Squad & Capacity Engine
-- [x] Calcular desperdícios (reuniões, suporte, incidentes) com tolerância configurável - Validated in Phase 2: Squad & Capacity Engine
+(None yet - ship to validate)
 
 ### Active
 
-- [ ] Ler e sincronizar planilhas Excel de pasta no OneDrive
-- [ ] Visualizar épicos com previsão de entrega
-- [ ] Sugerir histórias que cabem na capacity da sprint
-- [ ] Expor dados via servidor MCP para agentes de IA
-- [ ] Funcionar sem instalação (web app) em ambiente corporativo restrito
+- [ ] User can run the app locally in a browser with a simple install/start flow.
+- [ ] User can configure squad members, work schedules, absences, and holidays.
+- [ ] User can create a release and have sprints generated from the release period.
+- [ ] User can create features and split them into estimated stories.
+- [ ] User can plan stories into sprints while seeing capacity impact.
+- [ ] User can operate a sprint board and move stories through fixed workflow states.
+- [ ] User can close and reopen sprints while preserving leakage history.
+- [ ] User can view dashboard, timeline, progress, and capacity alerts for the active release.
+- [ ] User can export release planning and tracking reports to CSV or Excel.
+- [ ] AI agents can query local planning data through MCP and provide suggestions safely.
 
 ### Out of Scope
 
-- Integração direta com Jira/Azure DevOps — a ferramenta interna da empresa não permite APIs
-- Mobile app nativo — web app responsivo é suficiente
-- Autenticação multiusuário complexa — uso interno entre 3 pessoas
-- Edição colaborativa em tempo real — sincronização via OneDrive já resolve
-- Notificações automáticas — fora do escopo de MVP
-- Relatórios avançados/BI — dashboards básicos são suficientes
+- Multi-user authentication - the first version is a local single-user planning aid.
+- Advanced permissions - no role-based access control is needed without multi-user auth.
+- Jira, Azure DevOps, Trello, or GitHub integration - the app complements those tools instead of replacing or synchronizing with them in v1.
+- Automatic velocity calculation from story points - capacity is based on estimated business days, not point conversion.
+- Mandatory automatic planning - AI can suggest redistribution, but the user remains in control.
+- WIP limits - useful later, but not central to release capacity planning.
+- Story assignee ownership - v1 plans squad capacity, not individual allocation.
+- Multiple active releases or parallel sprint streams - v1 focuses on one active release at a time.
+- Blocking dependency management - dependencies can be discussed manually, but are not a formal model in v1.
+- Real-time collaborative editing - local-first scope keeps implementation and operations simple.
+- Remote database or corporate server deployment - SQLite and localhost are the intended v1 operating model.
 
 ## Context
 
-- Ambiente corporativo com restrições de instalação de software
-- Ferramenta interna da empresa não oferece capacity planning nem previsão de épicos
-- Dados de entrada vêm de planilhas Excel em pasta sincronizada no OneDrive
-- Squad atual não tem acesso a ferramentas de mercado (Jira, etc.)
-- Três usuários principais: Tech Lead (você), PM e gestora de portfólio
+The source context is captured in `spec.md` and `telas.md`. The product is meant to support release planning for a squad that already thinks in releases, sprints, features, and stories, but needs a lightweight local tool to visualize capacity, overflow, leakage, and delivery risk.
+
+The suggested stack is Next.js, TypeScript, SQLite, Prisma, Tailwind CSS, dnd-kit for drag-and-drop, Recharts or a similar chart/timeline library, XLSX/CSV export, and a local Node.js MCP server. The UI should feel like a modern management tool: quiet, information-dense, desktop-first, with side navigation, global release context, tables, badges, progress bars, alerts, and horizontal timelines.
+
+The first version should remain simple to run: `npm install` and `npm run dev`, or a local helper script. Offline operation is required for core planning features; AI quality can depend on whichever local agent/tool the user connects, but the MCP data surface itself must work locally.
+
+Expected scale is one squad, one active release, up to 20 sprints per release, up to 100 features, up to 1000 stories, and up to 30 members.
 
 ## Constraints
 
-- **Instalação**: Não pode instalar apps desktop por política de segurança — deve rodar no navegador ou ser executável sem instalação
-- **Dados**: Fonte primária são arquivos Excel em pasta do OneDrive; o app deve detectar mudanças nos arquivos
-- **Público**: Uso interno entre 3 pessoas; não precisa de escalabilidade massiva
-- **Offline-first**: Deve funcionar localmente mesmo com conectividade intermitente
+- **Execution**: Runs locally on localhost - the app must not expose APIs or MCP externally by default.
+- **Persistence**: Uses SQLite at `./data/squad-planner.db` - data should be easy to back up or move.
+- **Stack**: Next.js, TypeScript, Prisma, Tailwind CSS, dnd-kit, and Node.js MCP - chosen for a simple full-stack local web app with a polished UI.
+- **Capacity model**: Capacity is calculated in hours from members, working days, absences, holidays, meetings, and support, then normalized to 8-hour days.
+- **Planning model**: Story points and estimated business days are independent; only estimated days consume sprint capacity.
+- **Release model**: Only one release can be active at a time in v1.
+- **Safety**: AI and MCP writes must be explicit; sensitive actions such as closing sprints or canceling items require confirmation or dangerous-operation marking.
+- **UX priority**: Desktop is the priority; smaller screens may stack boards and use horizontal scrolling.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Web app sem instalação | Restrições de segurança corporativa | — Pending |
-| Excel/OneDrive como fonte de dados | Ferramenta interna não tem API; Excel é o formato usado hoje | — Pending |
-| Estimativa em story points + dias | Time já familiarizado com story points; dias ajudam na previsão de calendário | — Pending |
-| Servidor MCP embutido | Permitir que agentes de IA consultem dados para decisões de planejamento | — Pending |
-| Manual entry para histórias | Não há integração automática disponível com a ferramenta interna | — Pending |
-| Capacity final pós-waste e override | Planejamento deve usar a capacidade final após ausências, feriados, desperdício e ajustes manuais | Validated in Phase 2 |
+| Build as a local web app | Keeps installation simple and avoids SaaS/security scope for v1. | - Pending |
+| Use SQLite for local persistence | Portable, easy to back up, and enough for the expected data volume. | - Pending |
+| Track capacity by estimated business days, not story points | Story points remain relative effort while days support capacity comparison. | - Pending |
+| Permit over-capacity planning with visible warnings | Teams sometimes choose to overplan deliberately; the tool should expose risk, not block judgment. | - Pending |
+| Move unfinished stories to the next sprint on close | Captures sprint leakage and preserves historical truth. | - Pending |
+| Include MCP and AI in v1 | AI assistance is part of the product value, but must stay controlled and local. | - Pending |
+| Use coarse MVP phases | User selected coarse planning; phases should deliver broad vertical slices. | - Pending |
 
 ## Evolution
 
-Phase 3 completion note: sprint board closure now preserves status, estimates, and completed_at for Phase 4 velocity and analytics.
+PROJECT.md is a living project context document.
 
-Phase 4 completion note: release-first planning is now the primary workflow, with release-scoped sprints, feature timelines, capacity warnings, and feature-first child backlog rules.
+After each phase transition:
+1. Move requirements that shipped and proved useful to Validated.
+2. Move invalidated requirements to Out of Scope with the reason.
+3. Add newly discovered active requirements when scope changes.
+4. Record significant implementation or product decisions.
+5. Check that What This Is and Core Value still describe the project.
 
-This document evolves at phase transitions and milestone boundaries.
-
-**After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
-
-**After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
-2. Core Value check — still the right priority?
-3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state
+After each milestone:
+1. Review all sections.
+2. Confirm the Core Value is still the right priority.
+3. Audit Out of Scope items and keep the rationale current.
+4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-02 after Phase 4 completion*
+*Last updated: 2026-06-02 after initialization*

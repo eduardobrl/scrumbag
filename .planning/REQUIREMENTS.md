@@ -1,100 +1,138 @@
-# Requirements: Scrumbag
+# Requirements: Squad Planner
 
-**Defined:** 2026-05-30
-**Core Value:** Permitir o planejamento realista de sprints com capacity ajustada à realidade da squad (ausências, desperdício), gerando previsões confiáveis de entrega de épicos.
+**Defined:** 2026-06-02
+**Core Value:** A squad can see whether a release plan fits the team's real sprint capacity and adjust scope before delivery risk becomes invisible.
 
 ## v1 Requirements
 
-Requirements for initial release. Each maps to roadmap phases.
+Requirements for the initial release. Each maps to exactly one roadmap phase.
 
-### Backlog & Hierarchy
+### Local App Foundation
 
-- [ ] **BACK-01**: User can create and manage backlog items (stories, features, bugs, epics)
-- [ ] **BACK-02**: User can organize work items in hierarchy (epics → features → stories)
-- [x] **BACK-03**: User can prioritize backlog items via drag-and-drop
+- [ ] **APP-01**: User can install dependencies and run the app locally from standard commands.
+- [ ] **APP-02**: User can access the app in a browser on localhost.
+- [ ] **APP-03**: User can navigate between Dashboard, Releases, Features/Stories, Backlog, Sprints, Squad, Reports, Assistant AI, and Settings.
+- [ ] **APP-04**: User can see active release context, release status, capacity indicator, and assistant access in a global header.
+- [ ] **APP-05**: User data persists locally in SQLite and survives app restarts.
+- [ ] **APP-06**: User can configure general capacity settings including full-time hours, intern hours, standard day hours, MCP host, and MCP port.
 
-### Sprint Planning & Board
+### Squad And Calendar
 
-- [x] **SPRT-01**: User can create sprints with start date, end date, and goal
-- [x] **SPRT-02**: User can select backlog items to include in a sprint
-- [x] **SPRT-03**: User can view and manage sprint board with columns (To Do, In Progress, Done)
-- [x] **SPRT-04**: User can move items between board columns via drag-and-drop
+- [ ] **SQUAD-01**: User can create, edit, activate, and deactivate squad members.
+- [ ] **SQUAD-02**: User can set each member as full time or intern.
+- [ ] **SQUAD-03**: User can register vacations and day-off absences for members.
+- [ ] **SQUAD-04**: User can register holidays that reduce capacity for all active members.
+- [ ] **SQUAD-05**: User can view daily gross capacity, future absences, holidays, and absence impact by sprint.
 
-### Release Planning & UX
+### Releases And Sprints
 
-- [x] **REL-01**: User must create a release before creating or planning sprints for that release
-- [x] **REL-02**: User can assign features to a release, including adding features while the release is already in execution
-- [x] **REL-03**: System prevents orphan stories and bugs by requiring every story or bug to belong to a feature
-- [x] **REL-04**: User can plan a release visually by dragging features into a release board/timeline organized by sprints
-- [x] **REL-05**: User can expand or shrink a feature across one or more sprints and see the predicted sprint where the feature completes
-- [x] **REL-06**: System warns when planned feature scope exceeds sprint or release capacity and suggests splitting oversized features
-- [x] **UX-01**: User can open a sprint from the sprint list into a dedicated sprint screen with tabs for board, planning, capacity, and closure instead of rendering everything in one page
-- [x] **UX-02**: User can manage backlog through a clearer feature-first flow where features contain stories and bugs, reducing ambiguity in item creation
+- [ ] **REL-01**: User can create, edit, list, and inspect releases with name, objective, optional description, dates, sprint length, meeting percentage, support percentage, and status.
+- [ ] **REL-02**: User cannot set more than one release to in-progress status.
+- [ ] **REL-03**: User can save a release and have sprints generated automatically from start date, end date, and default sprint length in business days.
+- [ ] **REL-04**: Generated sprints are sequential, non-overlapping, and make the final sprint absorb remaining days instead of creating a very small final sprint.
+- [ ] **SPR-01**: User can list sprints for a release with period, status, capacity, planned effort, remaining capacity, occupancy, and risk.
+- [ ] **SPR-02**: User can edit sprint goal and dates.
+- [ ] **SPR-03**: System prevents overlapping sprints, warns about release gaps, and recalculates affected capacity after sprint date changes.
 
-### Estimation
+### Features, Stories, And Backlog
 
-- [x] **EST-01**: User can estimate stories using Fibonacci story points (1, 2, 3, 5, 8, 13, 21)
-- [x] **EST-02**: User can estimate stories in work days
+- [ ] **FEAT-01**: User can create, edit, list, inspect, and cancel features for a release.
+- [ ] **FEAT-02**: User can create, edit, list, inspect, and cancel stories for a feature.
+- [ ] **FEAT-03**: User can enter story title, description, acceptance criteria, story points, estimated business days, status, and current sprint.
+- [ ] **FEAT-04**: System calculates feature story points and estimated days from non-canceled stories.
+- [ ] **FEAT-05**: System calculates feature status from its stories as not started, in progress, or finished.
+- [ ] **FEAT-06**: System calculates feature progress by finished story points, falling back to story count when story points are absent.
+- [ ] **BACK-01**: User can view stories not assigned to any sprint in a general backlog.
+- [ ] **BACK-02**: User can filter backlog by release, feature, status, free text, unplanned stories, and canceled stories.
+- [ ] **BACK-03**: User can plan a backlog story into a sprint after seeing the sprint capacity impact.
+- [ ] **BACK-04**: User can remove a story from a sprint and return it to general backlog with Backlog status.
 
-### Squad & Capacity
+### Sprint Execution And Capacity
 
-- [x] **TEAM-01**: User can register squad members with name, role, and typical daily capacity
-- [x] **TEAM-02**: User can register absences, vacations, unpaid leave, and holidays
-- [x] **CAP-01**: System calculates realistic sprint capacity adjusting for absences and holidays
-- [x] **CAP-02**: System calculates capacity considering waste/overhead (meetings, support, incidents)
-- [x] **CAP-03**: System shows transparent capacity breakdown with manual override option
+- [ ] **BOARD-01**: User can open a sprint board with fixed columns Backlog da Sprint, Em Execucao, and Finalizado.
+- [ ] **BOARD-02**: User can drag stories between board columns and have the story status update.
+- [ ] **BOARD-03**: User can add stories from backlog to a sprint from the sprint screen.
+- [ ] **BOARD-04**: User can see sprint gross capacity, net capacity, planned effort, remaining capacity, occupancy percentage, and over-capacity alerts.
+- [ ] **CAP-01**: System calculates gross sprint capacity from active members, work schedule, and business days.
+- [ ] **CAP-02**: System reduces capacity for vacations, day offs, and holidays.
+- [ ] **CAP-03**: System applies meeting and support percentages to calculate net capacity.
+- [ ] **CAP-04**: System normalizes net capacity hours into 8-hour days.
+- [ ] **CAP-05**: System compares planned story estimated days with net capacity days and allows over-capacity planning with a clear warning.
+- [ ] **SPR-04**: User can close a sprint only when closure rules are satisfied.
+- [ ] **SPR-05**: System leaves finished stories in the closed sprint and moves unfinished stories to the next sprint while preserving status.
+- [ ] **SPR-06**: System creates a next sprint automatically when the last sprint is closed with unfinished stories.
+- [ ] **SPR-07**: System records story leakage history with origin sprint, destination sprint, event date, and status at event.
+- [ ] **SPR-08**: User can reopen a closed sprint while preserving leakage history.
 
-### Velocity & Tracking
+### Dashboard, Timeline, And Progress
 
-- [ ] **VEL-01**: System tracks velocity as rolling average of completed story points (last 3-5 sprints)
-- [ ] **BURN-01**: System displays basic burndown chart (ideal vs actual remaining effort)
+- [ ] **DASH-01**: User can view active release dashboard cards for progress, total capacity, planned effort, risk, feature count, story count, finished story count, and leaked story count.
+- [ ] **DASH-02**: User can view consolidated alerts for over-capacity sprints, over-capacity release, features without stories, stories without estimates, leaked stories, sprints without goals, and empty sprints.
+- [ ] **DASH-03**: User can view a release timeline showing features across sprints, continuous feature spans, inactive gaps, completion progress, finished sprints, and leaked sprints.
+- [ ] **DASH-04**: User can open related release, sprint, or feature screens from dashboard tables, timelines, and alerts.
+- [ ] **PROG-01**: System calculates release progress by finished story points, falling back to story count when story points are absent.
+- [ ] **PROG-02**: System calculates sprint progress by finished estimated days over planned estimated days.
 
-### Forecasting
+### Reports, MCP, And AI Assistant
 
-- [ ] **FORE-01**: System forecasts epic delivery with confidence intervals (not single dates)
-- [ ] **FORE-02**: System updates forecasts automatically when scope changes
-
-### Integration
-
-- [ ] **SYNC-01**: System detects changes in Excel files from OneDrive-synced folder
-- [ ] **SYNC-02**: System imports Excel data into internal data model with content-hash validation
+- [ ] **REP-01**: User can generate release planning, sprint capacity, stories by sprint, feature progress, leakage, planned-versus-capacity, and timeline reports.
+- [ ] **REP-02**: User can export reports to CSV.
+- [ ] **REP-03**: User can export reports to Excel.
+- [ ] **MCP-01**: Local MCP server listens only on localhost by default.
+- [ ] **MCP-02**: MCP exposes read tools for releases, active release, summaries, sprints, sprint capacity, features, stories, backlog, timeline, capacity report, and leakage report.
+- [ ] **MCP-03**: MCP exposes suggestion tools for scope adjustments, story redistribution, capacity risks, late features, and release status explanation.
+- [ ] **MCP-04**: MCP exposes explicit write tools for feature/story creation and updates, story movement, and story status changes.
+- [ ] **MCP-05**: Critical MCP operations such as closing sprints, reopening sprints, and canceling stories or features require confirmation or dangerous-operation marking.
+- [ ] **AI-01**: User can open a local AI assistant chat from the app.
+- [ ] **AI-02**: User can ask quick prompts about release fit, risky sprints, risky features, leaked stories, redistribution, management summaries, and stories without estimates.
+- [ ] **AI-03**: Assistant responses are grounded in app data through MCP.
+- [ ] **AI-04**: Assistant can suggest changes but does not apply sensitive changes without explicit user confirmation.
 
 ## v2 Requirements
 
-Deferred to future release. Tracked but not in current roadmap.
+Deferred to future releases. Tracked but not in the current roadmap.
 
-### AI Integration
+### Integrations
 
-- **MCP-01**: MCP server exposes capacity, backlog, and forecast data for AI agent queries
-- **MCP-02**: MCP server provides read-only tools first (query_capacity, list_sprints, get_backlog)
+- **INT-01**: User can import or synchronize planning data with Jira.
+- **INT-02**: User can import or synchronize planning data with Azure DevOps.
+- **INT-03**: User can import or synchronize planning data with Trello.
+- **INT-04**: User can import or synchronize planning data with GitHub.
 
-### Advanced Features
+### Advanced Planning
 
-- **SUGG-01**: System suggests stories that fit remaining sprint capacity based on priority and dependencies
-- **WASTE-01**: Advanced waste/overhead tracking with configurable categories and trend visualization
-- **OFF-01**: Enhanced offline-first support with adaptive sync and sync status indicators
-- **EXP-01**: JSON data export/backup functionality
+- **PLAN-01**: System can calculate squad velocity automatically from completed story points.
+- **PLAN-02**: System can enforce WIP limits on sprint board columns.
+- **PLAN-03**: User can assign stories to individual squad members.
+- **PLAN-04**: User can model blocking dependencies between stories or features.
+- **PLAN-05**: User can run multiple active releases or parallel sprint tracks.
+
+### Collaboration And Deployment
+
+- **COLL-01**: Multiple users can authenticate and collaborate in the same planning workspace.
+- **COLL-02**: Admin can manage roles and permissions.
+- **COLL-03**: Users can edit the plan collaboratively in real time.
+- **DEP-01**: App can run against a remote database.
+- **DEP-02**: App can be deployed to a shared corporate server.
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
+Explicitly excluded from v1 to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Complex multi-user auth/SSO | Only 3 internal users; corporate network is the trust boundary |
-| Native mobile app | PROJECT.md explicitly excludes; violates "no installation" constraint |
-| Real-time collaborative editing | OneDrive already syncs Excel; CRDT/OT is overkill for 3 users |
-| Automatic notifications/alerts | Out of scope per PROJECT.md; users have email/Teams |
-| Advanced BI/dashboards | "Dashboards básicos são suficientes" per PROJECT.md |
-| Direct Jira/Azure DevOps integration | Corporate tool has no API; Excel/OneDrive is the canonical bridge |
-| Built-in chat/messaging | Reinventing Slack/Teams; adds complexity with zero differentiation |
-| Complex workflow engine | Fixed workflow is sufficient; convention over configuration |
-| Public REST API | MCP is the chosen integration pattern |
-| Time tracking per task | Conflicts with story points; track at sprint level only |
-| Planning poker integration | Manual entry works for 3 users; defer to v2+ |
-| Custom board columns | Fixed Kanban columns are sufficient for v1 |
-| Multi-squad/portfolio views | One squad now; add when managing multiple teams |
-| Advanced analytics (Cycle Time, CFD) | Useful but not essential for core capacity planning |
+| Multi-user authentication | The app is local and single-user for v1. |
+| Advanced permission control | No multi-user surface exists in v1. |
+| Jira, Azure DevOps, Trello, or GitHub integration | The app is an auxiliary local planning tool in v1. |
+| Automatic velocity calculation from story points | v1 capacity is based on estimated business days. |
+| Mandatory automatic planning | User remains responsible for planning decisions. |
+| WIP limits | Useful later, but not core to release capacity fit. |
+| Story assignees | v1 plans squad-level capacity, not individual allocation. |
+| Multiple active releases | v1 keeps release context simple and focused. |
+| Parallel sprint streams | v1 assumes one sprint sequence per release. |
+| Blocking dependencies | Adds planning-model complexity outside the first release. |
+| Real-time collaboration | Conflicts with local-first simplicity. |
+| Remote database or server deployment | v1 targets localhost and SQLite. |
 
 ## Traceability
 
@@ -102,47 +140,72 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BACK-01 | Phase 1 | Pending |
-| BACK-02 | Phase 1 | Pending |
-| BACK-03 | Phase 3 | Complete |
-| SPRT-01 | Phase 3 | Complete |
-| SPRT-02 | Phase 3 | Complete |
-| SPRT-03 | Phase 3 | Complete |
-| SPRT-04 | Phase 3 | Complete |
-| REL-01 | Phase 4 | Complete |
-| REL-02 | Phase 4 | Complete |
-| REL-03 | Phase 4 | Complete |
-| REL-04 | Phase 4 | Complete |
-| REL-05 | Phase 4 | Complete |
-| REL-06 | Phase 4 | Complete |
-| UX-01 | Phase 4 | Complete |
-| UX-02 | Phase 4 | Complete |
-| EST-01 | Phase 3 | Complete |
-| EST-02 | Phase 3 | Complete |
-| TEAM-01 | Phase 2 | Complete |
-| TEAM-02 | Phase 2 | Complete |
-| CAP-01 | Phase 2 | Complete |
-| CAP-02 | Phase 2 | Complete |
-| CAP-03 | Phase 2 | Complete |
-| VEL-01 | Phase 5 | Pending |
-| BURN-01 | Phase 5 | Pending |
-| FORE-01 | Phase 5 | Pending |
-| FORE-02 | Phase 5 | Pending |
-| SYNC-01 | Phase 1 | Pending |
-| SYNC-02 | Phase 1 | Pending |
-| MCP-01 | v2 | Deferred |
-| MCP-02 | v2 | Deferred |
-| SUGG-01 | v2 | Deferred |
-| WASTE-01 | v2 | Deferred |
-| OFF-01 | v2 | Deferred |
-| EXP-01 | v2 | Deferred |
+| APP-01 | Phase 1 | Pending |
+| APP-02 | Phase 1 | Pending |
+| APP-03 | Phase 1 | Pending |
+| APP-04 | Phase 1 | Pending |
+| APP-05 | Phase 1 | Pending |
+| APP-06 | Phase 1 | Pending |
+| SQUAD-01 | Phase 1 | Pending |
+| SQUAD-02 | Phase 1 | Pending |
+| SQUAD-03 | Phase 1 | Pending |
+| SQUAD-04 | Phase 1 | Pending |
+| SQUAD-05 | Phase 1 | Pending |
+| REL-01 | Phase 2 | Pending |
+| REL-02 | Phase 2 | Pending |
+| REL-03 | Phase 2 | Pending |
+| REL-04 | Phase 2 | Pending |
+| SPR-01 | Phase 2 | Pending |
+| SPR-02 | Phase 2 | Pending |
+| SPR-03 | Phase 2 | Pending |
+| FEAT-01 | Phase 3 | Pending |
+| FEAT-02 | Phase 3 | Pending |
+| FEAT-03 | Phase 3 | Pending |
+| FEAT-04 | Phase 3 | Pending |
+| FEAT-05 | Phase 3 | Pending |
+| FEAT-06 | Phase 3 | Pending |
+| BACK-01 | Phase 3 | Pending |
+| BACK-02 | Phase 3 | Pending |
+| BACK-03 | Phase 3 | Pending |
+| BACK-04 | Phase 3 | Pending |
+| BOARD-01 | Phase 4 | Pending |
+| BOARD-02 | Phase 4 | Pending |
+| BOARD-03 | Phase 4 | Pending |
+| BOARD-04 | Phase 4 | Pending |
+| CAP-01 | Phase 4 | Pending |
+| CAP-02 | Phase 4 | Pending |
+| CAP-03 | Phase 4 | Pending |
+| CAP-04 | Phase 4 | Pending |
+| CAP-05 | Phase 4 | Pending |
+| SPR-04 | Phase 4 | Pending |
+| SPR-05 | Phase 4 | Pending |
+| SPR-06 | Phase 4 | Pending |
+| SPR-07 | Phase 4 | Pending |
+| SPR-08 | Phase 4 | Pending |
+| DASH-01 | Phase 5 | Pending |
+| DASH-02 | Phase 5 | Pending |
+| DASH-03 | Phase 5 | Pending |
+| DASH-04 | Phase 5 | Pending |
+| PROG-01 | Phase 5 | Pending |
+| PROG-02 | Phase 5 | Pending |
+| REP-01 | Phase 5 | Pending |
+| REP-02 | Phase 5 | Pending |
+| REP-03 | Phase 5 | Pending |
+| MCP-01 | Phase 5 | Pending |
+| MCP-02 | Phase 5 | Pending |
+| MCP-03 | Phase 5 | Pending |
+| MCP-04 | Phase 5 | Pending |
+| MCP-05 | Phase 5 | Pending |
+| AI-01 | Phase 5 | Pending |
+| AI-02 | Phase 5 | Pending |
+| AI-03 | Phase 5 | Pending |
+| AI-04 | Phase 5 | Pending |
 
 **Coverage:**
-
-- v1 requirements: 28 total
-- Mapped to phases: 28
-- Unmapped: 0 ✓
+- v1 requirements: 60 total
+- Mapped to phases: 60
+- Unmapped: 0
 
 ---
-*Requirements defined: 2026-05-30*
-*Last updated: 2026-06-01 after release planning UX exploration*
+*Requirements defined: 2026-06-02*
+*Last updated: 2026-06-02 after initial definition*
