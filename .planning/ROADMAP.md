@@ -34,6 +34,20 @@ This roadmap favors broad vertical phases. Each phase should leave the product m
 
 **UI hint:** yes
 
+**Execution Plans:**
+
+**Wave 1**
+- `01-01` - Walking skeleton: scaffold the local Next.js/SQLite app, app shell, and first persisted squad member loop.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- `01-02` - Persisted Settings screen and API for capacity defaults and local MCP configuration.
+- `01-03` - Squad and calendar management for members, absences, holidays, and summary metrics.
+
+Cross-cutting constraints:
+- Keep all runtime data local, with SQLite at `./data/squad-planner.db`.
+- Keep browser/API access localhost-only and do not add auth, remote DB, or external integrations in Phase 1.
+- Preserve desktop-first operational UI patterns: side navigation, global header, tables, badges, and summary cards.
+
 ### Phase 2: Release And Sprint Planning Core
 
 **Goal:** A user can create a release, have sprints generated automatically, inspect the release and sprint list, and adjust sprint dates/goals safely.
