@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum RoleType {
+  FULL_TIME
+  INTERN
+}
+
+enum AbsenceType {
+  VACATION
+  DAY_OFF
+}
+
+model SquadMember {
+  id        String    @id @default(cuid())
+  name      String
+  roleType  RoleType
+  active    Boolean   @default(true)
+  absences  Absence[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Absence {
+  id        String      @id @default(cuid())
+  memberId  String
+  member    SquadMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  type      AbsenceType
+  startDate DateTime
+  endDate   DateTime
+  notes     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Holiday {
+  id        String   @id @default(cuid())
+  date      DateTime
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AppSettings {
+  id                   String   @id @default(cuid())
+  workingHoursFullTime Float    @default(8)
+  workingHoursIntern   Float    @default(6)
+  standardDayHours     Float    @default(8)
+  mcpHost              String   @default("localhost")
+  mcpPort              Int      @default(3333)
+  mcpEnabled           Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
