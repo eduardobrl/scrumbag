@@ -97,6 +97,24 @@ Cross-cutting constraints:
 
 **UI hint:** yes
 
+**Execution Plans:**
+
+**Wave 1**
+
+- `03-01` - Feature and Story data foundation, feature CRUD, cancellation, and aggregate metrics.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- `03-02` - Story CRUD from feature detail with estimates, status, cancellation, and aggregate recalculation.
+- `03-03` - Backlog filters, story-to-sprint planning preview, sprint assignment, return-to-backlog, and planned-effort updates.
+
+Cross-cutting constraints:
+
+- Keep Feature and Story data local in SQLite and tied to the existing Release/Sprint model.
+- Use cancellation statuses instead of destructive deletion for scoped feature and story items.
+- Exclude canceled stories from feature totals, progress, and planned effort.
+- Keep real capacity, board drag-and-drop, sprint closure, reopening, and leakage history deferred to Phase 4.
+
 ### Phase 4: Sprint Board, Capacity Engine, And Leakage
 
 **Goal:** A user can execute a sprint on a drag-and-drop board while the system calculates real capacity, highlights over-capacity plans, closes/reopens sprints, and records leaked stories.
@@ -136,8 +154,8 @@ Cross-cutting constraints:
 | Phase | Requirement Count | Status |
 |-------|-------------------|--------|
 | Phase 1 | 11 | Complete |
-| Phase 2 | 7 | Pending |
-| Phase 3 | 10 | Pending |
+| Phase 2 | 7 | Complete |
+| Phase 3 | 10 | Ready to execute |
 | Phase 4 | 13 | Pending |
 | Phase 5 | 18 | Pending |
 
