@@ -14,7 +14,7 @@ This roadmap favors broad vertical phases. Each phase should leave the product m
 | 2 | 3/3 | Complete    | 2026-06-03 |
 | 3 | Feature, Story, And Backlog Planning | Let users model release scope as features and stories, aggregate estimates, and plan stories from backlog into sprints. | FEAT-01 to FEAT-06, BACK-01 to BACK-04 |
 | 4 | 3/3 | Complete    | 2026-06-03 |
-| 5 | Release Intelligence, Reports, MCP, And AI | Provide dashboard, timeline, progress, reports, exports, MCP tools, and the AI assistant. | DASH-01 to DASH-04, PROG-01 to PROG-02, REP-01 to REP-03, MCP-01 to MCP-05, AI-01 to AI-04 |
+| 5 | 1/3 | In Progress|  |
 
 ## Phases
 
@@ -167,6 +167,24 @@ Cross-cutting constraints:
 
 **UI hint:** yes
 
+**Execution Plans:**
+
+**Wave 1**
+
+- `05-01` - Dashboard, timeline, and progress: replace placeholder dashboard with real metrics, alerts, sprint table, and release timeline.
+- `05-02` - Reports and exports: generate 7 report types from live data and export to CSV or Excel.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- `05-03` - MCP server and AI assistant: local MCP tool surface, AI chat with grounded responses, quick prompts, and explicit confirmation for sensitive operations.
+
+Cross-cutting constraints:
+
+- Keep all runtime data local; MCP server binds to localhost only.
+- Dashboard aggregations and report data must match; share query logic where possible.
+- MCP write tools and AI assistant dangerous-operation flows must preserve existing cancellation/closure rules from Phase 4.
+- AI assistant does not bypass confirmation gates; explicit user action is required for close sprint, reopen sprint, cancel story, and cancel feature.
+
 ## Coverage
 
 | Phase | Requirement Count | Status |
@@ -175,7 +193,7 @@ Cross-cutting constraints:
 | Phase 2 | 7 | Complete |
 | Phase 3 | 10 | Complete |
 | Phase 4 | 13 | Complete |
-| Phase 5 | 18 | Ready to plan |
+| Phase 5 | 18 | Planned |
 
 **Total v1 requirements:** 60
 **Mapped requirements:** 60
@@ -183,4 +201,4 @@ Cross-cutting constraints:
 
 ---
 *Roadmap created: 2026-06-02*
-*Last updated: 2026-06-03 after Phase 3 completion*
+*Last updated: 2026-06-03 after Phase 5 planning*

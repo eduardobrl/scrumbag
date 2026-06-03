@@ -66,12 +66,12 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Dashboard, Timeline, And Progress
 
-- [ ] **DASH-01**: User can view active release dashboard cards for progress, total capacity, planned effort, risk, feature count, story count, finished story count, and leaked story count.
-- [ ] **DASH-02**: User can view consolidated alerts for over-capacity sprints, over-capacity release, features without stories, stories without estimates, leaked stories, sprints without goals, and empty sprints.
-- [ ] **DASH-03**: User can view a release timeline showing features across sprints, continuous feature spans, inactive gaps, completion progress, finished sprints, and leaked sprints.
-- [ ] **DASH-04**: User can open related release, sprint, or feature screens from dashboard tables, timelines, and alerts.
-- [ ] **PROG-01**: System calculates release progress by finished story points, falling back to story count when story points are absent.
-- [ ] **PROG-02**: System calculates sprint progress by finished estimated days over planned estimated days.
+- [x] **DASH-01**: User can view active release dashboard cards for progress, total capacity, planned effort, risk, feature count, story count, finished story count, and leaked story count.
+- [x] **DASH-02**: User can view consolidated alerts for over-capacity sprints, over-capacity release, features without stories, stories without estimates, leaked stories, sprints without goals, and empty sprints.
+- [x] **DASH-03**: User can view a release timeline showing features across sprints, continuous feature spans, inactive gaps, completion progress, finished sprints, and leaked sprints.
+- [x] **DASH-04**: User can open related release, sprint, or feature screens from dashboard tables, timelines, and alerts.
+- [x] **PROG-01**: System calculates release progress by finished story points, falling back to story count when story points are absent.
+- [x] **PROG-02**: System calculates sprint progress by finished estimated days over planned estimated days.
 
 ### Reports, MCP, And AI Assistant
 
@@ -182,12 +182,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SPR-06 | Phase 4 | Complete |
 | SPR-07 | Phase 4 | Complete |
 | SPR-08 | Phase 4 | Complete |
-| DASH-01 | Phase 5 | Pending |
-| DASH-02 | Phase 5 | Pending |
-| DASH-03 | Phase 5 | Pending |
-| DASH-04 | Phase 5 | Pending |
-| PROG-01 | Phase 5 | Pending |
-| PROG-02 | Phase 5 | Pending |
+| DASH-01 | Phase 5 | Complete |
+| DASH-02 | Phase 5 | Complete |
+| DASH-03 | Phase 5 | Complete |
+| DASH-04 | Phase 5 | Complete |
+| PROG-01 | Phase 5 | Complete |
+| PROG-02 | Phase 5 | Complete |
 | REP-01 | Phase 5 | Pending |
 | REP-02 | Phase 5 | Pending |
 | REP-03 | Phase 5 | Pending |
