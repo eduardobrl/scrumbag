@@ -1,53 +1,79 @@
-import { MemberList } from "@/features/squad/member-list";
-import { MemberQuickCreate } from "@/features/squad/member-quick-create";
-import { listSquadMembers } from "@/lib/squad";
+import Link from "next/link";
+import { Bot, FileSpreadsheet, PackagePlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { AlertPanel } from "@/features/dashboard/alert-panel";
+import { DashboardCards } from "@/features/dashboard/dashboard-cards";
+import { SprintTable } from "@/features/dashboard/sprint-table";
+import { TimelineView } from "@/features/dashboard/timeline-view";
+import { detectAlerts } from "@/lib/alerts";
+import { getDashboardData } from "@/lib/dashboard";
+import { getActiveReleaseSummary } from "@/lib/releases";
+import { buildTimelineData } from "@/lib/timeline";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const members = await listSquadMembers();
+  const activeRelease = await getActiveReleaseSummary();
+
+  if (!activeRelease) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-normal text-ink">Dashboard</h1>
+          <p className="mt-1 text-sm text-slate-600">Create an active release to start tracking release health.</p>
+        </div>
+        <Card className="max-w-2xl">
+          <h2 className="text-base font-semibold text-ink">No active release</h2>
+          <p className="mt-2 text-sm text-slate-600">Release capacity, alerts, and timelines appear once a release is in progress.</p>
+          <div className="mt-4">
+            <Button asChild>
+              <Link href="/releases">
+                <PackagePlus className="h-4 w-4" aria-hidden />
+                Open releases
+              </Link>
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  const [dashboard, alerts, timeline] = await Promise.all([
+    getDashboardData(activeRelease.id),
+    detectAlerts(activeRelease.id),
+    buildTimelineData(activeRelease.id)
+  ]);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-normal text-ink">Dashboard</h1>
-        <p className="mt-1 text-sm text-slate-600">Local planning foundation for squad setup and future release capacity.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-normal text-ink">Dashboard</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            {dashboard.release.name} | {dashboard.release.startDate} to {dashboard.release.endDate}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="secondary">
+            <Link href="/reports">
+              <FileSpreadsheet className="h-4 w-4" aria-hidden />
+              Reports
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/assistant">
+              <Bot className="h-4 w-4" aria-hidden />
+              Ask AI
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
-        <Card>
-          <div className="text-sm text-slate-500">Active release</div>
-          <div className="mt-2 text-xl font-semibold">None</div>
-        </Card>
-        <Card>
-          <div className="text-sm text-slate-500">Capacity</div>
-          <div className="mt-2 text-xl font-semibold">--</div>
-        </Card>
-        <Card>
-          <div className="text-sm text-slate-500">Squad members</div>
-          <div className="mt-2 text-xl font-semibold">{members.length}</div>
-        </Card>
-        <Card>
-          <div className="text-sm text-slate-500">Alerts</div>
-          <div className="mt-2 text-xl font-semibold">0</div>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-[360px_1fr] gap-4">
-        <Card>
-          <h2 className="text-base font-semibold">Create squad member</h2>
-          <div className="mt-4">
-            <MemberQuickCreate />
-          </div>
-        </Card>
-        <Card>
-          <h2 className="text-base font-semibold">Squad members</h2>
-          <div className="mt-4">
-            <MemberList members={members} />
-          </div>
-        </Card>
-      </div>
+      <DashboardCards data={dashboard} />
+      <AlertPanel alerts={alerts} />
+      <SprintTable sprints={dashboard.sprints} />
+      <TimelineView data={timeline} />
     </div>
   );
 }

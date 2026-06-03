@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Bot, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getDashboardData } from "@/lib/dashboard";
 import { getActiveReleaseSummary } from "@/lib/releases";
 
 export async function AppHeader() {
   const activeRelease = await getActiveReleaseSummary();
+  const dashboard = activeRelease ? await getDashboardData(activeRelease.id) : null;
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-line bg-white px-6">
@@ -15,7 +17,9 @@ export async function AppHeader() {
           <>
             <span className="font-semibold">{activeRelease.name}</span>
             <Badge tone="success">In progress</Badge>
-            <Badge tone="warning">Capacity: --</Badge>
+            <Badge tone={dashboard?.risk === "Over capacity" ? "danger" : "success"}>
+              Capacity: {dashboard?.plannedEffortDays.toFixed(1)} / {dashboard?.totalCapacityDays.toFixed(1)} days
+            </Badge>
           </>
         ) : (
           <>
