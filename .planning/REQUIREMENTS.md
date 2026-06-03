@@ -20,9 +20,9 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 - [x] **SQUAD-01**: User can create, edit, activate, and deactivate squad members.
 - [x] **SQUAD-02**: User can set each member as full time or intern.
-- [ ] **SQUAD-03**: User can register vacations and day-off absences for members.
-- [ ] **SQUAD-04**: User can register holidays that reduce capacity for all active members.
-- [ ] **SQUAD-05**: User can view daily gross capacity, future absences, holidays, and absence impact by sprint.
+- [x] **SQUAD-03**: User can register vacations and day-off absences for members.
+- [x] **SQUAD-04**: User can register holidays that reduce capacity for all active members.
+- [x] **SQUAD-05**: User can view daily gross capacity, future absences, holidays, and absence impact by sprint.
 
 ### Releases And Sprints
 
@@ -148,9 +148,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | APP-06 | Phase 1 | Complete |
 | SQUAD-01 | Phase 1 | Complete |
 | SQUAD-02 | Phase 1 | Complete |
-| SQUAD-03 | Phase 1 | Pending |
-| SQUAD-04 | Phase 1 | Pending |
-| SQUAD-05 | Phase 1 | Pending |
+| SQUAD-03 | Phase 1 | Complete |
+| SQUAD-04 | Phase 1 | Complete |
+| SQUAD-05 | Phase 1 | Complete |
 | REL-01 | Phase 2 | Pending |
 | REL-02 | Phase 2 | Pending |
 | REL-03 | Phase 2 | Pending |
