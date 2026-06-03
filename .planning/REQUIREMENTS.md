@@ -9,17 +9,17 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Local App Foundation
 
-- [ ] **APP-01**: User can install dependencies and run the app locally from standard commands.
-- [ ] **APP-02**: User can access the app in a browser on localhost.
-- [ ] **APP-03**: User can navigate between Dashboard, Releases, Features/Stories, Backlog, Sprints, Squad, Reports, Assistant AI, and Settings.
-- [ ] **APP-04**: User can see active release context, release status, capacity indicator, and assistant access in a global header.
-- [ ] **APP-05**: User data persists locally in SQLite and survives app restarts.
+- [x] **APP-01**: User can install dependencies and run the app locally from standard commands.
+- [x] **APP-02**: User can access the app in a browser on localhost.
+- [x] **APP-03**: User can navigate between Dashboard, Releases, Features/Stories, Backlog, Sprints, Squad, Reports, Assistant AI, and Settings.
+- [x] **APP-04**: User can see active release context, release status, capacity indicator, and assistant access in a global header.
+- [x] **APP-05**: User data persists locally in SQLite and survives app restarts.
 - [ ] **APP-06**: User can configure general capacity settings including full-time hours, intern hours, standard day hours, MCP host, and MCP port.
 
 ### Squad And Calendar
 
-- [ ] **SQUAD-01**: User can create, edit, activate, and deactivate squad members.
-- [ ] **SQUAD-02**: User can set each member as full time or intern.
+- [x] **SQUAD-01**: User can create, edit, activate, and deactivate squad members.
+- [x] **SQUAD-02**: User can set each member as full time or intern.
 - [ ] **SQUAD-03**: User can register vacations and day-off absences for members.
 - [ ] **SQUAD-04**: User can register holidays that reduce capacity for all active members.
 - [ ] **SQUAD-05**: User can view daily gross capacity, future absences, holidays, and absence impact by sprint.
@@ -140,14 +140,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| APP-01 | Phase 1 | Pending |
-| APP-02 | Phase 1 | Pending |
-| APP-03 | Phase 1 | Pending |
-| APP-04 | Phase 1 | Pending |
-| APP-05 | Phase 1 | Pending |
+| APP-01 | Phase 1 | Complete |
+| APP-02 | Phase 1 | Complete |
+| APP-03 | Phase 1 | Complete |
+| APP-04 | Phase 1 | Complete |
+| APP-05 | Phase 1 | Complete |
 | APP-06 | Phase 1 | Pending |
-| SQUAD-01 | Phase 1 | Pending |
-| SQUAD-02 | Phase 1 | Pending |
+| SQUAD-01 | Phase 1 | Complete |
+| SQUAD-02 | Phase 1 | Complete |
 | SQUAD-03 | Phase 1 | Pending |
 | SQUAD-04 | Phase 1 | Pending |
 | SQUAD-05 | Phase 1 | Pending |
@@ -202,6 +202,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AI-04 | Phase 5 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 60 total
 - Mapped to phases: 60
 - Unmapped: 0

@@ -26,6 +26,7 @@ This roadmap favors broad vertical phases. Each phase should leave the product m
 **Requirements:** APP-01, APP-02, APP-03, APP-04, APP-05, APP-06, SQUAD-01, SQUAD-02, SQUAD-03, SQUAD-04, SQUAD-05
 
 **Success Criteria**:
+
 1. A fresh checkout can be installed and started locally, then opened in a browser on localhost.
 2. The app shell shows side navigation and global release context/header without broken routes.
 3. SQLite persistence stores app settings, squad members, absences, and holidays across restarts.
@@ -37,13 +38,16 @@ This roadmap favors broad vertical phases. Each phase should leave the product m
 **Execution Plans:**
 
 **Wave 1**
+
 - `01-01` - Walking skeleton: scaffold the local Next.js/SQLite app, app shell, and first persisted squad member loop.
 
 **Wave 2** *(blocked on Wave 1 completion)*
+
 - `01-02` - Persisted Settings screen and API for capacity defaults and local MCP configuration.
 - `01-03` - Squad and calendar management for members, absences, holidays, and summary metrics.
 
 Cross-cutting constraints:
+
 - Keep all runtime data local, with SQLite at `./data/squad-planner.db`.
 - Keep browser/API access localhost-only and do not add auth, remote DB, or external integrations in Phase 1.
 - Preserve desktop-first operational UI patterns: side navigation, global header, tables, badges, and summary cards.
@@ -56,6 +60,7 @@ Cross-cutting constraints:
 **Requirements:** REL-01, REL-02, REL-03, REL-04, SPR-01, SPR-02, SPR-03
 
 **Success Criteria**:
+
 1. Release create/edit/list/detail flows capture all required release fields and prevent multiple in-progress releases.
 2. Saving a release generates sequential, non-overlapping sprints from business-day dates.
 3. The final sprint absorbs remaining business days instead of creating an impractically small final sprint.
@@ -72,6 +77,7 @@ Cross-cutting constraints:
 **Requirements:** FEAT-01, FEAT-02, FEAT-03, FEAT-04, FEAT-05, FEAT-06, BACK-01, BACK-02, BACK-03, BACK-04
 
 **Success Criteria**:
+
 1. Feature and story CRUD flows capture all specified fields and use cancelation instead of destructive deletion for scoped items.
 2. Feature totals, calculated status, progress, and date/timeline placeholders update from associated non-canceled stories.
 3. Backlog screen lists unplanned stories and supports release, feature, status, text, unplanned, and canceled filters.
@@ -88,6 +94,7 @@ Cross-cutting constraints:
 **Requirements:** BOARD-01, BOARD-02, BOARD-03, BOARD-04, CAP-01, CAP-02, CAP-03, CAP-04, CAP-05, SPR-04, SPR-05, SPR-06, SPR-07, SPR-08
 
 **Success Criteria**:
+
 1. Sprint detail shows fixed board columns and supports drag-and-drop status changes.
 2. Sprint capacity is calculated from active members, business days, absences, holidays, meeting percentage, support percentage, and 8-hour day normalization.
 3. Sprint screens display gross capacity, net capacity, planned effort, remaining capacity, occupancy, and visual overflow warnings while still allowing over-capacity planning.
@@ -104,6 +111,7 @@ Cross-cutting constraints:
 **Requirements:** DASH-01, DASH-02, DASH-03, DASH-04, PROG-01, PROG-02, REP-01, REP-02, REP-03, MCP-01, MCP-02, MCP-03, MCP-04, MCP-05, AI-01, AI-02, AI-03, AI-04
 
 **Success Criteria**:
+
 1. Dashboard summarizes active release progress, total capacity, planned effort, risk, feature/story counts, finished stories, leaked stories, alerts, timeline, and sprint table.
 2. Timeline shows feature spans across sprints, inactive gaps inside a span, completion progress, finished sprints, and leaked sprints.
 3. Reports screen generates the specified planning, capacity, sprint-story, feature-progress, leakage, planned-versus-capacity, and timeline reports in CSV and Excel.
