@@ -31,8 +31,8 @@ test("creates a release, shows generated sprints, and persists after reload", as
 
   // Assert sprint count is visible (should be > 0)
   const row = page.getByRole("row", { name: /Release Q3 2026/ });
-  const cells = await row.locator("td").allInnerTexts();
-  const sprintCount = Number(cells[cells.length - 1]);
+  const sprintCell = row.locator("td").nth(3);
+  const sprintCount = Number(await sprintCell.innerText());
   expect(sprintCount).toBeGreaterThan(0);
 
   // Reload and assert persistence
