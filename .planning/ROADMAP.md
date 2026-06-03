@@ -69,6 +69,17 @@ Cross-cutting constraints:
 
 **UI hint:** yes
 
+**Execution Plans:**
+
+**Wave 1**
+
+- `02-01` - Release creation slice with generated persisted sprints and schema sync.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- `02-02` - Release list, detail, edit, sprint reconciliation, and active release header context.
+- `02-03` - Sprint list, detail, goal/date editing, overlap blocking, gap warnings, and planning-summary placeholders.
+
 ### Phase 3: Feature, Story, And Backlog Planning
 
 **Goal:** A user can break release scope into features and stories, keep estimates aggregated automatically, and move unplanned stories from backlog into selected sprints with impact preview.
