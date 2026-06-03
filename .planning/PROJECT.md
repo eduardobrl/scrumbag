@@ -20,13 +20,15 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 - [x] User can create a release and have sprints generated from the release period. Validated in Phase 2: Release And Sprint Planning Core.
 - [x] Phase 3 delivered feature/story CRUD, cancellation, aggregate feature metrics, backlog filters, story-to-sprint planning preview, sprint assignment, return-to-backlog, and planned-effort updates.
 - [x] User can create features, split them into estimated stories, and plan stories into sprints with planned-effort impact preview. Validated in Phase 3: Feature, Story, And Backlog Planning.
+- [x] Phase 4 delivered the sprint board, story status movement, real capacity engine, capacity alerts, sprint close/reopen, and leakage history.
+- [x] User can operate a sprint board, compare planned effort against real net capacity, and preserve leakage history when closing or reopening sprints. Validated in Phase 4: Sprint Board, Capacity Engine, And Leakage.
 
 ### Active
 
 - [x] User can run the app locally in a browser with a simple install/start flow. Validated in Phase 1: Local Foundation And Squad Setup.
 - [x] User can configure squad members, work schedules, absences, and holidays. Validated in Phase 1: Local Foundation And Squad Setup.
-- [ ] User can operate a sprint board and move stories through fixed workflow states.
-- [ ] User can close and reopen sprints while preserving leakage history.
+- [x] User can operate a sprint board and move stories through fixed workflow states. Validated in Phase 4: Sprint Board, Capacity Engine, And Leakage.
+- [x] User can close and reopen sprints while preserving leakage history. Validated in Phase 4: Sprint Board, Capacity Engine, And Leakage.
 - [ ] User can view dashboard, timeline, progress, and capacity alerts for the active release.
 - [ ] User can export release planning and tracking reports to CSV or Excel.
 - [ ] AI agents can query local planning data through MCP and provide suggestions safely.
@@ -81,6 +83,8 @@ Expected scale is one squad, one active release, up to 20 sprints per release, u
 | Prepare SQLite with a local sync script | Prisma schema validation and SQL generation worked, but schema-engine apply failed on this Windows/Node 24 host. | - Accepted in Phase 1 |
 | Keep sprint assignment behind backlog planning preview | Direct story edits should not bypass capacity-impact context. | - Accepted in Phase 3 |
 | Keep capacity placeholders pending in Phase 3 | Planned effort can use assigned story estimates now, while gross/net capacity remains Phase 4 scope. | - Accepted in Phase 3 |
+| Calculate capacity on demand from local planning data | Derived sprint capacity should stay consistent with squad, calendar, release, and story edits without a separate summary table. | - Accepted in Phase 4 |
+| Keep leakage history append-only | Closing and reopening sprints must preserve historical truth for Phase 5 reports and dashboards. | - Accepted in Phase 4 |
 
 ## Evolution
 
@@ -100,4 +104,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-03 after Phase 3 completion*
+*Last updated: 2026-06-03 after Phase 4 completion*
