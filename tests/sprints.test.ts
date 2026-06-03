@@ -48,19 +48,19 @@ async function seedReleaseWithSprints() {
 }
 
 describe("sprint planning summary", () => {
-  it("returns capacity placeholders with current planned effort", async () => {
+  it("returns empty real capacity when sprint is missing", async () => {
     const summary = await getSprintPlanningSummary("any-id");
     expect(summary.plannedEffortDays).toBe(0);
-    expect(summary.capacityDays).toBeNull();
-    expect(summary.remainingCapacityDays).toBeNull();
+    expect(summary.capacityDays).toBe(0);
+    expect(summary.remainingCapacityDays).toBe(0);
     expect(summary.occupancyPercentage).toBeNull();
-    expect(summary.riskLabel).toBe("Pending capacity");
+    expect(summary.riskLabel).toBe("On track");
   });
 
   it("recalculate returns the current summary", async () => {
     const summary = await recalculateSprintPlanningSummary("any-id");
     expect(summary.plannedEffortDays).toBe(0);
-    expect(summary.riskLabel).toBe("Pending capacity");
+    expect(summary.riskLabel).toBe("On track");
   });
 });
 

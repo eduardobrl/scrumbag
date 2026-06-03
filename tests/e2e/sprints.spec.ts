@@ -10,7 +10,7 @@ test.afterAll(async () => {
   await prisma.$disconnect();
 });
 
-test("shows sprint list with placeholder metrics and opens detail", async ({ page }) => {
+test("shows sprint list with capacity metrics and opens detail", async ({ page }) => {
   // Create a release through the UI to generate sprints
   await page.goto("/releases");
 
@@ -35,8 +35,8 @@ test("shows sprint list with placeholder metrics and opens detail", async ({ pag
   // Verify sprint names are visible
   await expect(page.getByRole("link", { name: /Sprint \d+/ }).first()).toBeVisible();
 
-  // Verify placeholder metrics
-  await expect(page.getByText("Pending capacity").first()).toBeVisible();
+  // Verify capacity metrics
+  await expect(page.getByText("On track").first()).toBeVisible();
   await expect(page.getByText("0d").first()).toBeVisible();
 
   // Open first sprint detail
@@ -46,14 +46,15 @@ test("shows sprint list with placeholder metrics and opens detail", async ({ pag
   // Wait for navigation to sprint detail page
   await page.waitForURL(/\/sprints\/.+/);
 
-  // Verify detail page shows sprint info and placeholders
+  // Verify detail page shows sprint info and capacity metrics
   await expect(page.locator("h1")).toBeVisible();
-  await expect(page.getByText("Capacity").first()).toBeVisible();
+  await expect(page.getByText("Gross capacity").first()).toBeVisible();
+  await expect(page.getByText("Net capacity").first()).toBeVisible();
   await expect(page.getByText("Planned effort").first()).toBeVisible();
   await expect(page.getByText("Remaining").first()).toBeVisible();
   await expect(page.getByText("Occupancy").first()).toBeVisible();
   await expect(page.getByText("Risk").first()).toBeVisible();
-  await expect(page.getByText("Pending capacity").first()).toBeVisible();
+  await expect(page.getByText("On track").first()).toBeVisible();
 });
 
 test("edits sprint goal and shows updated value on detail", async ({ page }) => {

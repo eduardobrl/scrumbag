@@ -44,7 +44,7 @@ test("add story from backlog", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Sprint board" })).toBeVisible();
   await expect(page.getByText("Backlog da Sprint")).toBeVisible();
   await page.getByRole("button", { name: "Add Story" }).click();
-  await expect(page.getByRole("option", { name: "Drag card" })).toBeVisible();
+  await expect(page.getByLabel("Story")).toHaveValue(story.id);
   await expect(page.getByText("Canceled card")).toHaveCount(0);
   await Promise.all([
     page.waitForResponse((response) => response.url().includes(`/api/stories/${story.id}/plan`)),

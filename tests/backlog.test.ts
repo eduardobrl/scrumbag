@@ -86,15 +86,15 @@ describe("backlog planning", () => {
     if (preview.ok) {
       expect(preview.data.currentPlannedEffortDays).toBe(0);
       expect(preview.data.afterAddPlannedEffortDays).toBe(2);
-      expect(preview.data.riskLabel).toBe("Pending capacity");
+      expect(preview.data.riskLabel).toBe("On track");
     }
 
     const planned = await planStoryIntoSprint(story.id, sprint.id);
     expect(planned.ok).toBe(true);
     const summary = await getSprintPlanningSummary(sprint.id);
     expect(summary.plannedEffortDays).toBe(2);
-    expect(summary.capacityDays).toBeNull();
-    expect(summary.riskLabel).toBe("Pending capacity");
+    expect(summary.capacityDays).not.toBeNull();
+    expect(summary.riskLabel).toBe("On track");
 
     const defaultBacklog = await listBacklogStories({ releaseId: release.id });
     expect(defaultBacklog.find((item) => item.id === story.id)).toBeUndefined();

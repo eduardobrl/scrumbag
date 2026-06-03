@@ -71,7 +71,7 @@ test("filters backlog, previews planning impact, assigns, and returns story to b
   await page.getByRole("button", { name: "Plan" }).click();
   await expect(page.getByText("Current planned effort")).toBeVisible();
   await expect(page.getByText("After add")).toBeVisible();
-  await expect(page.getByText("Pending capacity")).toBeVisible();
+  await expect(page.getByText("On track")).toBeVisible();
   await Promise.all([
     page.waitForResponse((response) => response.url().includes(`/api/stories/${story.id}/plan`) && response.request().method() === "POST"),
     page.getByRole("button", { name: "Add to sprint" }).click()
