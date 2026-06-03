@@ -30,7 +30,7 @@ function optionalNonNegativeNumber(value: unknown, field: string): ValidationRes
   return { ok: true, data: numeric };
 }
 
-function validateStoryStatus(value: unknown): ValidationResult<StoryStatus> {
+export function validateStoryStatus(value: unknown): ValidationResult<StoryStatus> {
   if (value === undefined || value === null || value === "") {
     return { ok: true, data: StoryStatus.BACKLOG };
   }
