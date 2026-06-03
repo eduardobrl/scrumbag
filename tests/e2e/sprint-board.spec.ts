@@ -50,5 +50,5 @@ test("add story from backlog", async ({ page }) => {
     page.waitForResponse((response) => response.url().includes(`/api/stories/${story.id}/plan`)),
     page.getByRole("button", { name: "Adicionar" }).click()
   ]);
-  await expect(page.getByText("Drag card")).toBeVisible();
+  await expect(page.locator("dd").filter({ hasText: "Drag card" })).toBeVisible();
 });

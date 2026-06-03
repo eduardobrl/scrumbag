@@ -11,9 +11,9 @@ test.afterAll(async () => {
 });
 
 test("creates and reloads a persisted squad member", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/squad");
   await page.getByLabel("Member name").fill("Ana");
-  await page.getByRole("button", { name: "Save member" }).click();
+  await page.getByRole("button", { name: "Add member" }).click();
   await expect(page.getByRole("cell", { name: "Ana" })).toBeVisible();
 
   await page.reload();

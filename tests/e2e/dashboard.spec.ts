@@ -9,6 +9,8 @@ test.beforeEach(async () => {
   await prisma.sprint.deleteMany();
   await prisma.release.deleteMany();
   await prisma.squadMember.deleteMany();
+  await prisma.absence.deleteMany();
+  await prisma.holiday.deleteMany();
   await prisma.appSettings.deleteMany();
 
   await prisma.appSettings.create({
