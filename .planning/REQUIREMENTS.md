@@ -14,7 +14,7 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [x] **APP-03**: User can navigate between Dashboard, Releases, Features/Stories, Backlog, Sprints, Squad, Reports, Assistant AI, and Settings.
 - [x] **APP-04**: User can see active release context, release status, capacity indicator, and assistant access in a global header.
 - [x] **APP-05**: User data persists locally in SQLite and survives app restarts.
-- [ ] **APP-06**: User can configure general capacity settings including full-time hours, intern hours, standard day hours, MCP host, and MCP port.
+- [x] **APP-06**: User can configure general capacity settings including full-time hours, intern hours, standard day hours, MCP host, and MCP port.
 
 ### Squad And Calendar
 
@@ -145,7 +145,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | APP-03 | Phase 1 | Complete |
 | APP-04 | Phase 1 | Complete |
 | APP-05 | Phase 1 | Complete |
-| APP-06 | Phase 1 | Pending |
+| APP-06 | Phase 1 | Complete |
 | SQUAD-01 | Phase 1 | Complete |
 | SQUAD-02 | Phase 1 | Complete |
 | SQUAD-03 | Phase 1 | Pending |
