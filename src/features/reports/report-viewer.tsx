@@ -36,8 +36,8 @@ export function ReportViewer({ report, reportType, releaseId }: Props) {
   if (!report) {
     return (
       <Card>
-        <h2 className="text-base font-semibold text-ink">Report preview</h2>
-        <p className="mt-2 text-sm text-slate-600">Generate a report to preview rows and export files.</p>
+        <h2 className="text-base font-semibold text-ink">Prévia do relatório</h2>
+        <p className="mt-2 text-sm text-slate-600">Gere um relatório para visualizar linhas e exportar arquivos.</p>
       </Card>
     );
   }
@@ -47,21 +47,21 @@ export function ReportViewer({ report, reportType, releaseId }: Props) {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line p-4">
         <div>
           <h2 className="text-base font-semibold text-ink">{report.title}</h2>
-          <p className="mt-1 text-sm text-slate-600">{report.rows.length} rows</p>
+          <p className="mt-1 text-sm text-slate-600">{report.rows.length} linhas</p>
         </div>
         <div className="flex gap-2">
           <Button type="button" variant="secondary" onClick={() => download("csv")}>
             <Download className="h-4 w-4" aria-hidden />
-            Export CSV
+            Exportar CSV
           </Button>
           <Button type="button" variant="secondary" onClick={() => download("xlsx")}>
             <Download className="h-4 w-4" aria-hidden />
-            Export Excel
+            Exportar Excel
           </Button>
         </div>
       </div>
       {report.rows.length === 0 ? (
-        <div className="p-6 text-sm text-slate-600">No data</div>
+        <div className="p-6 text-sm text-slate-600">Nenhum dado</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-left text-sm">

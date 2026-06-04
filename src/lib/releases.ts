@@ -132,6 +132,29 @@ export async function listReleases() {
   });
 }
 
+export async function listReleaseOptions() {
+  return prisma.release.findMany({
+    select: { id: true, name: true, status: true, startDate: true, endDate: true },
+    orderBy: [{ status: "asc" }, { startDate: "desc" }]
+  });
+}
+
+export async function getReleaseById(id: string) {
+  return prisma.release.findUnique({
+    where: { id },
+    include: { sprints: { orderBy: { startDate: "asc" } } }
+  });
+}
+
+export async function getReleaseForView(releaseId?: string) {
+  if (releaseId) {
+    const selected = await getReleaseById(releaseId);
+    if (selected) return selected;
+  }
+
+  return getActiveReleaseSummary();
+}
+
 export async function getReleaseDetails(id: string) {
   return prisma.release.findUnique({
     where: { id },

@@ -11,13 +11,13 @@ import {
 } from "lucide-react";
 
 export const navigationItems = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Releases", href: "/releases", icon: CalendarRange },
-  { label: "Features/Stories", href: "/features", icon: Workflow },
-  { label: "Backlog", href: "/backlog", icon: ClipboardList },
-  { label: "Sprints", href: "/sprints", icon: ListChecks },
-  { label: "Squad", href: "/squad", icon: Users },
-  { label: "Reports", href: "/reports", icon: Gauge },
-  { label: "Assistant AI", href: "/assistant", icon: Bot },
-  { label: "Settings", href: "/settings", icon: Settings }
+  { labelKey: "dashboard", href: "/", icon: LayoutDashboard },
+  { labelKey: "releases", href: "/releases", icon: CalendarRange },
+  { labelKey: "features", href: "/features", icon: Workflow },
+  { labelKey: "backlog", href: "/backlog", icon: ClipboardList },
+  { labelKey: "sprints", href: "/sprints", icon: ListChecks },
+  { labelKey: "squad", href: "/squad", icon: Users },
+  { labelKey: "reports", href: "/reports", icon: Gauge },
+  { labelKey: "assistant", href: "/assistant", icon: Bot },
+  { labelKey: "settings", href: "/settings", icon: Settings }
 ] as const;

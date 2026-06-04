@@ -29,10 +29,10 @@ type StoryFormProps = {
 
 const STATUS_OPTIONS = [
   { value: "BACKLOG", label: "Backlog" },
-  { value: "SPRINT_BACKLOG", label: "Sprint backlog" },
-  { value: "IN_PROGRESS", label: "In progress" },
-  { value: "DONE", label: "Done" },
-  { value: "CANCELLED", label: "Cancelled" }
+  { value: "SPRINT_BACKLOG", label: "Backlog da Sprint" },
+  { value: "IN_PROGRESS", label: "Em andamento" },
+  { value: "DONE", label: "Concluída" },
+  { value: "CANCELLED", label: "Cancelada" }
 ];
 
 export function StoryForm({ features, fixedFeatureId, initial }: StoryFormProps) {
@@ -97,13 +97,13 @@ export function StoryForm({ features, fixedFeatureId, initial }: StoryFormProps)
       </label>
 
       <label className="grid gap-1 text-sm font-medium text-slate-700">
-        Title
+        Título
         <Input value={title} onChange={(event) => setTitle(event.target.value)} required />
         {errors.title && <p className="text-xs text-red-600">{errors.title}</p>}
       </label>
 
       <label className="grid gap-1 text-sm font-medium text-slate-700">
-        Description
+        Descrição
         <textarea
           className="min-h-[80px] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-teal-100"
           value={description}
@@ -112,7 +112,7 @@ export function StoryForm({ features, fixedFeatureId, initial }: StoryFormProps)
       </label>
 
       <label className="grid gap-1 text-sm font-medium text-slate-700">
-        Acceptance criteria
+        Critérios de aceite
         <textarea
           className="min-h-[80px] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-teal-100"
           value={acceptanceCriteria}
@@ -127,7 +127,7 @@ export function StoryForm({ features, fixedFeatureId, initial }: StoryFormProps)
           {errors.storyPoints && <p className="text-xs text-red-600">{errors.storyPoints}</p>}
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Estimated business days
+          Dias úteis estimados
           <Input min={0} step="0.5" type="number" value={estimatedDays} onChange={(event) => setEstimatedDays(event.target.value)} />
           {errors.estimatedDays && <p className="text-xs text-red-600">{errors.estimatedDays}</p>}
         </label>
@@ -150,7 +150,7 @@ export function StoryForm({ features, fixedFeatureId, initial }: StoryFormProps)
 
       {initial && (
         <p className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
-          Current sprint: <span className="font-medium text-slate-800">{initial.currentSprintName}</span>
+          Sprint atual: <span className="font-medium text-slate-800">{initial.currentSprintName}</span>
         </p>
       )}
       {errors.currentSprintId && <p className="text-sm text-red-700">{errors.currentSprintId}</p>}
@@ -159,11 +159,11 @@ export function StoryForm({ features, fixedFeatureId, initial }: StoryFormProps)
       <div className="flex gap-2">
         <Button disabled={isPending} type="submit">
           <Save className="h-4 w-4" aria-hidden="true" />
-          Save story
+          Salvar história
         </Button>
         <Button type="button" variant="secondary" onClick={() => router.push(`/features/${featureId}`)}>
           <X className="h-4 w-4" aria-hidden="true" />
-          Cancel
+          Cancelar
         </Button>
       </div>
     </form>

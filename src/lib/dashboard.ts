@@ -1,5 +1,5 @@
 import { FeatureLifecycleStatus, StoryStatus } from "@prisma/client";
-import { calculateSprintCapacity } from "@/lib/capacity";
+import { calculateSprintCapacity, countBusinessDaysInRange } from "@/lib/capacity";
 import { prisma } from "@/lib/db";
 import { calculateReleaseProgress, calculateSprintProgress } from "@/lib/progress";
 
@@ -79,7 +79,10 @@ export async function getSprintDashboardRows(releaseId: string): Promise<Dashboa
         status: sprint.status,
         startDate: dateOnly(sprint.startDate),
         endDate: dateOnly(sprint.endDate),
-        period: `${dateOnly(sprint.startDate)} to ${dateOnly(sprint.endDate)}`,
+        period: `${dateOnly(sprint.startDate)} - ${dateOnly(sprint.endDate)} (${countBusinessDaysInRange(
+          sprint.startDate,
+          sprint.endDate
+        )} dias úteis)`,
         grossCapacityDays: round(capacity.grossCapacityDays),
         netCapacityDays: round(capacity.netCapacityDays),
         plannedEffortDays: round(plannedEffortDays),

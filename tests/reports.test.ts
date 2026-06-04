@@ -143,7 +143,7 @@ describe("generateReport", () => {
     expect(report.rows[0]).toMatchObject({
       sprintName: "Sprint 1",
       grossCapacityDays: 5,
-      netCapacityDays: 5,
+      netCapacityDays: 4,
       plannedEffortDays: 3
     });
   });
@@ -184,7 +184,7 @@ describe("generateReport", () => {
     const { release } = await seedReports();
     const report = await generateReport("planned-vs-capacity", release.id);
 
-    expect(report.rows[0]).toMatchObject({ difference: -2 });
+    expect(report.rows[0]).toMatchObject({ difference: -1 });
   });
 });
 

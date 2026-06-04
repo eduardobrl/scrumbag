@@ -25,9 +25,9 @@ type FeatureDetailProps = {
 };
 
 const STATUS_LABEL: Record<string, string> = {
-  NOT_STARTED: "Not started",
-  IN_PROGRESS: "In progress",
-  FINISHED: "Finished"
+  NOT_STARTED: "Não iniciada",
+  IN_PROGRESS: "Em andamento",
+  FINISHED: "Finalizada"
 };
 
 export function FeatureDetail({ feature, stories }: FeatureDetailProps) {
@@ -50,13 +50,13 @@ export function FeatureDetail({ feature, stories }: FeatureDetailProps) {
           <Button variant="secondary" asChild>
             <Link href={`/features/${feature.id}/edit`}>
               <Pencil className="h-4 w-4" aria-hidden="true" />
-              Edit
+              Editar
             </Link>
           </Button>
           <Button asChild>
             <Link href={`/features/${feature.id}/stories/new`}>
               <Plus className="h-4 w-4" aria-hidden="true" />
-              New Story
+              Nova História
             </Link>
           </Button>
         </div>
@@ -72,10 +72,10 @@ export function FeatureDetail({ feature, stories }: FeatureDetailProps) {
           </div>
         </Card>
         <Card>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Lifecycle</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Ciclo de vida</p>
           <div className="mt-1">
             <Badge tone={feature.lifecycleStatus === "CANCELLED" ? "danger" : "success"}>
-              {feature.lifecycleStatus === "CANCELLED" ? "Cancelled" : "Active"}
+              {feature.lifecycleStatus === "CANCELLED" ? "Cancelada" : "Ativa"}
             </Badge>
           </div>
         </Card>
@@ -84,25 +84,25 @@ export function FeatureDetail({ feature, stories }: FeatureDetailProps) {
           <p className="mt-1 text-lg font-semibold">{feature.summary.totalStoryPoints}</p>
         </Card>
         <Card>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Estimated Days</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Dias estimados</p>
           <p className="mt-1 text-lg font-semibold">{feature.summary.totalEstimatedDays}d</p>
         </Card>
         <Card>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Progress</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Progresso</p>
           <p className="mt-1 text-lg font-semibold">{feature.summary.progressPercentage}%</p>
         </Card>
       </div>
 
       {feature.description && (
         <Card>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Description</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Descrição</p>
           <p className="mt-1 text-sm text-slate-700">{feature.description}</p>
         </Card>
       )}
 
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-          Stories ({feature.summary.storyCount})
+          Histórias ({feature.summary.storyCount})
         </h2>
         <StoryList stories={stories} />
       </section>

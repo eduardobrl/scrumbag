@@ -1,4 +1,6 @@
 import { Badge } from "@/components/ui/badge";
+import { countBusinessDaysInRange } from "@/lib/date-utils";
+import { getTranslations } from "next-intl/server";
 
 export type SprintListItem = {
   id: string;
@@ -20,21 +22,22 @@ const STATUS_TONE: Record<string, "neutral" | "success" | "warning" | "danger"> 
   CLOSED: "warning"
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  PLANNED: "Planned",
-  IN_PROGRESS: "In progress",
-  CLOSED: "Closed"
-};
-
-function formatPeriod(start: Date, end: Date): string {
-  return `${start.toISOString().slice(0, 10)} to ${end.toISOString().slice(0, 10)}`;
+function formatPeriod(start: Date, end: Date, workingDaysLabel: string): string {
+  return `${start.toISOString().slice(0, 10)} - ${end.toISOString().slice(0, 10)} (${workingDaysLabel})`;
 }
 
-export function SprintList({ sprints }: { sprints: SprintListItem[] }) {
+export async function SprintList({ sprints }: { sprints: SprintListItem[] }) {
+  const [tSprint, tCommon, tStatus, tRisk] = await Promise.all([
+    getTranslations("sprint"),
+    getTranslations("common"),
+    getTranslations("status"),
+    getTranslations("risk")
+  ]);
+
   if (sprints.length === 0) {
     return (
       <div className="rounded-lg border border-line bg-white p-6 text-center">
-        <p className="text-sm text-slate-600">No sprints generated for this release.</p>
+        <p className="text-sm text-slate-600">{tSprint("noSprints")}</p>
       </div>
     );
   }
@@ -45,38 +48,35 @@ export function SprintList({ sprints }: { sprints: SprintListItem[] }) {
         <thead className="bg-slate-50 text-xs uppercase text-slate-500">
           <tr>
             <th className="px-3 py-2">Sprint</th>
-            <th className="px-3 py-2">Period</th>
-            <th className="px-3 py-2">Status</th>
-            <th className="px-3 py-2">Goal</th>
-            <th className="px-3 py-2">Capacity</th>
-            <th className="px-3 py-2">Planned effort</th>
-            <th className="px-3 py-2">Remaining</th>
-            <th className="px-3 py-2">Occupancy</th>
-            <th className="px-3 py-2">Risk</th>
+            <th className="px-3 py-2">{tCommon("period")}</th>
+            <th className="px-3 py-2">{tCommon("status")}</th>
+            <th className="px-3 py-2">{tSprint("goal")}</th>
+            <th className="px-3 py-2">{tSprint("capacity")}</th>
+            <th className="px-3 py-2">{tSprint("plannedEffort")}</th>
+            <th className="px-3 py-2">{tSprint("remaining")}</th>
+            <th className="px-3 py-2">{tSprint("occupancy")}</th>
+            <th className="px-3 py-2">{tSprint("risk")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-line bg-white">
           {sprints.map((sprint) => (
             <tr key={sprint.id} className="hover:bg-slate-50">
               <td className="px-3 py-3">
-                <a
-                  href={`/sprints/${sprint.id}`}
-                  className="font-medium text-accent hover:underline"
-                >
+                <a href={`/sprints/${sprint.id}`} className="font-medium text-accent hover:underline">
                   {sprint.name}
                 </a>
               </td>
-              <td className="px-3 py-3 whitespace-nowrap">
-                {formatPeriod(sprint.startDate, sprint.endDate)}
+              <td className="whitespace-nowrap px-3 py-3">
+                {formatPeriod(
+                  sprint.startDate,
+                  sprint.endDate,
+                  tCommon("workingDays", { count: countBusinessDaysInRange(sprint.startDate, sprint.endDate) })
+                )}
               </td>
               <td className="px-3 py-3">
-                <Badge tone={STATUS_TONE[sprint.status] ?? "neutral"}>
-                  {STATUS_LABEL[sprint.status] ?? sprint.status}
-                </Badge>
+                <Badge tone={STATUS_TONE[sprint.status] ?? "neutral"}>{tStatus(sprint.status)}</Badge>
               </td>
-              <td className="px-3 py-3 text-slate-600">
-                {sprint.goal || "—"}
-              </td>
+              <td className="px-3 py-3 text-slate-600">{sprint.goal || "-"}</td>
               <td className="px-3 py-3 text-slate-600">{sprint.capacityDays?.toFixed(1) ?? "-"}d</td>
               <td className="px-3 py-3 text-slate-600">{sprint.plannedEffortDays}d</td>
               <td
@@ -92,7 +92,7 @@ export function SprintList({ sprints }: { sprints: SprintListItem[] }) {
                 {sprint.occupancyPercentage !== null ? `${sprint.occupancyPercentage.toFixed(0)}%` : "-"}
               </td>
               <td className="px-3 py-3">
-                <Badge tone={riskTone(sprint.riskLabel)}>{sprint.riskLabel}</Badge>
+                <Badge tone={riskTone(sprint.riskLabel)}>{tRisk(sprint.riskLabel)}</Badge>
               </td>
             </tr>
           ))}

@@ -26,6 +26,8 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 - [x] User can view dashboard, timeline, progress, and capacity alerts for the active release. Validated in Phase 5: Release Intelligence, Reports, MCP, And AI.
 - [x] User can export release planning and tracking reports to CSV or Excel. Validated in Phase 5: Release Intelligence, Reports, MCP, And AI.
 - [x] AI agents can query local planning data through MCP and provide suggestions safely. Validated in Phase 5: Release Intelligence, Reports, MCP, And AI.
+- [x] Phase 6 delivered pt-BR default UI, English fallback messages, global release view switching, business-day sprint period display, and larger action buttons.
+- [x] User can operate the polished v1 UI in Brazilian Portuguese, switch release view context from the header, and see sprint calendar ranges with business-day counts. Validated in Phase 6: UX Polish And Localization.
 
 ### Active
 
@@ -54,7 +56,7 @@ The source context is captured in `spec.md` and `telas.md`. The product is meant
 
 The suggested stack is Next.js, TypeScript, SQLite, Prisma, Tailwind CSS, dnd-kit for drag-and-drop, Recharts or a similar chart/timeline library, XLSX/CSV export, and a local Node.js MCP server. The UI should feel like a modern management tool: quiet, information-dense, desktop-first, with side navigation, global release context, tables, badges, progress bars, alerts, and horizontal timelines.
 
-The first version now includes the local operational flow from setup through dashboard intelligence, reports, exports, MCP tools, and assistant chat. It should remain simple to run: `npm install` and `npm run dev`, with `npm run mcp:start` available for the local MCP server. Offline operation is required for core planning features; AI quality can depend on whichever local agent/tool the user connects, but the MCP data surface itself works locally.
+The first version now includes the local operational flow from setup through dashboard intelligence, reports, exports, MCP tools, assistant chat, pt-BR localization, global release view switching, and daily-use UI polish. It should remain simple to run: `npm install` and `npm run dev`, with `npm run mcp:start` available for the local MCP server. Offline operation is required for core planning features; AI quality can depend on whichever local agent/tool the user connects, but the MCP data surface itself works locally.
 
 Expected scale is one squad, one active release, up to 20 sprints per release, up to 100 features, up to 1000 stories, and up to 30 members.
 
@@ -88,6 +90,8 @@ Expected scale is one squad, one active release, up to 20 sprints per release, u
 | Keep leakage history append-only | Closing and reopening sprints must preserve historical truth for Phase 5 reports and dashboards. | - Accepted in Phase 4 |
 | Share dashboard/report/MCP query logic | Release intelligence must stay consistent across UI, exports, and AI/tool surfaces. | - Accepted in Phase 5 |
 | Gate dangerous MCP and assistant actions with confirmation | Sensitive planning changes must remain explicit user actions. | - Accepted in Phase 5 |
+| Treat release switching as view context | The header selector should let users inspect any release without changing the one-active-release status rule. | - Accepted in Phase 6 |
+| Keep business-day sprint display cosmetic | Sprint period labels can show calendar dates plus business-day counts while capacity math remains unchanged. | - Accepted in Phase 6 |
 
 ## Evolution
 
@@ -107,4 +111,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-03 after Phase 5 completion*
+*Last updated: 2026-06-04 after Phase 6 completion*

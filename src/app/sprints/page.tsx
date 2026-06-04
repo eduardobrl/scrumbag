@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/db";
 import { ReleaseStatus } from "@prisma/client";
 import { SprintList } from "@/features/sprints/sprint-list";
-import { ReleaseSelector } from "@/features/sprints/release-selector";
 import { getSprintPlanningSummary } from "@/lib/sprint-planning-summary";
 
 export default async function SprintsPage({
@@ -43,16 +42,12 @@ export default async function SprintsPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-normal text-ink">Sprints</h1>
-        <ReleaseSelector
-          releases={releases.map((r) => ({ id: r.id, name: r.name }))}
-          selectedId={selectedRelease?.id ?? ""}
-        />
       </div>
 
       {!selectedRelease ? (
         <div className="rounded-lg border border-line bg-white p-6 text-center">
-          <p className="text-sm text-slate-600">No release created yet.</p>
-          <p className="mt-1 text-xs text-slate-500">Create a release to generate sprints.</p>
+          <p className="text-sm text-slate-600">Nenhuma release criada ainda.</p>
+          <p className="mt-1 text-xs text-slate-500">Crie uma release para gerar sprints.</p>
         </div>
       ) : (
         <section className="space-y-3">
@@ -61,7 +56,7 @@ export default async function SprintsPage({
               {selectedRelease.name}
             </h2>
             <span className="text-xs text-slate-500">
-              {selectedRelease.startDate.toISOString().slice(0, 10)} to{" "}
+              {selectedRelease.startDate.toISOString().slice(0, 10)} -{" "}
               {selectedRelease.endDate.toISOString().slice(0, 10)}
             </span>
           </div>

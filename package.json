@@ -11,19 +11,23 @@
     "db:generate": "prisma generate",
     "db:migrate": "tsx scripts/db-sync.ts",
     "db:seed": "tsx prisma/seed.ts",
-    "mcp:start": "tsx src/mcp/server.ts"
+    "mcp:start": "tsx src/mcp/server.ts",
+    "mcp:start-stdio": "tsx src/mcp/mcp-stdio.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "better-sqlite3": "^12.10.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
     "next": "^15.3.0",
+    "next-intl": "^4.13.0",
     "openai": "^6.42.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

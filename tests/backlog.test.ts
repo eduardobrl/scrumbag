@@ -5,6 +5,7 @@ import { getSprintPlanningSummary } from "@/lib/sprint-planning-summary";
 import { ReleaseStatus, SprintStatus, StoryStatus } from "@prisma/client";
 
 async function seedBacklog() {
+  await prisma.squadMember.create({ data: { name: "Planner", roleType: "FULL_TIME", active: true } });
   const release = await prisma.release.create({
     data: {
       name: "Release Q3",
@@ -57,6 +58,7 @@ beforeEach(async () => {
   await prisma.feature.deleteMany();
   await prisma.sprint.deleteMany();
   await prisma.release.deleteMany();
+  await prisma.squadMember.deleteMany();
 });
 
 describe("backlog filters", () => {

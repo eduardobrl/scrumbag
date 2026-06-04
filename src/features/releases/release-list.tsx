@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
 import { Eye, Pencil } from "lucide-react";
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export type ReleaseListItem = {
   id: string;
@@ -22,16 +22,15 @@ const STATUS_TONE: Record<string, "neutral" | "success" | "warning" | "danger"> 
   CANCELLED: "danger"
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  PLANNED: "Planned",
-  IN_PROGRESS: "In progress",
-  CLOSED: "Closed",
-  CANCELLED: "Cancelled"
-};
+export async function ReleaseList({ releases }: { releases: ReleaseListItem[] }) {
+  const [tRelease, tCommon, tStatus] = await Promise.all([
+    getTranslations("release"),
+    getTranslations("common"),
+    getTranslations("status")
+  ]);
 
-export function ReleaseList({ releases }: { releases: ReleaseListItem[] }) {
   if (releases.length === 0) {
-    return <p className="text-sm text-slate-500">No releases created yet.</p>;
+    return <p className="text-sm text-slate-500">{tRelease("noReleases")}</p>;
   }
 
   return (
@@ -39,13 +38,13 @@ export function ReleaseList({ releases }: { releases: ReleaseListItem[] }) {
       <table className="w-full border-collapse text-left text-sm">
         <thead className="bg-slate-50 text-xs uppercase text-slate-500">
           <tr>
-            <th className="px-3 py-2">Name</th>
-            <th className="px-3 py-2">Period</th>
-            <th className="px-3 py-2">Status</th>
-            <th className="px-3 py-2">Sprints</th>
-            <th className="px-3 py-2">Meetings</th>
-            <th className="px-3 py-2">Support</th>
-            <th className="px-3 py-2">Actions</th>
+            <th className="px-3 py-2">{tRelease("name")}</th>
+            <th className="px-3 py-2">{tCommon("period")}</th>
+            <th className="px-3 py-2">{tCommon("status")}</th>
+            <th className="px-3 py-2">{tRelease("sprintCount")}</th>
+            <th className="px-3 py-2">{tRelease("meetings")}</th>
+            <th className="px-3 py-2">{tCommon("support")}</th>
+            <th className="px-3 py-2">{tCommon("actions")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-line bg-white">
@@ -56,11 +55,11 @@ export function ReleaseList({ releases }: { releases: ReleaseListItem[] }) {
                 <div className="text-xs text-slate-500">{release.objective}</div>
               </td>
               <td className="px-3 py-3 whitespace-nowrap">
-                {release.startDate} to {release.endDate}
+                {release.startDate} - {release.endDate}
               </td>
               <td className="px-3 py-3">
                 <Badge tone={STATUS_TONE[release.status] ?? "neutral"}>
-                  {STATUS_LABEL[release.status] ?? release.status}
+                  {tStatus(release.status)}
                 </Badge>
               </td>
               <td className="px-3 py-3">{release.sprintCount}</td>
@@ -68,18 +67,12 @@ export function ReleaseList({ releases }: { releases: ReleaseListItem[] }) {
               <td className="px-3 py-3">{release.supportPercentage}%</td>
               <td className="px-3 py-3">
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" className="h-8 w-8 p-0" asChild>
-                    <Link href={`/releases/${release.id}`}>
-                      <Eye className="h-4 w-4" aria-hidden="true" />
-                      <span className="sr-only">View</span>
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" className="h-8 w-8 p-0" asChild>
-                    <Link href={`/releases/${release.id}/edit`}>
-                      <Pencil className="h-4 w-4" aria-hidden="true" />
-                      <span className="sr-only">Edit</span>
-                    </Link>
-                  </Button>
+                  <IconButton label={tCommon("view")} href={`/releases/${release.id}`}>
+                    <Eye className="h-4 w-4" aria-hidden="true" />
+                  </IconButton>
+                  <IconButton label={tCommon("edit")} href={`/releases/${release.id}/edit`}>
+                    <Pencil className="h-4 w-4" aria-hidden="true" />
+                  </IconButton>
                 </div>
               </td>
             </tr>

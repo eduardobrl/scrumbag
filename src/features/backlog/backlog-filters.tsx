@@ -57,7 +57,7 @@ export function BacklogFilters({
           value={searchParams.get("featureId") ?? ""}
           onChange={(event) => update("featureId", event.target.value)}
         >
-          <option value="">All</option>
+          <option value="">Todas</option>
           {features.map((feature) => (
             <option key={feature.id} value={feature.id}>
               {feature.name}
@@ -72,16 +72,16 @@ export function BacklogFilters({
           value={searchParams.get("status") ?? "ALL"}
           onChange={(event) => update("status", event.target.value === "ALL" ? "" : event.target.value)}
         >
-          <option value="ALL">All</option>
+          <option value="ALL">Todos</option>
           <option value="BACKLOG">Backlog</option>
-          <option value="SPRINT_BACKLOG">Sprint backlog</option>
-          <option value="IN_PROGRESS">In progress</option>
-          <option value="DONE">Done</option>
-          <option value="CANCELLED">Cancelled</option>
+          <option value="SPRINT_BACKLOG">Backlog da Sprint</option>
+          <option value="IN_PROGRESS">Em andamento</option>
+          <option value="DONE">Concluída</option>
+          <option value="CANCELLED">Cancelada</option>
         </select>
       </label>
       <label className="grid gap-1 text-sm font-medium text-slate-700 lg:col-span-2">
-        Search
+        Busca
         <Input
           value={q}
           onChange={(event) => setQ(event.target.value)}
@@ -89,7 +89,7 @@ export function BacklogFilters({
           onKeyDown={(event) => {
             if (event.key === "Enter") update("q", q);
           }}
-          placeholder="Title, description, acceptance criteria"
+          placeholder="Título, descrição, critérios de aceite"
         />
       </label>
       <div className="flex flex-col justify-end gap-2 text-sm text-slate-700">
@@ -99,7 +99,7 @@ export function BacklogFilters({
             checked={searchParams.get("unplannedOnly") !== "false"}
             onChange={(event) => update("unplannedOnly", event.target.checked ? "" : "false")}
           />
-          Unplanned
+          Não planejadas
         </label>
         <label className="flex items-center gap-2">
           <input
@@ -107,7 +107,7 @@ export function BacklogFilters({
             checked={searchParams.get("includeCanceled") === "true"}
             onChange={(event) => update("includeCanceled", event.target.checked ? "true" : "")}
           />
-          Include canceled
+          Incluir canceladas
         </label>
       </div>
     </div>

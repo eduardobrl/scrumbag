@@ -14,26 +14,26 @@ type Metric = {
 export function DashboardCards({ data }: { data: DashboardData }) {
   const metrics: Metric[] = [
     {
-      label: "Progress",
+      label: "Progresso",
       value: `${data.progress}%`,
-      helper: "Release completion",
+      helper: "Conclusão da release",
       icon: BarChart3,
       tone: data.progress >= 80 ? "success" : "neutral"
     },
-    { label: "Total capacity", value: `${data.totalCapacityDays.toFixed(1)}d`, icon: Gauge },
-    { label: "Planned effort", value: `${data.plannedEffortDays.toFixed(1)}d`, icon: ListChecks },
+    { label: "Capacidade total", value: `${data.totalCapacityDays.toFixed(1)}d`, icon: Gauge },
+    { label: "Esforço planejado", value: `${data.plannedEffortDays.toFixed(1)}d`, icon: ListChecks },
     {
-      label: "Risk",
-      value: data.risk,
-      helper: `${data.remainingCapacityDays.toFixed(1)}d remaining`,
+      label: "Risco",
+      value: data.risk === "Over capacity" ? "Acima da capacidade" : "No prazo",
+      helper: `${data.remainingCapacityDays.toFixed(1)}d restantes`,
       icon: AlertTriangle,
       tone: data.risk === "Over capacity" ? "danger" : "success"
     },
     { label: "Features", value: String(data.featureCount), icon: Layers },
-    { label: "Stories", value: String(data.storyCount), icon: Users },
-    { label: "Finished stories", value: String(data.finishedStoryCount), icon: CheckCircle2, tone: "success" },
+    { label: "Histórias", value: String(data.storyCount), icon: Users },
+    { label: "Histórias concluídas", value: String(data.finishedStoryCount), icon: CheckCircle2, tone: "success" },
     {
-      label: "Leaked stories",
+      label: "Histórias vazadas",
       value: String(data.leakedStoryCount),
       icon: Flag,
       tone: data.leakedStoryCount > 0 ? "warning" : "neutral"
@@ -55,7 +55,7 @@ export function DashboardCards({ data }: { data: DashboardData }) {
                 <Icon className="h-4 w-4 text-slate-600" aria-hidden />
               </div>
             </div>
-            {metric.label === "Progress" ? (
+            {metric.label === "Progresso" ? (
               <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
                 <div className="h-full rounded-full bg-accent" style={{ width: `${data.progress}%` }} />
               </div>
@@ -66,7 +66,7 @@ export function DashboardCards({ data }: { data: DashboardData }) {
               </div>
             ) : metric.tone ? (
               <div className="mt-3">
-                <Badge tone={metric.tone}>{metric.tone === "success" ? "Healthy" : "Watch"}</Badge>
+                <Badge tone={metric.tone}>{metric.tone === "success" ? "Saudável" : "Atenção"}</Badge>
               </div>
             ) : null}
           </Card>

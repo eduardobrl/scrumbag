@@ -2,20 +2,21 @@ import Link from "next/link";
 import { CheckCircle2, Flag } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { TimelineData } from "@/lib/timeline";
+import { countBusinessDaysInRange } from "@/lib/date-utils";
 
 export function TimelineView({ data }: { data: TimelineData }) {
   return (
     <Card>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-ink">Release timeline</h2>
-          <p className="mt-1 text-sm text-slate-600">Feature spans across planned sprints</p>
+          <h2 className="text-base font-semibold text-ink">Timeline da release</h2>
+          <p className="mt-1 text-sm text-slate-600">Features distribuídas nas sprints planejadas</p>
         </div>
         <div className="flex flex-wrap gap-3 text-xs text-slate-600">
-          <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded bg-accent" /> Feature span</span>
-          <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded border border-slate-300 bg-white" /> Inactive gap</span>
-          <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-emerald-700" aria-hidden /> Finished sprint</span>
-          <span className="inline-flex items-center gap-1"><Flag className="h-3 w-3 text-amber-700" aria-hidden /> Leaked sprint</span>
+          <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded bg-accent" /> Intervalo da feature</span>
+          <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded border border-slate-300 bg-white" /> Intervalo inativo</span>
+          <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-emerald-700" aria-hidden /> Sprint finalizada</span>
+          <span className="inline-flex items-center gap-1"><Flag className="h-3 w-3 text-amber-700" aria-hidden /> Sprint com vazamento</span>
         </div>
       </div>
 
@@ -29,10 +30,15 @@ export function TimelineView({ data }: { data: TimelineData }) {
             <div key={sprint.id} className="rounded-md border border-line bg-slate-50 p-2 text-xs font-medium text-slate-700">
               <div className="flex items-center gap-1">
                 <span>{sprint.name}</span>
-                {sprint.isFinished ? <CheckCircle2 className="h-3 w-3 text-emerald-700" aria-label="Finished sprint" /> : null}
-                {data.leakedSprints.includes(sprint.id) ? <Flag className="h-3 w-3 text-amber-700" aria-label="Leaked sprint" /> : null}
+                {sprint.isFinished ? <CheckCircle2 className="h-3 w-3 text-emerald-700" aria-label="Sprint finalizada" /> : null}
+                {data.leakedSprints.includes(sprint.id) ? <Flag className="h-3 w-3 text-amber-700" aria-label="Sprint com vazamento" /> : null}
               </div>
-              <div className="mt-1 text-[11px] font-normal text-slate-500">{sprint.startDate}</div>
+              <div className="mt-1 text-[11px] font-normal text-slate-500">
+                {sprint.startDate} - {sprint.endDate}
+              </div>
+              <div className="text-[11px] font-normal text-slate-500">
+                {countBusinessDaysInRange(sprint.startDate, sprint.endDate)} dias úteis
+              </div>
             </div>
           ))}
 
@@ -76,7 +82,7 @@ function TimelineRow({
                     ? "border-slate-300 bg-white"
                     : `border-transparent ${barClass}`
                 }`}
-                title={`${feature.name} ${isGap ? "inactive" : "active"}`}
+                title={`${feature.name} ${isGap ? "inativo" : "ativo"}`}
               />
             ) : (
               <div className="h-5 w-full rounded-sm border border-transparent" />

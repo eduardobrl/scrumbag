@@ -58,7 +58,7 @@ export function ReportList({
             </select>
           </label>
           <label className="text-sm font-medium text-slate-700">
-            Report type
+            Tipo de relatório
             <select
               value={reportType}
               onChange={(event) => setReportType(event.target.value as ReportType)}
@@ -73,7 +73,7 @@ export function ReportList({
           </label>
           <div className="flex items-end">
             <Button type="button" onClick={generate} disabled={loading || releases.length === 0}>
-              {loading ? "Generating..." : "Generate"}
+              {loading ? "Gerando..." : "Gerar relatório"}
             </Button>
           </div>
         </div>

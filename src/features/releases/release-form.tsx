@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const STATUS_OPTIONS = [
-  { value: "PLANNED", label: "Planned" },
-  { value: "IN_PROGRESS", label: "In progress" },
-  { value: "CLOSED", label: "Closed" },
-  { value: "CANCELLED", label: "Cancelled" }
+  { value: "PLANNED", label: "Planejada" },
+  { value: "IN_PROGRESS", label: "Em andamento" },
+  { value: "CLOSED", label: "Encerrada" },
+  { value: "CANCELLED", label: "Cancelada" }
 ];
 
 export function ReleaseForm() {
@@ -51,7 +51,7 @@ export function ReleaseForm() {
 
     if (!response.ok) {
       const firstError = Object.values(payload.errors ?? {})[0];
-      setError(typeof firstError === "string" ? firstError : "Unable to save release");
+      setError(typeof firstError === "string" ? firstError : "Não foi possível salvar a release");
       return;
     }
 
@@ -72,7 +72,7 @@ export function ReleaseForm() {
     <form className="grid gap-3" onSubmit={onSubmit}>
       <div className="grid grid-cols-2 gap-3">
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Name
+          Nome
           <Input
             value={name}
             onChange={(event) => setName(event.target.value)}
@@ -97,28 +97,28 @@ export function ReleaseForm() {
       </div>
 
       <label className="grid gap-1 text-sm font-medium text-slate-700">
-        Objective
+        Objetivo
         <Input
           value={objective}
           onChange={(event) => setObjective(event.target.value)}
-          placeholder="Deliver onboarding improvements"
+          placeholder="Entregar melhorias do fluxo de onboarding"
           required
         />
       </label>
 
       <label className="grid gap-1 text-sm font-medium text-slate-700">
-        Description
+        Descrição
         <textarea
           className="min-h-[60px] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-accent focus:ring-2 focus:ring-teal-100"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          placeholder="Optional details"
+          placeholder="Detalhes opcionais"
         />
       </label>
 
       <div className="grid grid-cols-2 gap-3">
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Start date
+          Data de início
           <Input
             type="date"
             value={startDate}
@@ -127,7 +127,7 @@ export function ReleaseForm() {
           />
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          End date
+          Data de término
           <Input
             type="date"
             value={endDate}
@@ -139,7 +139,7 @@ export function ReleaseForm() {
 
       <div className="grid grid-cols-3 gap-3">
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Sprint length (business days)
+          Duração da sprint (dias úteis)
           <Input
             type="number"
             min={1}
@@ -149,7 +149,7 @@ export function ReleaseForm() {
           />
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Meeting %
+          Reuniões %
           <Input
             type="number"
             min={0}
@@ -160,7 +160,7 @@ export function ReleaseForm() {
           />
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Support %
+          Sustentação %
           <Input
             type="number"
             min={0}
@@ -176,7 +176,7 @@ export function ReleaseForm() {
 
       <Button disabled={isPending} type="submit">
         <CalendarPlus className="h-4 w-4" aria-hidden="true" />
-        Save and generate sprints
+        Salvar e gerar sprints
       </Button>
     </form>
   );

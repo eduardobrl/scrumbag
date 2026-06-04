@@ -59,7 +59,7 @@ export function FeatureForm({ releases, initial, selectedReleaseId }: FeatureFor
   if (releases.length === 0) {
     return (
       <div className="rounded-lg border border-line bg-white p-4 text-sm text-slate-600">
-        Create a release before adding features.
+        Crie uma release antes de adicionar features.
       </div>
     );
   }
@@ -83,13 +83,13 @@ export function FeatureForm({ releases, initial, selectedReleaseId }: FeatureFor
       </label>
 
       <label className="grid gap-1 text-sm font-medium text-slate-700">
-        Name
+        Nome
         <Input value={name} onChange={(event) => setName(event.target.value)} required />
         {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
       </label>
 
       <label className="grid gap-1 text-sm font-medium text-slate-700">
-        Description
+        Descrição
         <textarea
           className="min-h-[96px] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-teal-100"
           value={description}
@@ -102,12 +102,12 @@ export function FeatureForm({ releases, initial, selectedReleaseId }: FeatureFor
       <div className="flex gap-2">
         <Button disabled={isPending} type="submit">
           <Save className="h-4 w-4" aria-hidden="true" />
-          {initial ? "Save changes" : "New Feature"}
+          {initial ? "Salvar alterações" : "Nova Feature"}
         </Button>
         {initial && (
           <Button type="button" variant="secondary" onClick={() => router.push(`/features/${initial.id}`)}>
             <X className="h-4 w-4" aria-hidden="true" />
-            Cancel
+            Cancelar
           </Button>
         )}
       </div>

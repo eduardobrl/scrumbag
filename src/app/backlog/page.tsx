@@ -49,7 +49,7 @@ export default async function BacklogPage({
 
       {!selectedRelease ? (
         <div className="rounded-lg border border-line bg-white p-6 text-center text-sm text-slate-600">
-          Create a release before planning backlog stories.
+          Crie uma release antes de planejar histórias do backlog.
         </div>
       ) : (
         <>

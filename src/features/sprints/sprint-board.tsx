@@ -24,7 +24,7 @@ export type LeakageEvent = {
 
 export const SPRINT_BOARD_COLUMNS: { title: string; status: BoardStoryStatus }[] = [
   { title: "Backlog da Sprint", status: "SPRINT_BACKLOG" },
-  { title: "Em Execucao", status: "IN_PROGRESS" },
+  { title: "Em Execução", status: "IN_PROGRESS" },
   { title: "Finalizado", status: "DONE" }
 ];
 
@@ -147,7 +147,7 @@ export function SprintBoard({
                 ))}
                 {columnStories.length === 0 && (
                   <div className="rounded-md border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500">
-                    No stories
+                    Nenhuma história
                   </div>
                 )}
               </div>

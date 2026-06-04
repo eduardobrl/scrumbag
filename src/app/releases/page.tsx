@@ -13,7 +13,7 @@ export default async function ReleasesPage() {
 
       <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">New release</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Nova release</h2>
           <ReleaseForm />
         </section>
 

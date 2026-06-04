@@ -1,6 +1,9 @@
 import { RoleType } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getOrCreateSettings } from "@/lib/settings";
+import { eachBusinessDayInRange, normalizeDateOnly } from "@/lib/date-utils";
+
+export { countBusinessDaysInRange } from "@/lib/date-utils";
 
 export type SprintCapacity = {
   grossCapacityHours: number;
@@ -17,27 +20,11 @@ export type SprintCapacity = {
 };
 
 function normalizeDate(date: Date): Date {
-  return new Date(`${date.toISOString().slice(0, 10)}T00:00:00.000Z`);
-}
-
-function isBusinessDay(date: Date): boolean {
-  const day = date.getUTCDay();
-  return day !== 0 && day !== 6;
+  return normalizeDateOnly(date);
 }
 
 function eachBusinessDay(startDate: Date, endDate: Date): Date[] {
-  const days: Date[] = [];
-  const current = normalizeDate(startDate);
-  const end = normalizeDate(endDate);
-
-  while (current <= end) {
-    if (isBusinessDay(current)) {
-      days.push(new Date(current));
-    }
-    current.setUTCDate(current.getUTCDate() + 1);
-  }
-
-  return days;
+  return eachBusinessDayInRange(startDate, endDate);
 }
 
 function dateKey(date: Date): string {

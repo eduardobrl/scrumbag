@@ -26,19 +26,19 @@ export default async function SquadPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-normal text-ink">Squad</h1>
-        <p className="mt-1 text-sm text-slate-600">Configure the local squad data used by future capacity calculations.</p>
+        <p className="mt-1 text-sm text-slate-600">Configure os dados locais da squad usados nos cálculos de capacidade.</p>
       </div>
       <SquadSummary summary={summary} />
 
       <div className="grid grid-cols-[360px_1fr] gap-4">
         <Card>
-          <h2 className="text-base font-semibold">New member</h2>
+          <h2 className="text-base font-semibold">Novo membro</h2>
           <div className="mt-4">
             <MemberForm />
           </div>
         </Card>
         <Card>
-          <h2 className="text-base font-semibold">Members</h2>
+          <h2 className="text-base font-semibold">Membros</h2>
           <div className="mt-4">
             <MemberTable members={memberViews} settings={toSettingsView(settings)} />
           </div>
@@ -47,13 +47,13 @@ export default async function SquadPage() {
 
       <div className="grid grid-cols-[360px_1fr] gap-4">
         <Card>
-          <h2 className="text-base font-semibold">New absence</h2>
+          <h2 className="text-base font-semibold">Nova ausência</h2>
           <div className="mt-4">
             <AbsenceForm members={memberViews} />
           </div>
         </Card>
         <Card>
-          <h2 className="text-base font-semibold">Absences</h2>
+          <h2 className="text-base font-semibold">Ausências</h2>
           <div className="mt-4">
             <AbsenceTable absences={absences.map(toAbsenceView)} />
           </div>
@@ -62,13 +62,13 @@ export default async function SquadPage() {
 
       <div className="grid grid-cols-[360px_1fr] gap-4">
         <Card>
-          <h2 className="text-base font-semibold">New holiday</h2>
+          <h2 className="text-base font-semibold">Novo feriado</h2>
           <div className="mt-4">
             <HolidayForm />
           </div>
         </Card>
         <Card>
-          <h2 className="text-base font-semibold">Holidays</h2>
+          <h2 className="text-base font-semibold">Feriados</h2>
           <div className="mt-4">
             <HolidayTable holidays={holidays.map(toHolidayView)} />
           </div>

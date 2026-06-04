@@ -10,9 +10,9 @@ const STATUS_TONE: Record<string, "neutral" | "success" | "warning" | "danger"> 
 };
 
 const STATUS_LABEL: Record<string, string> = {
-  PLANNED: "Planned",
-  IN_PROGRESS: "In progress",
-  CLOSED: "Closed"
+  PLANNED: "Planejada",
+  IN_PROGRESS: "Em andamento",
+  CLOSED: "Encerrada"
 };
 
 function occupancyTone(value: number): "success" | "warning" | "danger" {
@@ -32,13 +32,13 @@ export function SprintTable({ sprints }: { sprints: DashboardSprintRow[] }) {
           <thead className="bg-slate-50 text-xs uppercase text-slate-500">
             <tr>
               <th className="px-3 py-2">Sprint</th>
-              <th className="px-3 py-2">Period</th>
-              <th className="px-3 py-2">Goal</th>
-              <th className="px-3 py-2">Capacity</th>
-              <th className="px-3 py-2">Planned</th>
-              <th className="px-3 py-2">Remaining</th>
-              <th className="px-3 py-2">Occupancy</th>
-              <th className="px-3 py-2">Progress</th>
+              <th className="px-3 py-2">Período</th>
+              <th className="px-3 py-2">Objetivo</th>
+              <th className="px-3 py-2">Capacidade</th>
+              <th className="px-3 py-2">Planejado</th>
+              <th className="px-3 py-2">Restante</th>
+              <th className="px-3 py-2">Ocupação</th>
+              <th className="px-3 py-2">Progresso</th>
               <th className="px-3 py-2">Status</th>
             </tr>
           </thead>
