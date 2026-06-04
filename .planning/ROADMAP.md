@@ -11,10 +11,11 @@ This roadmap favors broad vertical phases. Each phase should leave the product m
 | Phase | Name | Goal | Requirements |
 |-------|------|------|--------------|
 | 1 | Local Foundation And Squad Setup | Establish the local app shell, persistence, navigation, settings, and squad/calendar data needed for capacity. | APP-01 to APP-06, SQUAD-01 to SQUAD-05 |
-| 2 | 3/3 | Complete    | 2026-06-03 |
+| 2 | Release And Sprint Planning Core | A user can create a release, have sprints generated automatically, inspect the release and sprint list, and adjust sprint dates/goals safely. | REL-01, REL-02, REL-03, REL-04, SPR-01, SPR-02, SPR-03 |
 | 3 | Feature, Story, And Backlog Planning | Let users model release scope as features and stories, aggregate estimates, and plan stories from backlog into sprints. | FEAT-01 to FEAT-06, BACK-01 to BACK-04 |
-| 4 | 3/3 | Complete    | 2026-06-03 |
-| 5 | 3/3 | Complete    | 2026-06-03 |
+| 4 | Sprint Board, Capacity Engine, And Leakage | A user can execute a sprint on a drag-and-drop board while the system calculates real capacity, highlights over-capacity plans, closes/reopens sprints, and records leaked stories. | BOARD-01 to BOARD-04, CAP-01 to CAP-05, SPR-04 to SPR-08 |
+| 5 | Release Intelligence, Reports, MCP, And AI | A user can understand release health through dashboard/timeline/progress/reporting, export planning data, and ask a local AI assistant for MCP-grounded analysis and controlled suggestions. | DASH-01 to DASH-04, PROG-01 to PROG-02, REP-01 to REP-03, MCP-01 to MCP-05, AI-01 to AI-04 |
+| 6 | UX Polish And Localization | Polish calendar-day sprint display, global release view switcher, larger action buttons, and full pt-BR localization. | UX-01, UX-02, UX-03, UX-04 |
 
 ## Phases
 
@@ -185,6 +186,33 @@ Cross-cutting constraints:
 - MCP write tools and AI assistant dangerous-operation flows must preserve existing cancellation/closure rules from Phase 4.
 - AI assistant does not bypass confirmation gates; explicit user action is required for close sprint, reopen sprint, cancel story, and cancel feature.
 
+### Phase 6: UX Polish And Localization
+
+**Goal:** Polish the UI for daily use: sprint durations display calendar days + business day count, the header includes a global release view switcher, all table action buttons are larger with tooltips, and the entire app renders in Brazilian Portuguese.
+
+**Requirements:** UX-01, UX-02, UX-03, UX-04
+
+**Success Criteria:**
+
+1. Sprint date ranges show both calendar start/end and business day count on all sprint views.
+2. A release switcher dropdown in the global header updates the view context for all pages via URL params.
+3. All table action buttons are enlarged to 40x40px with tooltip labels.
+4. The app renders entirely in Brazilian Portuguese (pt-BR) with English fallback available.
+
+**UI hint:** yes
+
+**Execution Plans:**
+
+**Wave 1**
+
+- `06-01` - Calendar-day sprint display, global release switcher, larger action buttons, and full pt-BR i18n.
+
+Cross-cutting constraints:
+
+- Calendar-day display is cosmetic only — capacity math stays on business days.
+- Release switcher does NOT toggle release status — it only changes the view context via URL params.
+- pt-BR is the default locale; English is a fallback, not the primary language.
+
 ## Coverage
 
 | Phase | Requirement Count | Status |
@@ -194,11 +222,12 @@ Cross-cutting constraints:
 | Phase 3 | 10 | Complete |
 | Phase 4 | 13 | Complete |
 | Phase 5 | 18 | Complete |
+| Phase 6 | 4 | Planned |
 
-**Total v1 requirements:** 60
-**Mapped requirements:** 60
+**Total v1 requirements:** 64
+**Mapped requirements:** 64
 **Unmapped requirements:** 0
 
 ---
 *Roadmap created: 2026-06-02*
-*Last updated: 2026-06-03 after Phase 5 completion*
+*Last updated: 2026-06-03 after Phase 6 planning*

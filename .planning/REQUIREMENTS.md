@@ -88,6 +88,13 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [x] **AI-03**: Assistant responses are grounded in app data through MCP.
 - [x] **AI-04**: Assistant can suggest changes but does not apply sensitive changes without explicit user confirmation.
 
+### UX Polish And Localization
+
+- [ ] **UX-01**: Sprint date ranges display calendar start/end dates plus the count of business days within, without changing capacity calculation math.
+- [ ] **UX-02**: A global release view selector in the header shows all releases as a dropdown; selecting one updates the URL param and all pages render data for that release, staying on the current page.
+- [ ] **UX-03**: Action icon buttons (edit, view, delete, cancel) in all table grids are enlarged from 32x32px to at least 40x40px and include tooltip labels.
+- [ ] **UX-04**: All UI strings are externalized to translation files; the app renders by default in Brazilian Portuguese (pt-BR) with English available as a fallback.
+
 ## v2 Requirements
 
 Deferred to future releases. Tracked but not in the current roadmap.
@@ -200,13 +207,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AI-02 | Phase 5 | Complete |
 | AI-03 | Phase 5 | Complete |
 | AI-04 | Phase 5 | Complete |
+| UX-01 | Phase 6 | Planned |
+| UX-02 | Phase 6 | Planned |
+| UX-03 | Phase 6 | Planned |
+| UX-04 | Phase 6 | Planned |
 
 **Coverage:**
 
-- v1 requirements: 60 total
-- Mapped to phases: 60
+- v1 requirements: 64 total
+- Mapped to phases: 64
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-06-02*
-*Last updated: 2026-06-03 after Phase 5 completion*
+*Last updated: 2026-06-03 after Phase 6 planning*
