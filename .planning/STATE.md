@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: Squad Planner MVP
-current_phase: archived
-status: Milestone complete
-last_updated: "2026-06-05"
+milestone: v1.1
+milestone_name: Squad Planner Next
+status: planning
+last_updated: "2026-06-05T03:26:55.877Z"
+last_activity: 2026-06-05
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 16
-  completed_plans: 16
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State: Squad Planner
@@ -88,3 +88,10 @@ Fresh requirements needed for next milestone — run `/gsd-new-milestone`.
 ---
 *State initialized: 2026-06-02*
 *Last updated: 2026-06-05 after v1.0 milestone archival*
+
+## Current Position
+
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-05 — Milestone v1.1 started

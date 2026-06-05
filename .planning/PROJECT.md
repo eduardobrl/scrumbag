@@ -2,26 +2,20 @@
 
 ## What This Is
 
-Squad Planner is a local web app for planning and tracking a squad release from scope definition through sprint execution. It helps a squad register members, absences, holidays, releases, sprints, features, and stories, then compares planned effort against available capacity and highlights delivery risk.
+Squad Planner is a local web app for planning and tracking squad releases from scope definition through sprint execution. It helps a squad register members, absences, holidays, releases, sprints, features, and stories, then compares planned effort against available capacity and highlights delivery risk.
 
 The first version is desktop-first, runs on localhost, stores data in SQLite, and includes a local MCP surface plus an AI assistant so agents can query the plan, explain risk, and suggest changes without applying sensitive actions automatically. The UI defaults to Brazilian Portuguese (pt-BR) with English fallback.
 
-## Current State
+## Current Milestone: v1.1 Squad Planner Next
 
-**v1.0 shipped** — 2026-06-04. All 64 v1 requirements delivered across 6 phases (16 plans). The app provides end-to-end release planning: squad/calendar setup, release/sprint management, feature/story modeling, backlog planning, sprint board execution, capacity engine, leakage tracking, dashboard intelligence, 7 report types (CSV/Excel), local MCP tools, and an AI assistant chat.
+**Goal:** Add multi-release portfolio planning with an annual timeline, impediment tracking with resolution history, and drag-and-drop feature reassignment across releases.
 
-**Codebase:** ~9,810 source LOC (TypeScript/TSX/Prisma/SQL/CSS), 167 files, 109 commits over 5 days. Stack: Next.js, Prisma 7 + SQLite (better-sqlite3), Tailwind CSS, next-intl, native HTML5 drag-and-drop. Persistence at `./data/squad-planner.db`.
+**Target features:**
+- Impediment/blocker tracking — register, timeline view, dashboard alerts, and resolution history with delivery impact measurement
+- Multi-release management — create and manage multiple releases in parallel, breaking the v1.0 one-active-release constraint
+- Annual timeline — visual roadmap showing all releases across a year with features mapped per release and drag-and-drop reassignment
 
-**Known gaps:** Impediment model (IMP-01 to IMP-03) explored but deferred to v1.next.
-
-## Next Milestone Goals
-
-- Impediment/blocker tracking with timeline integration
-- If approved: Jira/Azure DevOps/GitHub integration
-- WIP limits and story assignee support
-- Advanced planning (velocity, dependencies, multiple active releases)
-
-Start with `/gsd-new-milestone` to define requirements, research, and roadmap for the next milestone.
+**v1.0 shipped** — 2026-06-04. All 64 v1 requirements delivered across 6 phases (16 plans). Stack: Next.js, Prisma 7 + SQLite, Tailwind CSS, next-intl, dnd-kit. Persistence at `./data/squad-planner.db`.
 
 ## Core Value
 
@@ -43,9 +37,13 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 
 ### Active
 
-- [ ] Register impediments with dates, descriptions, and affected stories (IMP-01 to IMP-03)
-- [ ] View impediments on the release timeline showing when they occurred and which stories they impacted
+- [ ] Register impediments with dates, descriptions, affected stories, and resolution tracking (IMP-01 to IMP-03)
+- [ ] View impediments on the release timeline showing when they occurred, which stories they impacted, and resolution history
 - [ ] Dashboard alerts for stories with unresolved impediments
+- [ ] Create and manage multiple releases in parallel with independent sprints, features, and stories
+- [ ] View all releases on an annual timeline with features mapped to their target release
+- [ ] Reassign features between releases via drag-and-drop on the annual timeline
+- [ ] Export impediment reports to CSV/Excel alongside existing report types
 
 ### Out of Scope
 
@@ -56,10 +54,10 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 - Mandatory automatic planning - AI can suggest redistribution, but the user remains in control.
 - WIP limits - useful later, but not central to release capacity planning.
 - Story assignee ownership - v1 plans squad capacity, not individual allocation.
-- Multiple active releases or parallel sprint streams - v1 focuses on one active release at a time.
 - Blocking dependency management - dependencies can be discussed manually, but are not a formal model in v1.
 - Real-time collaborative editing - local-first scope keeps implementation and operations simple.
 - Remote database or corporate server deployment - SQLite and localhost are the intended v1 operating model.
+- Jira, Azure DevOps, Trello, or GitHub integration - the app complements those tools instead of replacing or synchronizing with them.
 
 ## Context
 
@@ -78,7 +76,7 @@ Expected scale is one squad, one active release, up to 20 sprints per release, u
 - **Stack**: Next.js, TypeScript, Prisma, Tailwind CSS, dnd-kit, and Node.js MCP - chosen for a simple full-stack local web app with a polished UI.
 - **Capacity model**: Capacity is calculated in hours from members, working days, absences, holidays, meetings, and support, then normalized to 8-hour days.
 - **Planning model**: Story points and estimated business days are independent; only estimated days consume sprint capacity.
-- **Release model**: Only one release can be active at a time in v1.
+- **Release model**: Multiple releases can be managed in parallel. The release context selector allows switching between releases.
 - **Safety**: AI and MCP writes must be explicit; sensitive actions such as closing sprints or canceling items require confirmation or dangerous-operation marking.
 - **UX priority**: Desktop is the priority; smaller screens may stack boards and use horizontal scrolling.
 
@@ -122,4 +120,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-04 after v1.0 milestone completion*
+*Last updated: 2026-06-05 after v1.1 milestone initialization*
