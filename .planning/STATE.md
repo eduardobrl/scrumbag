@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-current_phase: 06
+milestone_name: Squad Planner MVP
+current_phase: archived
 status: Milestone complete
-last_updated: "2026-06-04T02:25:00.063Z"
+last_updated: "2026-06-05"
 progress:
   total_phases: 6
   completed_phases: 6
@@ -16,35 +16,39 @@ progress:
 # Project State: Squad Planner
 
 **Initialized:** 2026-06-02
-**Current phase:** 06
+**Archived:** 2026-06-05
 **Workflow mode:** YOLO
 **Granularity:** Coarse
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-06-04)
+See: `.planning/PROJECT.md` (updated 2026-06-05)
 
 **Core value:** A squad can see whether a release plan fits the team's real sprint capacity and adjust scope before delivery risk becomes invisible.
-**Current focus:** Milestone v1.0 complete
+**Current focus:** v1.0 shipped. Next milestone pending.
 
 ## Roadmap Progress
 
 | Phase | Name | Status | Progress |
 |-------|------|--------|----------|
-| 1 | Local Foundation And Squad Setup | Complete | 100% |
-| 2 | Release And Sprint Planning Core | Complete | 100% |
-| 3 | Feature, Story, And Backlog Planning | Complete | 100% |
-| 4 | Sprint Board, Capacity Engine, And Leakage | Complete | 100% |
-| 5 | Release Intelligence, Reports, MCP, And AI | Complete | 100% |
-| 6 | UX Polish And Localization | Complete | 100% |
+| 1 | Local Foundation And Squad Setup | Complete (archived) | 100% |
+| 2 | Release And Sprint Planning Core | Complete (archived) | 100% |
+| 3 | Feature, Story, And Backlog Planning | Complete (archived) | 100% |
+| 4 | Sprint Board, Capacity Engine, And Leakage | Complete (archived) | 100% |
+| 5 | Release Intelligence, Reports, MCP, And AI | Complete (archived) | 100% |
+| 6 | UX Polish And Localization | Complete (archived) | 100% |
+
+## Milestones
+
+| Version | Name | Status | Phases | Shipped |
+|---------|------|--------|--------|---------|
+| v1.0 | Squad Planner MVP | Shipped | 01-06 | 2026-06-04 |
 
 ## Active Requirement Set
 
-See `.planning/REQUIREMENTS.md`.
+v1.0 requirements: 64/64 shipped. See `.planning/milestones/v1.0-REQUIREMENTS.md`.
 
-- v1 requirements: 64
-- Mapped to phases: 64
-- Unmapped: 0
+Fresh requirements needed for next milestone — run `/gsd-new-milestone`.
 
 ## Workflow Preferences
 
@@ -61,8 +65,6 @@ See `.planning/REQUIREMENTS.md`.
 
 ## Notes
 
-- Project-level domain research was skipped for initialization based on the user's Research = No selection and the detailed source specs in `spec.md` and `telas.md`.
-- Existing deleted tracked files outside these planning artifacts were not restored or reverted.
 - Phase 1 was planned without CONTEXT.md by user choice on 2026-06-02.
 - Phase 1 has 3 execution plans across 2 waves plus `01-SKELETON.md` for the walking skeleton contract.
 - Phase 1 completed on 2026-06-03 with verification passed.
@@ -80,8 +82,9 @@ See `.planning/REQUIREMENTS.md`.
 - Phase 5 completed on 2026-06-03 with verification passed.
 - Phase 6 planned on 2026-06-03: UX Polish And Localization covering calendar-day sprints, global release switcher, larger action buttons, and pt-BR i18n.
 - Phase 6 completed on 2026-06-04 with verification passed.
-- Milestone v1.0 is complete; next recommended command: `$gsd-complete-milestone`
+- v1.0 milestone archived on 2026-06-05. Requirements, roadmap, and project docs archived to `.planning/milestones/`.
+- Next recommended command: `/gsd-new-milestone`
 
 ---
 *State initialized: 2026-06-02*
-*Last updated: 2026-06-04 after Phase 6 completion*
+*Last updated: 2026-06-05 after v1.0 milestone archival*

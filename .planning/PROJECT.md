@@ -4,7 +4,24 @@
 
 Squad Planner is a local web app for planning and tracking a squad release from scope definition through sprint execution. It helps a squad register members, absences, holidays, releases, sprints, features, and stories, then compares planned effort against available capacity and highlights delivery risk.
 
-The first version is desktop-first, runs on localhost, stores data in SQLite, and includes a local MCP surface plus an AI assistant so agents can query the plan, explain risk, and suggest changes without applying sensitive actions automatically.
+The first version is desktop-first, runs on localhost, stores data in SQLite, and includes a local MCP surface plus an AI assistant so agents can query the plan, explain risk, and suggest changes without applying sensitive actions automatically. The UI defaults to Brazilian Portuguese (pt-BR) with English fallback.
+
+## Current State
+
+**v1.0 shipped** — 2026-06-04. All 64 v1 requirements delivered across 6 phases (16 plans). The app provides end-to-end release planning: squad/calendar setup, release/sprint management, feature/story modeling, backlog planning, sprint board execution, capacity engine, leakage tracking, dashboard intelligence, 7 report types (CSV/Excel), local MCP tools, and an AI assistant chat.
+
+**Codebase:** ~9,810 source LOC (TypeScript/TSX/Prisma/SQL/CSS), 167 files, 109 commits over 5 days. Stack: Next.js, Prisma 7 + SQLite (better-sqlite3), Tailwind CSS, next-intl, native HTML5 drag-and-drop. Persistence at `./data/squad-planner.db`.
+
+**Known gaps:** Impediment model (IMP-01 to IMP-03) explored but deferred to v1.next.
+
+## Next Milestone Goals
+
+- Impediment/blocker tracking with timeline integration
+- If approved: Jira/Azure DevOps/GitHub integration
+- WIP limits and story assignee support
+- Advanced planning (velocity, dependencies, multiple active releases)
+
+Start with `/gsd-new-milestone` to define requirements, research, and roadmap for the next milestone.
 
 ## Core Value
 
@@ -14,27 +31,21 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 
 ### Validated
 
-- [x] Phase 1 delivered a localhost-only Next.js app shell with SQLite persistence, navigation, global header context, settings, and squad/calendar management.
-- [x] User can create and maintain local squad members, absences, holidays, and capacity defaults with data persisted at `./data/squad-planner.db`.
-- [x] Phase 2 delivered release creation/editing, one active release guard, generated sprint planning, sprint list/detail, and date/goal editing.
-- [x] User can create a release and have sprints generated from the release period. Validated in Phase 2: Release And Sprint Planning Core.
-- [x] Phase 3 delivered feature/story CRUD, cancellation, aggregate feature metrics, backlog filters, story-to-sprint planning preview, sprint assignment, return-to-backlog, and planned-effort updates.
-- [x] User can create features, split them into estimated stories, and plan stories into sprints with planned-effort impact preview. Validated in Phase 3: Feature, Story, And Backlog Planning.
-- [x] Phase 4 delivered the sprint board, story status movement, real capacity engine, capacity alerts, sprint close/reopen, and leakage history.
-- [x] User can operate a sprint board, compare planned effort against real net capacity, and preserve leakage history when closing or reopening sprints. Validated in Phase 4: Sprint Board, Capacity Engine, And Leakage.
-- [x] Phase 5 delivered dashboard cards, consolidated alerts, sprint progress, release timeline, report generation, CSV/Excel export, local MCP tools, and the assistant chat.
-- [x] User can view dashboard, timeline, progress, and capacity alerts for the active release. Validated in Phase 5: Release Intelligence, Reports, MCP, And AI.
-- [x] User can export release planning and tracking reports to CSV or Excel. Validated in Phase 5: Release Intelligence, Reports, MCP, And AI.
-- [x] AI agents can query local planning data through MCP and provide suggestions safely. Validated in Phase 5: Release Intelligence, Reports, MCP, And AI.
-- [x] Phase 6 delivered pt-BR default UI, English fallback messages, global release view switching, business-day sprint period display, and larger action buttons.
-- [x] User can operate the polished v1 UI in Brazilian Portuguese, switch release view context from the header, and see sprint calendar ranges with business-day counts. Validated in Phase 6: UX Polish And Localization.
+- ✓ User can run the app locally in a browser with a simple install/start flow — v1.0
+- ✓ User can configure squad members, work schedules, absences, and holidays — v1.0
+- ✓ User can create a release and have sprints generated from the release period — v1.0
+- ✓ User can create features, split them into estimated stories, and plan stories into sprints — v1.0
+- ✓ User can operate a sprint board, compare planned effort against net capacity, and track leakage — v1.0
+- ✓ User can view dashboard, timeline, progress, and capacity alerts for the active release — v1.0
+- ✓ User can export release planning and tracking reports to CSV or Excel — v1.0
+- ✓ AI agents can query local planning data through MCP and provide suggestions safely — v1.0
+- ✓ User can operate the app in Brazilian Portuguese, switch release view context, and see sprint calendar ranges — v1.0
 
 ### Active
 
-- [x] User can run the app locally in a browser with a simple install/start flow. Validated in Phase 1: Local Foundation And Squad Setup.
-- [x] User can configure squad members, work schedules, absences, and holidays. Validated in Phase 1: Local Foundation And Squad Setup.
-- [x] User can operate a sprint board and move stories through fixed workflow states. Validated in Phase 4: Sprint Board, Capacity Engine, And Leakage.
-- [x] User can close and reopen sprints while preserving leakage history. Validated in Phase 4: Sprint Board, Capacity Engine, And Leakage.
+- [ ] Register impediments with dates, descriptions, and affected stories (IMP-01 to IMP-03)
+- [ ] View impediments on the release timeline showing when they occurred and which stories they impacted
+- [ ] Dashboard alerts for stories with unresolved impediments
 
 ### Out of Scope
 
@@ -54,9 +65,9 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 
 The source context is captured in `spec.md` and `telas.md`. The product is meant to support release planning for a squad that already thinks in releases, sprints, features, and stories, but needs a lightweight local tool to visualize capacity, overflow, leakage, and delivery risk.
 
-The suggested stack is Next.js, TypeScript, SQLite, Prisma, Tailwind CSS, dnd-kit for drag-and-drop, Recharts or a similar chart/timeline library, XLSX/CSV export, and a local Node.js MCP server. The UI should feel like a modern management tool: quiet, information-dense, desktop-first, with side navigation, global release context, tables, badges, progress bars, alerts, and horizontal timelines.
+The stack is Next.js 15, TypeScript, Prisma 7 + SQLite (better-sqlite3), Tailwind CSS, dnd-kit, next-intl for i18n, XLSX/CSV export, and a local Node.js MCP server. The UI feels like a modern management tool: quiet, information-dense, desktop-first, with side navigation, global release context, tables, badges, progress bars, alerts, and horizontal timelines.
 
-The first version now includes the local operational flow from setup through dashboard intelligence, reports, exports, MCP tools, assistant chat, pt-BR localization, global release view switching, and daily-use UI polish. It should remain simple to run: `npm install` and `npm run dev`, with `npm run mcp:start` available for the local MCP server. Offline operation is required for core planning features; AI quality can depend on whichever local agent/tool the user connects, but the MCP data surface itself works locally.
+The app is simple to run: `npm install` and `npm run dev`, with `npm run db:sync` for schema setup and `npm run mcp:start` for the MCP server. Offline operation is required for core planning features; AI quality depends on the connected agent/tool, but the MCP data surface works locally.
 
 Expected scale is one squad, one active release, up to 20 sprints per release, up to 100 features, up to 1000 stories, and up to 30 members.
 
@@ -75,23 +86,23 @@ Expected scale is one squad, one active release, up to 20 sprints per release, u
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Build as a local web app | Keeps installation simple and avoids SaaS/security scope for v1. | - Pending |
-| Use SQLite for local persistence | Portable, easy to back up, and enough for the expected data volume. | - Pending |
-| Track capacity by estimated business days, not story points | Story points remain relative effort while days support capacity comparison. | - Pending |
-| Permit over-capacity planning with visible warnings | Teams sometimes choose to overplan deliberately; the tool should expose risk, not block judgment. | - Pending |
-| Move unfinished stories to the next sprint on close | Captures sprint leakage and preserves historical truth. | - Pending |
-| Include MCP and AI in v1 | AI assistance is part of the product value, but must stay controlled and local. | - Pending |
-| Use coarse MVP phases | User selected coarse planning; phases should deliver broad vertical slices. | - Pending |
-| Use Prisma 7 with better-sqlite3 adapter | The local machine runs Node 24, and Prisma 7 is the supported line for that runtime. | - Accepted in Phase 1 |
-| Prepare SQLite with a local sync script | Prisma schema validation and SQL generation worked, but schema-engine apply failed on this Windows/Node 24 host. | - Accepted in Phase 1 |
-| Keep sprint assignment behind backlog planning preview | Direct story edits should not bypass capacity-impact context. | - Accepted in Phase 3 |
-| Keep capacity placeholders pending in Phase 3 | Planned effort can use assigned story estimates now, while gross/net capacity remains Phase 4 scope. | - Accepted in Phase 3 |
-| Calculate capacity on demand from local planning data | Derived sprint capacity should stay consistent with squad, calendar, release, and story edits without a separate summary table. | - Accepted in Phase 4 |
-| Keep leakage history append-only | Closing and reopening sprints must preserve historical truth for Phase 5 reports and dashboards. | - Accepted in Phase 4 |
-| Share dashboard/report/MCP query logic | Release intelligence must stay consistent across UI, exports, and AI/tool surfaces. | - Accepted in Phase 5 |
-| Gate dangerous MCP and assistant actions with confirmation | Sensitive planning changes must remain explicit user actions. | - Accepted in Phase 5 |
-| Treat release switching as view context | The header selector should let users inspect any release without changing the one-active-release status rule. | - Accepted in Phase 6 |
-| Keep business-day sprint display cosmetic | Sprint period labels can show calendar dates plus business-day counts while capacity math remains unchanged. | - Accepted in Phase 6 |
+| Build as a local web app | Keeps installation simple and avoids SaaS/security scope for v1. | ✓ Good — shipped |
+| Use SQLite for local persistence | Portable, easy to back up, and enough for the expected data volume. | ✓ Good — shipped |
+| Track capacity by estimated business days, not story points | Story points remain relative effort while days support capacity comparison. | ✓ Good — shipped |
+| Permit over-capacity planning with visible warnings | Teams sometimes choose to overplan deliberately; the tool should expose risk, not block judgment. | ✓ Good — shipped |
+| Move unfinished stories to the next sprint on close | Captures sprint leakage and preserves historical truth. | ✓ Good — shipped |
+| Include MCP and AI in v1 | AI assistance is part of the product value, but must stay controlled and local. | ✓ Good — shipped |
+| Use coarse MVP phases | User selected coarse planning; phases should deliver broad vertical slices. | ✓ Good — shipped |
+| Use Prisma 7 with better-sqlite3 adapter | The local machine runs Node 24, and Prisma 7 is the supported line for that runtime. | ✓ Good — shipped |
+| Prepare SQLite with a local sync script | Prisma schema validation and SQL generation worked, but schema-engine apply failed on this Windows/Node 24 host. | ✓ Good — shipped |
+| Keep sprint assignment behind backlog planning preview | Direct story edits should not bypass capacity-impact context. | ✓ Good — shipped |
+| Keep capacity placeholders pending in Phase 3 | Planned effort can use assigned story estimates now, while gross/net capacity remains Phase 4 scope. | ✓ Good — shipped |
+| Calculate capacity on demand from local planning data | Derived sprint capacity should stay consistent with squad, calendar, release, and story edits without a separate summary table. | ✓ Good — shipped |
+| Keep leakage history append-only | Closing and reopening sprints must preserve historical truth for Phase 5 reports and dashboards. | ✓ Good — shipped |
+| Share dashboard/report/MCP query logic | Release intelligence must stay consistent across UI, exports, and AI/tool surfaces. | ✓ Good — shipped |
+| Gate dangerous MCP and assistant actions with confirmation | Sensitive planning changes must remain explicit user actions. | ✓ Good — shipped |
+| Treat release switching as view context | The header selector should let users inspect any release without changing the one-active-release status rule. | ✓ Good — shipped |
+| Keep business-day sprint display cosmetic | Sprint period labels can show calendar dates plus business-day counts while capacity math remains unchanged. | ✓ Good — shipped |
 
 ## Evolution
 
@@ -111,4 +122,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-04 after Phase 6 completion*
+*Last updated: 2026-06-04 after v1.0 milestone completion*
