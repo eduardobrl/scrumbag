@@ -23,7 +23,7 @@ Read these files before planning or implementation work:
 
 - Mode: YOLO.
 - Granularity: Coarse.
-- Execution: Parallel when plans are independent.
+- Execution: Sequential (parallel execution disabled due to OpenCode runtime limitations).
 - Research before planning each phase: Disabled.
 - Plan check: Enabled.
 - Verifier: Enabled.
