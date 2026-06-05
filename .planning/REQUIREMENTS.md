@@ -95,6 +95,16 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [x] **UX-03**: Action icon buttons (edit, view, delete, cancel) in all table grids are enlarged from 32x32px to at least 40x40px and include tooltip labels.
 - [x] **UX-04**: All UI strings are externalized to translation files; the app renders by default in Brazilian Portuguese (pt-BR) with English available as a fallback.
 
+## v1.next Requirements
+
+Requirements surfaced post-v1.0. To be phased into the roadmap.
+
+### Impediments And Timeline
+
+- **IMP-01**: User can register an impediment with date, description, and affected stories (N:N).
+- **IMP-02**: Impediments appear on the release timeline, showing when they occurred and which stories they impacted.
+- **IMP-03**: Dashboard alerts surface stories with unresolved impediments.
+
 ## v2 Requirements
 
 Deferred to future releases. Tracked but not in the current roadmap.
