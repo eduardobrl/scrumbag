@@ -26,3 +26,13 @@ npm run db:seed
 ```
 
 The dev server binds to `localhost` by default through `npm run dev`.
+
+## Mcp example
+
+  "mcp": {
+    "squad-planner": {
+      "type": "local",
+      "command": ["npx", "tsx", "src/mcp/mcp-stdio.ts"],
+      "enabled": true
+    }
+  }
