@@ -62,20 +62,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IMP-01 | — | Pending |
-| IMP-02 | — | Pending |
-| IMP-03 | — | Pending |
-| MREL-01 | — | Pending |
-| MREL-02 | — | Pending |
-| TL-01 | — | Pending |
-| TL-02 | — | Pending |
-| TL-03 | — | Pending |
+| IMP-01 | Phase 8 | Pending |
+| IMP-02 | Phase 8 | Pending |
+| IMP-03 | Phase 8 | Pending |
+| MREL-01 | Phase 7 | Pending |
+| MREL-02 | Phase 9 | Pending |
+| TL-01 | Phase 9 | Pending |
+| TL-02 | Phase 9 | Pending |
+| TL-03 | Phase 9 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 8 total
-- Mapped to phases: 0
-- Unmapped: 8 ⚠️
+- Mapped to phases: 8
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-05*
-*Last updated: 2026-06-05 after v1.1 milestone definition*
+*Last updated: 2026-06-05 after v1.1 roadmap creation (traceability populated)*

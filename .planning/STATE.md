@@ -1,12 +1,12 @@
 ---
-gsd_state_version: 1.0
+gsd_state_version: '1.0'
 milestone: v1.1
 milestone_name: Squad Planner Next
 status: planning
-last_updated: "2026-06-05T03:26:55.877Z"
+last_updated: "2026-06-05T04:00:00.000Z"
 last_activity: 2026-06-05
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -16,7 +16,6 @@ progress:
 # Project State: Squad Planner
 
 **Initialized:** 2026-06-02
-**Archived:** 2026-06-05
 **Workflow mode:** YOLO
 **Granularity:** Coarse
 
@@ -25,7 +24,7 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-06-05)
 
 **Core value:** A squad can see whether a release plan fits the team's real sprint capacity and adjust scope before delivery risk becomes invisible.
-**Current focus:** v1.0 shipped. Next milestone pending.
+**Current focus:** v1.1 Squad Planner Next — multi-release portfolio planning, impediment tracking, annual timeline.
 
 ## Roadmap Progress
 
@@ -37,61 +36,89 @@ See: `.planning/PROJECT.md` (updated 2026-06-05)
 | 4 | Sprint Board, Capacity Engine, And Leakage | Complete (archived) | 100% |
 | 5 | Release Intelligence, Reports, MCP, And AI | Complete (archived) | 100% |
 | 6 | UX Polish And Localization | Complete (archived) | 100% |
+| 7 | Multi-Release Foundation | Not started | 0% |
+| 8 | Impediment Tracking | Not started | 0% |
+| 9 | Annual Timeline & Cross-Release View | Not started | 0% |
 
 ## Milestones
 
 | Version | Name | Status | Phases | Shipped |
 |---------|------|--------|--------|---------|
 | v1.0 | Squad Planner MVP | Shipped | 01-06 | 2026-06-04 |
+| v1.1 | Squad Planner Next | Planning | 07-09 | — |
 
 ## Active Requirement Set
 
+v1.1 requirements: 8 defined, 0 shipped. See `.planning/REQUIREMENTS.md`.
+
 v1.0 requirements: 64/64 shipped. See `.planning/milestones/v1.0-REQUIREMENTS.md`.
-
-Fresh requirements needed for next milestone — run `/gsd-new-milestone`.
-
-## Workflow Preferences
-
-- Mode: YOLO
-- Phase granularity: Coarse
-- Execution: Parallel
-- Commit planning docs: Yes
-- Research before planning each phase: No
-- Plan check: Yes
-- Verifier: Yes
-- Drift guard: Yes
-- AI model profile: Balanced
-- PR body sections: User Stories & Acceptance Criteria
-
-## Notes
-
-- Phase 1 was planned without CONTEXT.md by user choice on 2026-06-02.
-- Phase 1 has 3 execution plans across 2 waves plus `01-SKELETON.md` for the walking skeleton contract.
-- Phase 1 completed on 2026-06-03 with verification passed.
-- Phase 2 was planned without CONTEXT.md by user choice on 2026-06-03.
-- Phase 2 has 3 execution plans across 2 waves.
-- Phase 2 completed on 2026-06-03 with verification passed.
-- Phase 3 was planned without CONTEXT.md by user choice on 2026-06-03.
-- Phase 3 has 3 execution plans across 2 waves.
-- Phase 3 completed on 2026-06-03 with verification passed.
-- Phase 4 was planned without CONTEXT.md by user choice on 2026-06-03.
-- Phase 4 has 3 execution plans across 2 waves.
-- Phase 4 completed on 2026-06-03 with verification passed.
-- Phase 5 was planned on 2026-06-03 without CONTEXT.md by user choice (consistent with Phases 1–4).
-- Phase 5 has 3 execution plans across 2 waves: `05-01` (Dashboard/Timeline/Progress), `05-02` (Reports/Exports), `05-03` (MCP/AI Assistant).
-- Phase 5 completed on 2026-06-03 with verification passed.
-- Phase 6 planned on 2026-06-03: UX Polish And Localization covering calendar-day sprints, global release switcher, larger action buttons, and pt-BR i18n.
-- Phase 6 completed on 2026-06-04 with verification passed.
-- v1.0 milestone archived on 2026-06-05. Requirements, roadmap, and project docs archived to `.planning/milestones/`.
-- Next recommended command: `/gsd-new-milestone`
-
----
-*State initialized: 2026-06-02*
-*Last updated: 2026-06-05 after v1.0 milestone archival*
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 7 of 9 (Multi-Release Foundation)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-05 — Milestone v1.1 started
+Status: Ready to plan
+Last activity: 2026-06-05 — Roadmap created for v1.1 (3 phases)
+
+Progress: [░░░░░░░░░░] 0%
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 16 (v1.0)
+- Average duration: — (not yet tracked per plan)
+- Total execution time: — (not yet aggregated)
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| 1-6 (v1.0) | 16 | — | — |
+| 7-9 (v1.1) | 0 (TBD) | — | — |
+
+*Updated after each plan completion*
+
+## Accumulated Context
+
+### Decisions
+
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- v1.1: Multi-release constraint removal — the one-active-release guard from v1.0 is lifted for MREL-01
+- v1.1: Impediment tracking is self-contained per release, not cross-release
+- v1.1: Annual timeline builds on existing release timeline infrastructure from Phase 5
+
+### Pending Todos
+
+None yet.
+
+### Blockers/Concerns
+
+None yet.
+
+## Deferred Items
+
+Items acknowledged and carried forward from previous milestone close:
+
+| Category | Item | Status | Deferred At |
+|----------|------|--------|-------------|
+| Impediment | IMP-01 to IMP-03 (full impediment tracking) | Now active in v1.1 | v1.0 close |
+| Multi-Release | Multiple active releases | Now active in v1.1 (MREL-01) | v1.0 close |
+
+## Session Continuity
+
+Last session: 2026-06-05
+Stopped at: Roadmap creation for v1.1 — 3 phases defined
+Resume file: None
+
+## Notes
+
+- v1.0 milestone archived on 2026-06-05. Requirements, roadmap, and project docs archived to `.planning/milestones/`.
+- v1.1 roadmap created with 3 phases (07-09) covering 8 requirements across 3 categories.
+- Next recommended command: `/gsd-plan-phase 7`
+
+---
+
+*State initialized: 2026-06-02*
+*Last updated: 2026-06-05 after v1.1 roadmap creation*
