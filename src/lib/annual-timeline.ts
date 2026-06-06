@@ -144,7 +144,16 @@ export function dateToMonthIndex(date: Date, year: number): number | null {
 }
 
 async function buildReleaseSummary(releaseId: string): Promise<AnnualReleaseSummary> {
-  const data = await getDashboardData(releaseId);
+  const [data, stories] = await Promise.all([
+    getDashboardData(releaseId),
+    prisma.story.findMany({
+      where: {
+        status: { not: StoryStatus.CANCELLED },
+        feature: { releaseId }
+      },
+      select: { estimatedDays: true }
+    })
+  ]);
 
   return {
     id: data.release.id,
@@ -154,9 +163,7 @@ async function buildReleaseSummary(releaseId: string): Promise<AnnualReleaseSumm
     endDate: data.release.endDate,
     featureCount: data.featureCount,
     storyCount: data.storyCount,
-    estimatedDays: round(
-      data.sprints.reduce((sum, sprint) => sum + sprint.plannedEffortDays, 0)
-    ),
+    estimatedDays: round(stories.reduce((sum, story) => sum + (story.estimatedDays ?? 0), 0)),
     completionPercentage: data.progress,
     sprintCount: data.sprints.length,
     totalCapacityDays: data.totalCapacityDays,

@@ -1,6 +1,7 @@
 import {
   Bot,
   CalendarRange,
+  CalendarDays,
   ClipboardList,
   CircleAlert,
   Gauge,
@@ -18,6 +19,7 @@ export const navigationItems = [
   { labelKey: "backlog", href: "/backlog", icon: ClipboardList },
   { labelKey: "sprints", href: "/sprints", icon: ListChecks },
   { labelKey: "impediments", href: "/impediments", icon: CircleAlert },
+  { labelKey: "timeline", href: "/timeline", icon: CalendarDays },
   { labelKey: "squad", href: "/squad", icon: Users },
   { labelKey: "reports", href: "/reports", icon: Gauge },
   { labelKey: "assistant", href: "/assistant", icon: Bot },
