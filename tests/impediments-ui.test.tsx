@@ -95,6 +95,14 @@ describe("impediment UI", () => {
     expect(html).toContain("Resolver impedimento");
   });
 
+  it("renders affected stories as linked title rows", () => {
+    const html = renderToStaticMarkup(<ImpedimentDetail impediment={openDetail} releaseId="release-1" />);
+
+    expect(html).toContain("Create checkout shell");
+    expect(html).toContain("/stories/story-1/edit?releaseId=release-1");
+    expect(html).not.toContain("feature-1");
+  });
+
   it("renders resolved details without a reopen action", () => {
     const html = renderToStaticMarkup(
       <ImpedimentDetail
