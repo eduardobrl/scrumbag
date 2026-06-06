@@ -4,8 +4,8 @@ milestone: v1.1
 milestone_name: Squad Planner Next
 status: verifying
 stopped_at: Phase 8 planned
-last_updated: "2026-06-06T15:48:32.650Z"
-last_activity: 2026-06-06 -- Phase 08 execution started
+last_updated: "2026-06-06T15:49:22.196Z"
+last_activity: 2026-06-06
 progress:
   total_phases: 2
   completed_phases: 2
@@ -55,10 +55,10 @@ v1.0 requirements: 64/64 shipped. See `.planning/milestones/v1.0-REQUIREMENTS.md
 
 ## Current Position
 
-Phase: 08 (annual-timeline-cross-release-view) — EXECUTING
-Plan: 3 of 3
+Phase: 08
+Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-06-06 -- Phase 08 execution started
+Last activity: 2026-06-06
 
 Progress: [----------] 0%
 
@@ -66,7 +66,7 @@ Progress: [----------] 0%
 
 **Velocity:**
 
-- Total plans completed: 16 (v1.0) + 3 (v1.1 Phase 7)
+- Total plans completed: 19 (v1.0) + 3 (v1.1 Phase 7)
 - Average duration: - (not yet tracked per plan)
 - Total execution time: - (not yet aggregated)
 
@@ -76,6 +76,7 @@ Progress: [----------] 0%
 |-------|-------|-------|----------|
 | 1-6 (v1.0) | 16 | - | - |
 | 7-8 (v1.1) | 3 complete / 6 planned | - | - |
+| 08 | 3 | - | - |
 
 *Updated after each plan completion*
 | Phase 07 P01 | 15 min | 4 tasks | 6 files |

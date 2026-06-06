@@ -17,12 +17,11 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 
 - **MREL-01**: Remove the one-active-release constraint — allow multiple releases IN_PROGRESS simultaneously. Deferred 2026-06-06 per user decision.
 
-
 ### Annual Timeline
 
-- [ ] **TL-01**: User can view a yearly release timeline showing all releases across months and quarters
-- [ ] **TL-02**: User can see features displayed on the timeline grouped under their target release
-- [ ] **TL-03**: User can drag and drop features between releases on the timeline to reassign them
+- [x] **TL-01**: User can view a yearly release timeline showing all releases across months and quarters
+- [x] **TL-02**: User can see features displayed on the timeline grouped under their target release
+- [x] **TL-03**: User can drag and drop features between releases on the timeline to reassign them
 
 ## Future Requirements
 
@@ -66,12 +65,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | IMP-01 | Phase 7 | Pending |
 | IMP-02 | Phase 7 | Pending |
 | IMP-03 | Phase 7 | Pending |
-| MREL-02 | Phase 8 | Pending |
-| TL-01 | Phase 8 | Pending |
-| TL-02 | Phase 8 | Pending |
-| TL-03 | Phase 8 | Pending |
+| MREL-02 | Phase 8 | Complete |
+| TL-01 | Phase 8 | Complete |
+| TL-02 | Phase 8 | Complete |
+| TL-03 | Phase 8 | Complete |
 
 **Coverage:**
+
 - v1.1 requirements: 7 total
 - Mapped to phases: 7
 - Unmapped: 0 ✓

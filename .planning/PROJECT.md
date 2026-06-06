@@ -11,7 +11,7 @@ The first version is desktop-first, runs on localhost, stores data in SQLite, an
 **Goal:** Add annual timeline with cross-release view, impediment tracking with resolution history, and drag-and-drop feature reassignment across releases.
 
 **Target features:**
-- Impediment/blocker tracking — register, timeline view, dashboard alerts, and resolution history with delivery impact measurement
+- Impediment/blocker tracking — register, timeline view, and resolution history with delivery impact measurement
 - Annual timeline — visual roadmap showing all releases across a year with features mapped per release and drag-and-drop reassignment
 
 **v1.0 shipped** — 2026-06-04. All 64 v1 requirements delivered across 6 phases (16 plans). Stack: Next.js, Prisma 7 + SQLite, Tailwind CSS, next-intl, dnd-kit. Persistence at `./data/squad-planner.db`.
@@ -33,15 +33,15 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 - ✓ User can export release planning and tracking reports to CSV or Excel — v1.0
 - ✓ AI agents can query local planning data through MCP and provide suggestions safely — v1.0
 - ✓ User can operate the app in Brazilian Portuguese, switch release view context, and see sprint calendar ranges — v1.0
+- ✓ User can register impediments with dates, descriptions, affected stories, and resolution tracking — v1.1 Phase 7
+- ✓ User can view impediments on the release timeline with affected stories and delivery impact — v1.1 Phase 7
+- ✓ User can view all releases on an annual timeline with features mapped to target releases — v1.1 Phase 8
+- ✓ User can compare releases side by side and reassign features via drag-and-drop with undo — v1.1 Phase 8
 
 ### Active
 
-- [ ] Register impediments with dates, descriptions, affected stories, and resolution tracking (IMP-01 to IMP-03)
-- [ ] View impediments on the release timeline showing when they occurred, which stories they impacted, and resolution history
-- [ ] Dashboard alerts for stories with unresolved impediments
-- [ ] View all releases on an annual timeline with features mapped to their target release
-- [ ] Reassign features between releases via drag-and-drop on the annual timeline
-- [ ] Export impediment reports to CSV/Excel alongside existing report types
+- [ ] No active v1.1 implementation requirements remain after Phase 8 completion.
+- [ ] Deferred future scope: impediment dashboard alerts, impediment exports, timeline filters, and multiple active releases.
 
 ### Out of Scope
 
@@ -99,6 +99,8 @@ Expected scale is one squad, one active release, up to 20 sprints per release, u
 | Gate dangerous MCP and assistant actions with confirmation | Sensitive planning changes must remain explicit user actions. | ✓ Good — shipped |
 | Treat release switching as view context | The header selector should let users inspect any release without changing the one-active-release status rule. | ✓ Good — shipped |
 | Keep business-day sprint display cosmetic | Sprint period labels can show calendar dates plus business-day counts while capacity math remains unchanged. | ✓ Good — shipped |
+| Keep annual timeline independent from release selector | Portfolio planning needs cross-release context and must not inherit active release filtering. | ✓ Good — shipped |
+| Reassigning a feature detaches its stories to backlog | Moving a feature across releases should avoid invalid sprint assignments instead of guessing sprint remaps. | ✓ Good — shipped |
 
 ## Evolution
 
@@ -118,4 +120,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-06 after v1.1 Phase 7(Multi-Release) cancellation*
+*Last updated: 2026-06-06 after v1.1 Phase 8 completion*
