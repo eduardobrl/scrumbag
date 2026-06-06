@@ -27,7 +27,7 @@
 
 **Milestone Goal:** Add impediment tracking with resolution history, an annual timeline with cross-release comparison, and drag-and-drop feature reassignment across releases.
 
-- [ ] **Phase 7: Impediment Tracking** — Register, timeline view, and resolution tracking
+- [x] **Phase 7: Impediment Tracking** — Register, timeline view, and resolution tracking (completed 2026-06-06)
 - [ ] **Phase 8: Annual Timeline & Cross-Release View** — Yearly timeline, cross-release comparison, drag-and-drop reassignment
 
 ## Phase Details
@@ -86,7 +86,7 @@ Cross-cutting constraints:
 | 04. Sprint Board, Capacity Engine, And Leakage | v1.0 | 3/3 | Complete | 2026-06-03 |
 | 05. Release Intelligence, Reports, MCP, And AI | v1.0 | 3/3 | Complete | 2026-06-03 |
 | 06. UX Polish And Localization | v1.0 | 1/1 | Complete | 2026-06-04 |
-| 07. Impediment Tracking | v1.1 | 2/3 | In Progress | - |
+| 07. Impediment Tracking | v1.1 | 3/3 | Complete   | 2026-06-06 |
 | 08. Annual Timeline & Cross-Release View | v1.1 | 0/0 | Not started | - |
 
 ## Coverage
