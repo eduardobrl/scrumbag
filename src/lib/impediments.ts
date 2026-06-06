@@ -58,7 +58,9 @@ function parseAffectedStoryIds(value: unknown): ValidationResult<string[]> {
     return { ok: false, errors: { affectedStoryIds: "Select at least one affected story" } };
   }
 
-  const ids = Array.from(new Set(value.filter((item): item is string => typeof item === "string" && item.trim())));
+  const ids = Array.from(
+    new Set(value.filter((item): item is string => typeof item === "string" && item.trim().length > 0))
+  );
   if (ids.length === 0) {
     return { ok: false, errors: { affectedStoryIds: "Select at least one affected story" } };
   }
