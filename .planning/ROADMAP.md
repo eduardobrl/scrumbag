@@ -86,7 +86,7 @@ Cross-cutting constraints:
 | 04. Sprint Board, Capacity Engine, And Leakage | v1.0 | 3/3 | Complete | 2026-06-03 |
 | 05. Release Intelligence, Reports, MCP, And AI | v1.0 | 3/3 | Complete | 2026-06-03 |
 | 06. UX Polish And Localization | v1.0 | 1/1 | Complete | 2026-06-04 |
-| 07. Impediment Tracking | v1.1 | 1/3 | In Progress | - |
+| 07. Impediment Tracking | v1.1 | 2/3 | In Progress | - |
 | 08. Annual Timeline & Cross-Release View | v1.1 | 0/0 | Not started | - |
 
 ## Coverage
