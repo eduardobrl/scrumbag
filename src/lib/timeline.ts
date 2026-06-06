@@ -1,5 +1,6 @@
 import { FeatureLifecycleStatus, SprintStatus, StoryStatus } from "@prisma/client";
 import { calculateFeatureSummary } from "@/lib/features";
+import { countBusinessDaysInRange } from "@/lib/date-utils";
 import { prisma } from "@/lib/db";
 
 export type TimelineSprint = {
@@ -24,10 +25,26 @@ export type TimelineFeature = {
   isFinished: boolean;
 };
 
+export type TimelineImpediment = {
+  id: string;
+  title: string;
+  status: string;
+  reportedDate: string;
+  resolutionDate: string | null;
+  affectedStoryCount: number;
+  estimatedDays: number;
+  blockedBusinessDays: number;
+  affectedSprintIds: string[];
+  startIndex: number | null;
+  endIndex: number | null;
+  impactText: string;
+};
+
 export type TimelineData = {
   sprints: TimelineSprint[];
   features: TimelineFeature[];
   leakedSprints: string[];
+  impediments: TimelineImpediment[];
 };
 
 function dateOnly(date: Date): string {
@@ -35,7 +52,7 @@ function dateOnly(date: Date): string {
 }
 
 export async function buildTimelineData(releaseId: string): Promise<TimelineData> {
-  const [sprints, features, leakage] = await Promise.all([
+  const [sprints, features, leakage, impediments] = await Promise.all([
     prisma.sprint.findMany({
       where: { releaseId },
       orderBy: { startDate: "asc" }
@@ -54,6 +71,22 @@ export async function buildTimelineData(releaseId: string): Promise<TimelineData
       where: { originSprint: { releaseId } },
       select: { originSprintId: true },
       distinct: ["originSprintId"]
+    }),
+    prisma.impediment.findMany({
+      where: {
+        affectedStories: {
+          some: {
+            feature: { releaseId }
+          }
+        }
+      },
+      include: {
+        affectedStories: {
+          include: { feature: true, currentSprint: true },
+          orderBy: { title: "asc" }
+        }
+      },
+      orderBy: [{ status: "asc" }, { reportedDate: "desc" }, { createdAt: "desc" }]
     })
   ]);
 
@@ -103,9 +136,45 @@ export async function buildTimelineData(releaseId: string): Promise<TimelineData
     };
   });
 
+  const timelineImpediments = impediments.map((impediment) => {
+    const releaseStories = impediment.affectedStories.filter((story) => story.feature.releaseId === releaseId);
+    const affectedSprintIds = Array.from(
+      new Set(
+        releaseStories
+          .map((story) => story.currentSprintId)
+          .filter((id): id is string => typeof id === "string" && sprintIndex.has(id))
+      )
+    ).sort((left, right) => sprintIndex.get(left)! - sprintIndex.get(right)!);
+    const startIndex = affectedSprintIds.length > 0 ? sprintIndex.get(affectedSprintIds[0])! : null;
+    const endIndex =
+      affectedSprintIds.length > 0 ? sprintIndex.get(affectedSprintIds[affectedSprintIds.length - 1])! : null;
+    const estimatedDays = releaseStories.reduce((sum, story) => sum + (story.estimatedDays ?? 0), 0);
+    const blockedBusinessDays = countBusinessDaysInRange(
+      impediment.reportedDate,
+      impediment.resolutionDate ?? new Date()
+    );
+    const resolutionLabel = impediment.resolutionDate ? `resolved ${dateOnly(impediment.resolutionDate)}` : "open";
+
+    return {
+      id: impediment.id,
+      title: impediment.title,
+      status: impediment.status,
+      reportedDate: dateOnly(impediment.reportedDate),
+      resolutionDate: impediment.resolutionDate ? dateOnly(impediment.resolutionDate) : null,
+      affectedStoryCount: releaseStories.length,
+      estimatedDays,
+      blockedBusinessDays,
+      affectedSprintIds,
+      startIndex,
+      endIndex,
+      impactText: `${impediment.title} (${resolutionLabel}) - ${releaseStories.length} stories, ${estimatedDays}d estimated, ${blockedBusinessDays} blocked business days`
+    };
+  });
+
   return {
     sprints: timelineSprints,
     features: timelineFeatures,
-    leakedSprints: leakage.map((item) => item.originSprintId)
+    leakedSprints: leakage.map((item) => item.originSprintId),
+    impediments: timelineImpediments
   };
 }
