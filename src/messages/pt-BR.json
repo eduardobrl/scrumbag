@@ -224,7 +224,10 @@
     "finishedSprint": "Sprint finalizada",
     "featureSpan": "Intervalo da feature",
     "inactiveGap": "Intervalo inativo",
+    "impedimentSpan": "Impedimento",
+    "impediments": "Impedimentos",
     "leakedSprint": "Sprint com vazamento",
+    "resolvedImpediment": "Impedimento resolvido",
     "subtitle": "Features distribuídas nas sprints planejadas",
     "title": "Timeline da release"
   },

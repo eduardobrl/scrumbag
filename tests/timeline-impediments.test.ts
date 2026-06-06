@@ -1,7 +1,12 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ImpedimentStatus, ReleaseStatus, SprintStatus, StoryStatus } from "@prisma/client";
+import { renderToStaticMarkup } from "react-dom/server";
+import React from "react";
+import { TimelineView } from "@/features/dashboard/timeline-view";
 import { prisma } from "@/lib/db";
 import { buildTimelineData } from "@/lib/timeline";
+
+vi.stubGlobal("React", React);
 
 async function resetDb() {
   await prisma.impediment.deleteMany();
@@ -31,7 +36,7 @@ async function seedTimeline() {
       status: SprintStatus.IN_PROGRESS
     }
   });
-  const sprint2 = await prisma.sprint.create({
+  await prisma.sprint.create({
     data: {
       releaseId: release.id,
       name: "Sprint 2",
@@ -145,5 +150,18 @@ describe("timeline impediments", () => {
     expect(timeline.features.some((item) => item.id === feature.id)).toBe(true);
     expect(timeline.impediments).toHaveLength(2);
     expect(timeline.sprints).toHaveLength(3);
+  });
+
+  it("renders impediment rows with compact impact tooltips", async () => {
+    const { release } = await seedTimeline();
+    const timeline = await buildTimelineData(release.id);
+
+    const html = renderToStaticMarkup(React.createElement(TimelineView, { data: timeline }));
+
+    expect(html).toContain("Impedimentos");
+    expect(html).toContain("Vendor sandbox unavailable");
+    expect(html).toContain("2 stories, 5d estimated, 3 blocked business days");
+    expect(html).toContain("Impedimento resolvido");
+    expect(html).not.toContain("/impediments/");
   });
 });

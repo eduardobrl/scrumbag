@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, Flag } from "lucide-react";
+import { CheckCircle2, CircleAlert, Flag } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { TimelineData } from "@/lib/timeline";
 import { countBusinessDaysInRange } from "@/lib/date-utils";
@@ -15,6 +15,8 @@ export function TimelineView({ data }: { data: TimelineData }) {
         <div className="flex flex-wrap gap-3 text-xs text-slate-600">
           <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded bg-accent" /> Intervalo da feature</span>
           <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded border border-slate-300 bg-white" /> Intervalo inativo</span>
+          <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded bg-rose-600" /> Impedimento</span>
+          <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-rose-700" aria-hidden /> Impedimento resolvido</span>
           <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-emerald-700" aria-hidden /> Sprint finalizada</span>
           <span className="inline-flex items-center gap-1"><Flag className="h-3 w-3 text-amber-700" aria-hidden /> Sprint com vazamento</span>
         </div>
@@ -45,9 +47,66 @@ export function TimelineView({ data }: { data: TimelineData }) {
           {data.features.map((feature) => (
             <TimelineRow key={feature.id} feature={feature} sprints={data.sprints} />
           ))}
+
+          {data.impediments.length > 0 ? (
+            <>
+              <div className="col-span-full pt-3 text-xs font-semibold uppercase text-slate-500">Impedimentos</div>
+              {data.impediments.map((impediment) => (
+                <TimelineImpedimentRow key={impediment.id} impediment={impediment} sprints={data.sprints} />
+              ))}
+            </>
+          ) : null}
         </div>
       </div>
     </Card>
+  );
+}
+
+function TimelineImpedimentRow({
+  impediment,
+  sprints
+}: {
+  impediment: TimelineData["impediments"][number];
+  sprints: TimelineData["sprints"];
+}) {
+  const hasSpan = impediment.startIndex !== null && impediment.endIndex !== null;
+
+  return (
+    <>
+      <div className="flex min-h-11 items-center gap-2 text-sm font-medium text-rose-800">
+        <CircleAlert className="h-4 w-4 shrink-0" aria-hidden />
+        <span className="min-w-0 truncate" title={impediment.impactText}>
+          {impediment.title}
+        </span>
+        <span className="shrink-0 text-xs font-normal text-slate-500">{impediment.affectedStoryCount} hist.</span>
+      </div>
+      {sprints.map((sprint, index) => {
+        const inSpan = hasSpan && index >= impediment.startIndex! && index <= impediment.endIndex!;
+        const showUnassigned = !hasSpan && index === 0;
+
+        return (
+          <div key={`${impediment.id}-${sprint.id}`} className="flex min-h-11 items-center">
+            {inSpan ? (
+              <div
+                className="flex h-5 w-full items-center justify-end rounded-sm border border-rose-700 bg-rose-600 px-1 text-white"
+                title={impediment.impactText}
+              >
+                {impediment.status === "RESOLVED" ? <CheckCircle2 className="h-3 w-3" aria-label="Impedimento resolvido" /> : null}
+              </div>
+            ) : showUnassigned ? (
+              <div
+                className="flex h-5 w-full items-center rounded-sm border border-dashed border-rose-300 bg-rose-50 px-2 text-[11px] text-rose-800"
+                title={impediment.impactText}
+              >
+                Sem sprint
+              </div>
+            ) : (
+              <div className="h-5 w-full rounded-sm border border-transparent" />
+            )}
+          </div>
+        );
+      })}
+    </>
   );
 }
 

@@ -224,7 +224,10 @@
     "finishedSprint": "Finished sprint",
     "featureSpan": "Feature span",
     "inactiveGap": "Inactive gap",
+    "impedimentSpan": "Impediment",
+    "impediments": "Impediments",
     "leakedSprint": "Leaked sprint",
+    "resolvedImpediment": "Resolved impediment",
     "subtitle": "Feature spans across planned sprints",
     "title": "Release timeline"
   },
