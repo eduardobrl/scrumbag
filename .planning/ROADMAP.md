@@ -73,7 +73,19 @@ Cross-cutting constraints:
   4. User can drag a feature from one release and drop it onto another on the timeline
   5. Feature reassignment via drag-and-drop updates the feature's release association immediately
 
-**Plans**: TBD
+**Plans**:
+
+- Wave 1: `08-01-annual-timeline-data` - annual data contract, release summaries, month grid, feature spans, and data tests
+- Wave 2 *(blocked on Wave 1 completion)*: `08-02-annual-timeline-page` - `/timeline` page, navigation, year selector, comparison UI, swimlane grid, and UI tests
+- Wave 3 *(blocked on Waves 1-2 completion)*: `08-03-feature-reassignment-dnd` - dnd-kit setup, reassignment API/domain logic, drag-and-drop UI, undo toast, and reassignment tests
+
+Cross-cutting constraints:
+
+- The annual timeline remains cross-release and standalone; it is not filtered by the active release selector.
+- The one-active-release constraint remains unchanged; this phase does not revive MREL-01.
+- Feature rows preserve detail navigation while drag-and-drop adds reassignment behavior.
+- Moving a feature to another release detaches its stories from sprints and returns them to backlog.
+
 **UI hint**: yes
 
 ## Progress
@@ -87,7 +99,7 @@ Cross-cutting constraints:
 | 05. Release Intelligence, Reports, MCP, And AI | v1.0 | 3/3 | Complete | 2026-06-03 |
 | 06. UX Polish And Localization | v1.0 | 1/1 | Complete | 2026-06-04 |
 | 07. Impediment Tracking | v1.1 | 3/3 | Complete   | 2026-06-06 |
-| 08. Annual Timeline & Cross-Release View | v1.1 | 0/0 | Not started | - |
+| 08. Annual Timeline & Cross-Release View | v1.1 | 0/3 | Planned | - |
 
 ## Coverage
 
@@ -99,8 +111,8 @@ Cross-cutting constraints:
 | Phase 4 | 13 | Complete |
 | Phase 5 | 18 | Complete |
 | Phase 6 | 4 | Complete |
-| Phase 7 | 3 | Not started |
-| Phase 8 | 4 | Not started |
+| Phase 7 | 3 | Complete |
+| Phase 8 | 4 | Planned |
 
 **Total v1.0 requirements:** 64 (shipped)
 **Total v1.1 requirements:** 7
@@ -110,4 +122,4 @@ Cross-cutting constraints:
 ---
 
 *Roadmap created: 2026-06-02*
-*Last updated: 2026-06-05 after v1.1 roadmap creation*
+*Last updated: 2026-06-06 after Phase 8 planning*
