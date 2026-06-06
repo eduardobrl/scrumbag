@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ImpedimentStatus, ReleaseStatus, SprintStatus, StoryStatus } from "@prisma/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import React from "react";
+import { GET as getTimeline } from "@/app/api/timeline/route";
 import { TimelineView } from "@/features/dashboard/timeline-view";
 import { prisma } from "@/lib/db";
 import { buildTimelineData } from "@/lib/timeline";
@@ -163,5 +164,17 @@ describe("timeline impediments", () => {
     expect(html).toContain("2 stories, 5d estimated, 3 blocked business days");
     expect(html).toContain("Impedimento resolvido");
     expect(html).not.toContain("/impediments/");
+  });
+
+  it("returns impediments from the timeline API without removing existing fields", async () => {
+    const { release } = await seedTimeline();
+
+    const response = await getTimeline(new Request(`http://localhost/api/timeline?releaseId=${release.id}`));
+    const body = await response.json();
+
+    expect(body.sprints).toHaveLength(3);
+    expect(body.features.length).toBeGreaterThan(0);
+    expect(body.leakedSprints).toEqual([]);
+    expect(body.impediments).toHaveLength(2);
   });
 });
