@@ -113,6 +113,31 @@ CREATE INDEX IF NOT EXISTS "Feature_releaseId_idx" ON "Feature" ("releaseId");
 CREATE INDEX IF NOT EXISTS "Story_featureId_idx" ON "Story" ("featureId");
 CREATE INDEX IF NOT EXISTS "Story_currentSprintId_idx" ON "Story" ("currentSprintId");
 
+CREATE TABLE IF NOT EXISTS "Impediment" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "title" TEXT NOT NULL,
+  "description" TEXT,
+  "reportedDate" DATETIME NOT NULL,
+  "resolutionDate" DATETIME,
+  "resolutionNotes" TEXT,
+  "status" TEXT NOT NULL DEFAULT 'OPEN',
+  "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" DATETIME NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS "Impediment_status_idx" ON "Impediment" ("status");
+CREATE INDEX IF NOT EXISTS "Impediment_reportedDate_idx" ON "Impediment" ("reportedDate");
+
+CREATE TABLE IF NOT EXISTS "_ImpedimentToStory" (
+  "A" TEXT NOT NULL,
+  "B" TEXT NOT NULL,
+  CONSTRAINT "_ImpedimentToStory_A_fkey" FOREIGN KEY ("A") REFERENCES "Impediment" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT "_ImpedimentToStory_B_fkey" FOREIGN KEY ("B") REFERENCES "Story" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "_ImpedimentToStory_AB_unique" ON "_ImpedimentToStory" ("A", "B");
+CREATE INDEX IF NOT EXISTS "_ImpedimentToStory_B_index" ON "_ImpedimentToStory" ("B");
+
 CREATE TABLE IF NOT EXISTS "leakage_history" (
   "id" TEXT NOT NULL PRIMARY KEY,
   "storyId" TEXT NOT NULL,
