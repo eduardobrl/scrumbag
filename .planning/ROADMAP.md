@@ -7,7 +7,7 @@
 ## Milestones
 
 - ✅ **v1.0 Squad Planner MVP** — Phases 01-06 (shipped 2026-06-04)
-- 📋 **v1.1 Squad Planner Next** — Phases 07-09 (planning)
+- 📋 **v1.1 Squad Planner Next** — Phases 07-08 (planning)
 
 ## Phases
 
@@ -25,28 +25,16 @@
 
 ### 📋 v1.1 Squad Planner Next (Planning)
 
-**Milestone Goal:** Add multi-release portfolio planning with an annual timeline, impediment tracking with resolution history, and drag-and-drop feature reassignment across releases.
+**Milestone Goal:** Add impediment tracking with resolution history, an annual timeline with cross-release comparison, and drag-and-drop feature reassignment across releases.
 
-- [ ] **Phase 7: Multi-Release Foundation** — Remove one-active-release constraint, enable parallel releases
-- [ ] **Phase 8: Impediment Tracking** — Register, timeline view, and resolution tracking
-- [ ] **Phase 9: Annual Timeline & Cross-Release View** — Yearly timeline, cross-release comparison, drag-and-drop reassignment
+- [ ] **Phase 7: Impediment Tracking** — Register, timeline view, and resolution tracking
+- [ ] **Phase 8: Annual Timeline & Cross-Release View** — Yearly timeline, cross-release comparison, drag-and-drop reassignment
 
 ## Phase Details
 
-### Phase 7: Multi-Release Foundation
-**Goal**: Users can create and manage multiple releases simultaneously without the one-active-release constraint, enabling parallel release planning.
-**Depends on**: Phase 6
-**Requirements**: MREL-01
-**Success Criteria** (what must be TRUE):
-  1. User can create a new release while another release remains active (IN_PROGRESS)
-  2. User can switch between releases in the header selector and each release maintains independent sprints, features, and stories
-  3. Multiple releases can have IN_PROGRESS status simultaneously
-**Plans**: TBD
-**UI hint**: yes
-
-### Phase 8: Impediment Tracking
+### Phase 7: Impediment Tracking
 **Goal**: Users can register impediments with affected stories, see them as markers on the release timeline, and track resolution with blocked duration and delivery impact.
-**Depends on**: Phase 7
+**Depends on**: Phase 6
 **Requirements**: IMP-01, IMP-02, IMP-03
 **Success Criteria** (what must be TRUE):
   1. User can register an impediment with title, description, date, and select affected stories
@@ -57,9 +45,9 @@
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 9: Annual Timeline & Cross-Release View
+### Phase 8: Annual Timeline & Cross-Release View
 **Goal**: Users can view all releases on a yearly timeline with features grouped under each release, compare releases side by side, and reassign features between releases via drag-and-drop.
-**Depends on**: Phase 7
+**Depends on**: Phase 6
 **Requirements**: MREL-02, TL-01, TL-02, TL-03
 **Success Criteria** (what must be TRUE):
   1. User can view a cross-release summary comparing key metrics across all releases side by side
@@ -80,9 +68,8 @@
 | 04. Sprint Board, Capacity Engine, And Leakage | v1.0 | 3/3 | Complete | 2026-06-03 |
 | 05. Release Intelligence, Reports, MCP, And AI | v1.0 | 3/3 | Complete | 2026-06-03 |
 | 06. UX Polish And Localization | v1.0 | 1/1 | Complete | 2026-06-04 |
-| 07. Multi-Release Foundation | v1.1 | 0/0 | Not started | - |
-| 08. Impediment Tracking | v1.1 | 0/0 | Not started | - |
-| 09. Annual Timeline & Cross-Release View | v1.1 | 0/0 | Not started | - |
+| 07. Impediment Tracking | v1.1 | 0/0 | Not started | - |
+| 08. Annual Timeline & Cross-Release View | v1.1 | 0/0 | Not started | - |
 
 ## Coverage
 
@@ -94,13 +81,12 @@
 | Phase 4 | 13 | Complete |
 | Phase 5 | 18 | Complete |
 | Phase 6 | 4 | Complete |
-| Phase 7 | 1 | Not started |
-| Phase 8 | 3 | Not started |
-| Phase 9 | 4 | Not started |
+| Phase 7 | 3 | Not started |
+| Phase 8 | 4 | Not started |
 
 **Total v1.0 requirements:** 64 (shipped)
-**Total v1.1 requirements:** 8
-**Mapped v1.1 requirements:** 8
+**Total v1.1 requirements:** 7
+**Mapped v1.1 requirements:** 7
 **Unmapped v1.1 requirements:** 0
 
 ---

@@ -15,8 +15,8 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 
 ### Multi-Release Management
 
-- [ ] **MREL-01**: User can have multiple releases active in parallel (remove the one-active-release constraint)
-- [ ] **MREL-02**: User can view a cross-release summary comparing releases side by side with key metrics
+- **MREL-01**: Remove the one-active-release constraint — allow multiple releases IN_PROGRESS simultaneously. Deferred 2026-06-06 per user decision.
+
 
 ### Annual Timeline
 
@@ -35,6 +35,7 @@ Deferred to future milestones. Tracked but not in current roadmap.
 
 ### Multi-Release Management
 
+- **MREL-01**: Remove the one-active-release constraint — allow multiple releases IN_PROGRESS simultaneously. Deferred 2026-06-06 per user decision.
 - **MREL-03**: Per-release report generation scoped to the selected release context
 
 ### Annual Timeline
@@ -62,20 +63,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IMP-01 | Phase 8 | Pending |
-| IMP-02 | Phase 8 | Pending |
-| IMP-03 | Phase 8 | Pending |
-| MREL-01 | Phase 7 | Pending |
-| MREL-02 | Phase 9 | Pending |
-| TL-01 | Phase 9 | Pending |
-| TL-02 | Phase 9 | Pending |
-| TL-03 | Phase 9 | Pending |
+| IMP-01 | Phase 7 | Pending |
+| IMP-02 | Phase 7 | Pending |
+| IMP-03 | Phase 7 | Pending |
+| MREL-02 | Phase 8 | Pending |
+| TL-01 | Phase 8 | Pending |
+| TL-02 | Phase 8 | Pending |
+| TL-03 | Phase 8 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 8 total
-- Mapped to phases: 8
+- v1.1 requirements: 7 total
+- Mapped to phases: 7
 - Unmapped: 0 ✓
+- Deferred: 1 (MREL-01)
 
 ---
 *Requirements defined: 2026-06-05*
-*Last updated: 2026-06-05 after v1.1 roadmap creation (traceability populated)*
+*Last updated: 2026-06-06 after Phase 7 cancellation (MREL-01 deferred, phases renumbered)*

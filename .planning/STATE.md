@@ -3,10 +3,10 @@ gsd_state_version: '1.0'
 milestone: v1.1
 milestone_name: Squad Planner Next
 status: planning
-last_updated: "2026-06-05T04:00:00.000Z"
-last_activity: 2026-06-05
+last_updated: "2026-06-06T00:00:00.000Z"
+last_activity: 2026-06-06
 progress:
-  total_phases: 3
+  total_phases: 2
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -36,16 +36,15 @@ See: `.planning/PROJECT.md` (updated 2026-06-05)
 | 4 | Sprint Board, Capacity Engine, And Leakage | Complete (archived) | 100% |
 | 5 | Release Intelligence, Reports, MCP, And AI | Complete (archived) | 100% |
 | 6 | UX Polish And Localization | Complete (archived) | 100% |
-| 7 | Multi-Release Foundation | Not started | 0% |
-| 8 | Impediment Tracking | Not started | 0% |
-| 9 | Annual Timeline & Cross-Release View | Not started | 0% |
+| 7 | Impediment Tracking | Not started | 0% |
+| 8 | Annual Timeline & Cross-Release View | Not started | 0% |
 
 ## Milestones
 
 | Version | Name | Status | Phases | Shipped |
 |---------|------|--------|--------|---------|
 | v1.0 | Squad Planner MVP | Shipped | 01-06 | 2026-06-04 |
-| v1.1 | Squad Planner Next | Planning | 07-09 | — |
+| v1.1 | Squad Planner Next | Planning | 07-08 | — |
 
 ## Active Requirement Set
 
@@ -55,10 +54,10 @@ v1.0 requirements: 64/64 shipped. See `.planning/milestones/v1.0-REQUIREMENTS.md
 
 ## Current Position
 
-Phase: 7 of 9 (Multi-Release Foundation)
+Phase: 7 of 8 (Impediment Tracking)
 Plan: —
 Status: Ready to plan
-Last activity: 2026-06-05 — Roadmap created for v1.1 (3 phases)
+Last activity: 2026-06-06 — Phase 7 (Multi-Release) cancelled per user decision; Phases renumbered
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -74,7 +73,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1-6 (v1.0) | 16 | — | — |
-| 7-9 (v1.1) | 0 (TBD) | — | — |
+| 7-8 (v1.1) | 0 (TBD) | — | — |
 
 *Updated after each plan completion*
 
@@ -85,7 +84,7 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- v1.1: Multi-release constraint removal — the one-active-release guard from v1.0 is lifted for MREL-01
+- v1.1: Multi-release constraint NOT removed — user chose to keep one-active-release constraint on 2026-06-06. Phase 7 (Multi-Release) cancelled.
 - v1.1: Impediment tracking is self-contained per release, not cross-release
 - v1.1: Annual timeline builds on existing release timeline infrastructure from Phase 5
 
@@ -108,15 +107,15 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-05
-Stopped at: Roadmap creation for v1.1 — 3 phases defined
+Last session: 2026-06-06
+Stopped at: Phase 7 (Multi-Release) cancelled; roadmap restructured to 2 v1.1 phases
 Resume file: None
 
 ## Notes
 
 - v1.0 milestone archived on 2026-06-05. Requirements, roadmap, and project docs archived to `.planning/milestones/`.
-- v1.1 roadmap created with 3 phases (07-09) covering 8 requirements across 3 categories.
-- Next recommended command: `/gsd-plan-phase 7`
+- v1.1 roadmap restructured 2026-06-06: Phase 7 (Multi-Release) removed per user decision. MREL-01 deferred. Remaining phases renumbered: Impediment → Phase 7, Timeline → Phase 8.
+- Next recommended command: `/gsd-discuss-phase 7`
 
 ---
 

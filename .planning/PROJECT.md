@@ -8,11 +8,10 @@ The first version is desktop-first, runs on localhost, stores data in SQLite, an
 
 ## Current Milestone: v1.1 Squad Planner Next
 
-**Goal:** Add multi-release portfolio planning with an annual timeline, impediment tracking with resolution history, and drag-and-drop feature reassignment across releases.
+**Goal:** Add annual timeline with cross-release view, impediment tracking with resolution history, and drag-and-drop feature reassignment across releases.
 
 **Target features:**
 - Impediment/blocker tracking — register, timeline view, dashboard alerts, and resolution history with delivery impact measurement
-- Multi-release management — create and manage multiple releases in parallel, breaking the v1.0 one-active-release constraint
 - Annual timeline — visual roadmap showing all releases across a year with features mapped per release and drag-and-drop reassignment
 
 **v1.0 shipped** — 2026-06-04. All 64 v1 requirements delivered across 6 phases (16 plans). Stack: Next.js, Prisma 7 + SQLite, Tailwind CSS, next-intl, dnd-kit. Persistence at `./data/squad-planner.db`.
@@ -40,7 +39,6 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 - [ ] Register impediments with dates, descriptions, affected stories, and resolution tracking (IMP-01 to IMP-03)
 - [ ] View impediments on the release timeline showing when they occurred, which stories they impacted, and resolution history
 - [ ] Dashboard alerts for stories with unresolved impediments
-- [ ] Create and manage multiple releases in parallel with independent sprints, features, and stories
 - [ ] View all releases on an annual timeline with features mapped to their target release
 - [ ] Reassign features between releases via drag-and-drop on the annual timeline
 - [ ] Export impediment reports to CSV/Excel alongside existing report types
@@ -76,7 +74,7 @@ Expected scale is one squad, one active release, up to 20 sprints per release, u
 - **Stack**: Next.js, TypeScript, Prisma, Tailwind CSS, dnd-kit, and Node.js MCP - chosen for a simple full-stack local web app with a polished UI.
 - **Capacity model**: Capacity is calculated in hours from members, working days, absences, holidays, meetings, and support, then normalized to 8-hour days.
 - **Planning model**: Story points and estimated business days are independent; only estimated days consume sprint capacity.
-- **Release model**: Multiple releases can be managed in parallel. The release context selector allows switching between releases.
+- **Release model**: One release can be IN_PROGRESS at a time. The release context selector allows viewing any release regardless of status.
 - **Safety**: AI and MCP writes must be explicit; sensitive actions such as closing sprints or canceling items require confirmation or dangerous-operation marking.
 - **UX priority**: Desktop is the priority; smaller screens may stack boards and use horizontal scrolling.
 
@@ -120,4 +118,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-05 after v1.1 milestone initialization*
+*Last updated: 2026-06-06 after v1.1 Phase 7(Multi-Release) cancellation*
