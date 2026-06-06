@@ -36,7 +36,9 @@ const labels: AnnualTimelineLabels = {
   legendActive: "Ativa",
   legendFinished: "Finalizada",
   legendCancelled: "Cancelada",
-  legendGap: "Intervalo inativo"
+  legendGap: "Intervalo inativo",
+  movedTo: "movida para",
+  undo: "Desfazer"
 };
 
 const data: AnnualTimelineData = {

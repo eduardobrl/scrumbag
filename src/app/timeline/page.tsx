@@ -42,7 +42,9 @@ export default async function TimelinePage({
     legendActive: t("legendActive"),
     legendFinished: t("legendFinished"),
     legendCancelled: t("legendCancelled"),
-    legendGap: t("legendGap")
+    legendGap: t("legendGap"),
+    movedTo: t("movedTo"),
+    undo: t("undo")
   };
 
   return (

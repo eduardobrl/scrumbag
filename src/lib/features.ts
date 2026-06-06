@@ -20,6 +20,17 @@ export type FeatureSummary = {
   periodLabel: string;
 };
 
+export type FeatureReassignmentUndo = {
+  featureId: string;
+  previousReleaseId: string;
+  targetReleaseId: string;
+  stories: Array<{
+    id: string;
+    previousSprintId: string | null;
+    previousStatus: StoryStatus;
+  }>;
+};
+
 type FeatureWithStories = Awaited<ReturnType<typeof getFeatureDetails>>;
 
 function optionalText(value: unknown): string | undefined {
@@ -165,6 +176,169 @@ export async function cancelFeature(id: string) {
   });
 
   return { ok: true as const, data: feature };
+}
+
+export async function reassignFeatureRelease(featureId: string, targetReleaseId: unknown) {
+  const releaseId = await requireRelease(targetReleaseId);
+  if (!releaseId.ok) {
+    return releaseId;
+  }
+
+  const existing = await prisma.feature.findUnique({
+    where: { id: featureId },
+    include: { stories: true }
+  });
+  if (!existing) {
+    return { ok: false as const, errors: { general: "Feature not found" } };
+  }
+
+  const undo: FeatureReassignmentUndo = {
+    featureId,
+    previousReleaseId: existing.releaseId,
+    targetReleaseId: releaseId.data,
+    stories: existing.stories.map((story) => ({
+      id: story.id,
+      previousSprintId: story.currentSprintId,
+      previousStatus: story.status
+    }))
+  };
+
+  if (existing.releaseId === releaseId.data) {
+    const feature = await getFeatureDetails(featureId);
+    return { ok: true as const, data: { feature: feature!, undo, changed: false } };
+  }
+
+  const feature = await prisma.$transaction(async (tx) => {
+    await tx.feature.update({
+      where: { id: featureId },
+      data: { releaseId: releaseId.data }
+    });
+    await tx.story.updateMany({
+      where: { featureId },
+      data: {
+        currentSprintId: null,
+        status: StoryStatus.BACKLOG
+      }
+    });
+
+    return tx.feature.findUniqueOrThrow({
+      where: { id: featureId },
+      include: featureInclude
+    });
+  });
+
+  return { ok: true as const, data: { feature, undo, changed: true } };
+}
+
+function parseUndoPayload(value: unknown): ValidationResult<FeatureReassignmentUndo> {
+  if (!value || typeof value !== "object") {
+    return { ok: false, errors: { undo: "Undo payload is required" } };
+  }
+
+  const payload = value as Partial<FeatureReassignmentUndo>;
+  if (
+    typeof payload.featureId !== "string" ||
+    typeof payload.previousReleaseId !== "string" ||
+    typeof payload.targetReleaseId !== "string" ||
+    !Array.isArray(payload.stories)
+  ) {
+    return { ok: false, errors: { undo: "Undo payload is invalid" } };
+  }
+
+  const stories = [];
+  for (const story of payload.stories) {
+    if (!story || typeof story !== "object") {
+      return { ok: false, errors: { undo: "Undo story payload is invalid" } };
+    }
+    const item = story as Partial<FeatureReassignmentUndo["stories"][number]>;
+    if (
+      typeof item.id !== "string" ||
+      !(typeof item.previousSprintId === "string" || item.previousSprintId === null) ||
+      !Object.values(StoryStatus).includes(item.previousStatus as StoryStatus)
+    ) {
+      return { ok: false, errors: { undo: "Undo story payload is invalid" } };
+    }
+    stories.push({
+      id: item.id,
+      previousSprintId: item.previousSprintId,
+      previousStatus: item.previousStatus as StoryStatus
+    });
+  }
+
+  return {
+    ok: true,
+    data: {
+      featureId: payload.featureId,
+      previousReleaseId: payload.previousReleaseId,
+      targetReleaseId: payload.targetReleaseId,
+      stories
+    }
+  };
+}
+
+export async function undoReassignFeatureRelease(featureId: string, undoPayload: unknown) {
+  const parsed = parseUndoPayload(undoPayload);
+  if (!parsed.ok) {
+    return parsed;
+  }
+
+  const undo = parsed.data;
+  if (undo.featureId !== featureId) {
+    return { ok: false as const, errors: { undo: "Undo payload does not match feature" } };
+  }
+
+  const [feature, previousRelease] = await Promise.all([
+    prisma.feature.findUnique({ where: { id: featureId } }),
+    prisma.release.findUnique({ where: { id: undo.previousReleaseId } })
+  ]);
+  if (!feature) {
+    return { ok: false as const, errors: { general: "Feature not found" } };
+  }
+  if (!previousRelease) {
+    return { ok: false as const, errors: { releaseId: "Release not found" } };
+  }
+
+  const sprintIds = undo.stories
+    .map((story) => story.previousSprintId)
+    .filter((id): id is string => typeof id === "string");
+  const validSprints = new Set(
+    (
+      await prisma.sprint.findMany({
+        where: { id: { in: sprintIds }, releaseId: undo.previousReleaseId },
+        select: { id: true }
+      })
+    ).map((sprint) => sprint.id)
+  );
+
+  const restored = await prisma.$transaction(async (tx) => {
+    await tx.feature.update({
+      where: { id: featureId },
+      data: { releaseId: undo.previousReleaseId }
+    });
+
+    for (const story of undo.stories) {
+      const canRestoreSprint = story.previousSprintId === null || validSprints.has(story.previousSprintId);
+      await tx.story.update({
+        where: { id: story.id },
+        data: canRestoreSprint
+          ? {
+              currentSprintId: story.previousSprintId,
+              status: story.previousStatus
+            }
+          : {
+              currentSprintId: null,
+              status: StoryStatus.BACKLOG
+            }
+      });
+    }
+
+    return tx.feature.findUniqueOrThrow({
+      where: { id: featureId },
+      include: featureInclude
+    });
+  });
+
+  return { ok: true as const, data: { feature: restored } };
 }
 
 const featureInclude = {

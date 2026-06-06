@@ -243,6 +243,7 @@
     "legendCancelled": "Cancelada",
     "legendFinished": "Finalizada",
     "legendGap": "Intervalo inativo",
+    "movedTo": "movida para",
     "noFeatures": "Nenhuma feature nesta release",
     "noReleases": "Nenhuma release encontrada para este ano.",
     "release": "Release",
@@ -253,6 +254,7 @@
     "subtitle": "Features distribuídas nas sprints planejadas",
     "title": "Timeline da release",
     "unplanned": "Não planejada",
+    "undo": "Desfazer",
     "year": "Ano"
   },
   "assistant": {
