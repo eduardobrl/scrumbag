@@ -42,6 +42,11 @@ enum StoryStatus {
   CANCELLED
 }
 
+enum ImpedimentStatus {
+  OPEN
+  RESOLVED
+}
+
 model SquadMember {
   id        String    @id @default(cuid())
   name      String
@@ -132,11 +137,28 @@ model Story {
   estimatedDays      Float?
   status             StoryStatus @default(BACKLOG)
   leakageHistory     LeakageHistory[]
+  impediments        Impediment[]
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
 
   @@index([featureId])
   @@index([currentSprintId])
+}
+
+model Impediment {
+  id              String           @id @default(cuid())
+  title           String
+  description     String?
+  reportedDate    DateTime
+  resolutionDate  DateTime?
+  resolutionNotes String?
+  status          ImpedimentStatus @default(OPEN)
+  affectedStories Story[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([status])
+  @@index([reportedDate])
 }
 
 model LeakageHistory {
