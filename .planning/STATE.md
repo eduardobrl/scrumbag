@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Squad Planner Next
-status: verifying
-stopped_at: Phase 8 planned
-last_updated: "2026-06-06T15:49:22.196Z"
-last_activity: 2026-06-06
+status: milestone_ready
+stopped_at: Phase 8 complete
+last_updated: "2026-06-06T16:18:00.000Z"
+last_activity: 2026-06-06 -- Phase 08 verified and completed
 progress:
   total_phases: 2
   completed_phases: 2
@@ -25,7 +25,7 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-06-05)
 
 **Core value:** A squad can see whether a release plan fits the team's real sprint capacity and adjust scope before delivery risk becomes invisible.
-**Current focus:** Phase 08 — annual-timeline-cross-release-view
+**Current focus:** v1.1 milestone complete; ready for milestone close-out
 
 ## Roadmap Progress
 
@@ -38,35 +38,35 @@ See: `.planning/PROJECT.md` (updated 2026-06-05)
 | 5 | Release Intelligence, Reports, MCP, And AI | Complete (archived) | 100% |
 | 6 | UX Polish And Localization | Complete (archived) | 100% |
 | 7 | Impediment Tracking | Complete | 100% |
-| 8 | Annual Timeline & Cross-Release View | Planned | 0% |
+| 8 | Annual Timeline & Cross-Release View | Complete | 100% |
 
 ## Milestones
 
 | Version | Name | Status | Phases | Shipped |
 |---------|------|--------|--------|---------|
 | v1.0 | Squad Planner MVP | Shipped | 01-06 | 2026-06-04 |
-| v1.1 | Squad Planner Next | Planning | 07-08 | - |
+| v1.1 | Squad Planner Next | Complete | 07-08 | 2026-06-06 |
 
 ## Active Requirement Set
 
-v1.1 requirements: 7 active, 3 shipped in Phase 7, 4 planned in Phase 8. See `.planning/REQUIREMENTS.md`.
+v1.1 requirements: 7/7 shipped across Phases 7-8. See `.planning/REQUIREMENTS.md`.
 
 v1.0 requirements: 64/64 shipped. See `.planning/milestones/v1.0-REQUIREMENTS.md`.
 
 ## Current Position
 
 Phase: 08
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-06-06
+Plan: 3 of 3
+Status: Phase complete and verified
+Last activity: 2026-06-06 -- Phase 08 verified and completed
 
-Progress: [----------] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 19 (v1.0) + 3 (v1.1 Phase 7)
+- Total plans completed: 16 (v1.0) + 6 (v1.1)
 - Average duration: - (not yet tracked per plan)
 - Total execution time: - (not yet aggregated)
 
@@ -75,8 +75,8 @@ Progress: [----------] 0%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1-6 (v1.0) | 16 | - | - |
-| 7-8 (v1.1) | 3 complete / 6 planned | - | - |
-| 08 | 3 | - | - |
+| 7-8 (v1.1) | 6 complete / 6 planned | - | - |
+| 08 | 3 | 58 min | 19 min |
 
 *Updated after each plan completion*
 | Phase 07 P01 | 15 min | 4 tasks | 6 files |
@@ -97,6 +97,8 @@ Recent decisions affecting current work:
 - v1.1: Impediment tracking is self-contained per release, not cross-release.
 - v1.1: Annual timeline builds on existing release timeline infrastructure from Phase 5.
 - v1.1: Phase 8 planned as three waves: annual data, annual page/navigation, feature reassignment drag-and-drop.
+- v1.1: Annual timeline is standalone and does not inherit active release selector filtering.
+- v1.1: Feature reassignment detaches moved feature stories from sprints and returns them to backlog, with undo available from the move toast.
 
 ### Pending Todos
 
@@ -118,17 +120,17 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-06T15:02:22.828Z
-Stopped at: Phase 8 planned
-Resume file: .planning/phases/08-annual-timeline-cross-release-view/08-01-annual-timeline-data-PLAN.md
+Last session: 2026-06-06T16:18:00.000Z
+Stopped at: Phase 8 complete and verified
+Resume file: None
 
 ## Notes
 
 - v1.0 milestone archived on 2026-06-05. Requirements, roadmap, and project docs archived to `.planning/milestones/`.
 - v1.1 roadmap restructured 2026-06-06: Phase 7 (Multi-Release) removed per user decision. MREL-01 deferred. Remaining phases renumbered: Impediment -> Phase 7, Timeline -> Phase 8.
-- Next recommended command: `/gsd-execute-phase 8`
+- Next recommended command: `/gsd-complete-milestone`
 
 ---
 
 *State initialized: 2026-06-02*
-*Last updated: 2026-06-06 after Phase 8 planning*
+*Last updated: 2026-06-06 after Phase 8 completion*

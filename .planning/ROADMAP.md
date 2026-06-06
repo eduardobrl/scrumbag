@@ -112,7 +112,7 @@ Cross-cutting constraints:
 | Phase 5 | 18 | Complete |
 | Phase 6 | 4 | Complete |
 | Phase 7 | 3 | Complete |
-| Phase 8 | 4 | Planned |
+| Phase 8 | 4 | Complete |
 
 **Total v1.0 requirements:** 64 (shipped)
 **Total v1.1 requirements:** 7
@@ -122,4 +122,4 @@ Cross-cutting constraints:
 ---
 
 *Roadmap created: 2026-06-02*
-*Last updated: 2026-06-06 after Phase 8 planning*
+*Last updated: 2026-06-06 after Phase 8 completion*

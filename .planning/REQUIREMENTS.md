@@ -9,9 +9,9 @@ Requirements for v1.1 milestone. Each maps to roadmap phases.
 
 ### Impediment Tracking
 
-- [ ] **IMP-01**: User can register an impediment with title, description, date, and affected stories
-- [ ] **IMP-02**: User can view impediment markers on the release timeline showing when they occurred and which stories they impacted
-- [ ] **IMP-03**: User can track impediment resolution — record resolution date, view blocked duration, and see delivery impact
+- [x] **IMP-01**: User can register an impediment with title, description, date, and affected stories
+- [x] **IMP-02**: User can view impediment markers on the release timeline showing when they occurred and which stories they impacted
+- [x] **IMP-03**: User can track impediment resolution — record resolution date, view blocked duration, and see delivery impact
 
 ### Multi-Release Management
 
@@ -62,9 +62,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IMP-01 | Phase 7 | Pending |
-| IMP-02 | Phase 7 | Pending |
-| IMP-03 | Phase 7 | Pending |
+| IMP-01 | Phase 7 | Complete |
+| IMP-02 | Phase 7 | Complete |
+| IMP-03 | Phase 7 | Complete |
 | MREL-02 | Phase 8 | Complete |
 | TL-01 | Phase 8 | Complete |
 | TL-02 | Phase 8 | Complete |
@@ -79,4 +79,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-06-05*
-*Last updated: 2026-06-06 after Phase 7 cancellation (MREL-01 deferred, phases renumbered)*
+*Last updated: 2026-06-06 after Phase 8 completion*
