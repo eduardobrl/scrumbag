@@ -6,6 +6,18 @@ Squad Planner is a local web app for planning and tracking squad releases from s
 
 The app is desktop-first, runs on localhost, stores data in SQLite, supports impediment tracking with resolution history and timeline markers, and provides an annual timeline with cross-release comparison and drag-and-drop feature reassignment. It includes a local MCP surface plus an AI assistant so agents can query the plan, explain risk, and suggest changes without applying sensitive actions automatically. The UI defaults to Brazilian Portuguese (pt-BR) with English fallback.
 
+## Current Milestone: v1.2 Planning & Estimate Audit
+
+**Goal:** Give releases a dedicated planning phase where estimates can be freely shaped, then audit all estimate changes after go-live to surface plan drift.
+
+**Target features:**
+- New `PLANNING` release state: DRAFT → PLANNING → IN_PROGRESS → COMPLETED
+- In PLANNING state: story estimates (points + days) are freely editable with no audit trail
+- Transition to IN_PROGRESS captures an estimate baseline snapshot
+- After IN_PROGRESS: any estimate change is recorded (old value, new value, timestamp)
+- Per-story change history visible in story detail panel
+- Release-level aggregate drift summary showing total estimate change since baseline
+
 ## Shipped Milestones
 
 | Version | Name | Shipped | Phases | Plans | Highlights |
@@ -39,7 +51,13 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 
 ### Active
 
-- (No active v1.x implementation requirements — milestone complete)
+- [ ] Release lifecycle includes PLANNING state between DRAFT and IN_PROGRESS
+- [ ] Release state transitions enforce DRAFT → PLANNING → IN_PROGRESS → COMPLETED order
+- [ ] Story estimates (points + days) are freely editable during PLANNING, no audit
+- [ ] Estimate baseline snapshot captured on PLANNING → IN_PROGRESS transition
+- [ ] After IN_PROGRESS, all estimate changes recorded with old value, new value, and timestamp
+- [ ] Per-story estimate change history visible in story detail panel
+- [ ] Release-level aggregate drift summary comparing baseline vs current estimates
 
 ### Deferred
 
@@ -66,7 +84,7 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 
 The source context is captured in `spec.md` and `telas.md`. The product is meant to support release planning for a squad that already thinks in releases, sprints, features, and stories, but needs a lightweight local tool to visualize capacity, overflow, leakage, delivery risk, impediments, and portfolio-level timeline.
 
-**Current state (after v1.1):** 8 phases, 22 plans, 70 shipped requirements (v1.0: 64, v1.1: 7). Two milestones shipped across ~5 development days. The app supports end-to-end squad management: members, absences, releases, sprints, features, stories, capacity planning, sprint boards, dashboards, reports, CSV/Excel exports, MCP integration, impediment tracking with timeline markers, an annual timeline with cross-release comparison, and drag-and-drop feature reassignment.
+**Current state (after v1.2 initiation):** 8 phases, 22 plans, 70 shipped requirements (v1.0: 64, v1.1: 7). The app supports end-to-end squad management: members, absences, releases, sprints, features, stories, capacity planning, sprint boards, dashboards, reports, CSV/Excel exports, MCP integration, impediment tracking with timeline markers, an annual timeline with cross-release comparison, and drag-and-drop feature reassignment. v1.2 is now active: Planning & Estimate Audit.
 
 The stack is Next.js 15, TypeScript, Prisma 7 + SQLite (better-sqlite3), Tailwind CSS, dnd-kit, next-intl for i18n, XLSX/CSV export, and a local Node.js MCP server. The UI feels like a modern management tool: quiet, information-dense, desktop-first, with side navigation, global release context, tables, badges, progress bars, alerts, and horizontal timelines.
 
@@ -133,4 +151,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-08 after v1.1 milestone close*
+*Last updated: 2026-06-08 after v1.2 milestone initiation*
