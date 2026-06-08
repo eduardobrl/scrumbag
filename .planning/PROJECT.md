@@ -4,17 +4,16 @@
 
 Squad Planner is a local web app for planning and tracking squad releases from scope definition through sprint execution. It helps a squad register members, absences, holidays, releases, sprints, features, and stories, then compares planned effort against available capacity and highlights delivery risk.
 
-The first version is desktop-first, runs on localhost, stores data in SQLite, and includes a local MCP surface plus an AI assistant so agents can query the plan, explain risk, and suggest changes without applying sensitive actions automatically. The UI defaults to Brazilian Portuguese (pt-BR) with English fallback.
+The app is desktop-first, runs on localhost, stores data in SQLite, supports impediment tracking with resolution history and timeline markers, and provides an annual timeline with cross-release comparison and drag-and-drop feature reassignment. It includes a local MCP surface plus an AI assistant so agents can query the plan, explain risk, and suggest changes without applying sensitive actions automatically. The UI defaults to Brazilian Portuguese (pt-BR) with English fallback.
 
-## Current Milestone: v1.1 Squad Planner Next
+## Shipped Milestones
 
-**Goal:** Add annual timeline with cross-release view, impediment tracking with resolution history, and drag-and-drop feature reassignment across releases.
+| Version | Name | Shipped | Phases | Plans | Highlights |
+|---------|------|---------|--------|-------|------------|
+| v1.0 | Squad Planner MVP | 2026-06-04 | 01-06 | 16 | Foundation, releases, sprints, features, stories, capacity, board, reports, dashboards, MCP, AI, polish |
+| v1.1 | Squad Planner Next | 2026-06-06 | 07-08 | 6 | Impediment tracking with timeline markers, annual timeline, cross-release comparison, drag-and-drop reassignment |
 
-**Target features:**
-- Impediment/blocker tracking — register, timeline view, and resolution history with delivery impact measurement
-- Annual timeline — visual roadmap showing all releases across a year with features mapped per release and drag-and-drop reassignment
-
-**v1.0 shipped** — 2026-06-04. All 64 v1 requirements delivered across 6 phases (16 plans). Stack: Next.js, Prisma 7 + SQLite, Tailwind CSS, next-intl, dnd-kit. Persistence at `./data/squad-planner.db`.
+Stack: Next.js 15, TypeScript, Prisma 7 + SQLite, Tailwind CSS, next-intl, dnd-kit. Persistence at `./data/squad-planner.db`.
 
 ## Core Value
 
@@ -33,15 +32,21 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 - ✓ User can export release planning and tracking reports to CSV or Excel — v1.0
 - ✓ AI agents can query local planning data through MCP and provide suggestions safely — v1.0
 - ✓ User can operate the app in Brazilian Portuguese, switch release view context, and see sprint calendar ranges — v1.0
-- ✓ User can register impediments with dates, descriptions, affected stories, and resolution tracking — v1.1 Phase 7
-- ✓ User can view impediments on the release timeline with affected stories and delivery impact — v1.1 Phase 7
-- ✓ User can view all releases on an annual timeline with features mapped to target releases — v1.1 Phase 8
-- ✓ User can compare releases side by side and reassign features via drag-and-drop with undo — v1.1 Phase 8
+- ✓ User can register impediments with affected stories and track resolution with delivery impact — v1.1
+- ✓ User can view impediment markers on the release timeline with sprint spans and impact tooltips — v1.1
+- ✓ User can view all releases on an annual timeline with features grouped under each release — v1.1
+- ✓ User can compare releases side by side and reassign features via drag-and-drop with undo — v1.1
 
 ### Active
 
-- [ ] No active v1.1 implementation requirements remain after Phase 8 completion.
-- [ ] Deferred future scope: impediment dashboard alerts, impediment exports, timeline filters, and multiple active releases.
+- (No active v1.x implementation requirements — milestone complete)
+
+### Deferred
+
+- [ ] Multiple active releases (MREL-01) — deferred 2026-06-06 per user decision
+- [ ] Impediment dashboard alerts (IMP-04) — deferred to future milestone
+- [ ] Impediment exports to CSV/Excel (IMP-05) — deferred to future milestone
+- [ ] Timeline filters by year, quarter, or feature status (TL-04) — deferred to future milestone
 
 ### Out of Scope
 
@@ -59,13 +64,17 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 
 ## Context
 
-The source context is captured in `spec.md` and `telas.md`. The product is meant to support release planning for a squad that already thinks in releases, sprints, features, and stories, but needs a lightweight local tool to visualize capacity, overflow, leakage, and delivery risk.
+The source context is captured in `spec.md` and `telas.md`. The product is meant to support release planning for a squad that already thinks in releases, sprints, features, and stories, but needs a lightweight local tool to visualize capacity, overflow, leakage, delivery risk, impediments, and portfolio-level timeline.
+
+**Current state (after v1.1):** 8 phases, 22 plans, 70 shipped requirements (v1.0: 64, v1.1: 7). Two milestones shipped across ~5 development days. The app supports end-to-end squad management: members, absences, releases, sprints, features, stories, capacity planning, sprint boards, dashboards, reports, CSV/Excel exports, MCP integration, impediment tracking with timeline markers, an annual timeline with cross-release comparison, and drag-and-drop feature reassignment.
 
 The stack is Next.js 15, TypeScript, Prisma 7 + SQLite (better-sqlite3), Tailwind CSS, dnd-kit, next-intl for i18n, XLSX/CSV export, and a local Node.js MCP server. The UI feels like a modern management tool: quiet, information-dense, desktop-first, with side navigation, global release context, tables, badges, progress bars, alerts, and horizontal timelines.
 
 The app is simple to run: `npm install` and `npm run dev`, with `npm run db:sync` for schema setup and `npm run mcp:start` for the MCP server. Offline operation is required for core planning features; AI quality depends on the connected agent/tool, but the MCP data surface works locally.
 
 Expected scale is one squad, one active release, up to 20 sprints per release, up to 100 features, up to 1000 stories, and up to 30 members.
+
+**Known tech debt:** None significant. The one-active-release constraint remains by user decision. Deferred items include multiple active releases, impediment dashboard alerts, impediment exports, and timeline filters — tracked in `### Deferred` above.
 
 ## Constraints
 
@@ -101,6 +110,10 @@ Expected scale is one squad, one active release, up to 20 sprints per release, u
 | Keep business-day sprint display cosmetic | Sprint period labels can show calendar dates plus business-day counts while capacity math remains unchanged. | ✓ Good — shipped |
 | Keep annual timeline independent from release selector | Portfolio planning needs cross-release context and must not inherit active release filtering. | ✓ Good — shipped |
 | Reassigning a feature detaches its stories to backlog | Moving a feature across releases should avoid invalid sprint assignments instead of guessing sprint remaps. | ✓ Good — shipped |
+| Retain one-active-release constraint | User chose not to allow multiple IN_PROGRESS releases simultaneously. MREL-01 deferred. | ⚠️ Revisit if needed |
+| Impediments remain story-linked and release-scoped | Validation rejects mixed-release story selections and infers scope through story features. | ✓ Good — shipped |
+| Impediment resolution is final | Closed impediments do not mutate affected story statuses; only delivery impact is recorded. | ✓ Good — shipped |
+| Calculate delivery impact on-demand | Derived from affected stories and business-day blocked duration, not persisted as a separate summary. | ✓ Good — shipped |
 
 ## Evolution
 
@@ -120,4 +133,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-06 after v1.1 Phase 8 completion*
+*Last updated: 2026-06-08 after v1.1 milestone close*

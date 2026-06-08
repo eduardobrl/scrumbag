@@ -7,7 +7,7 @@
 ## Milestones
 
 - ✅ **v1.0 Squad Planner MVP** — Phases 01-06 (shipped 2026-06-04)
-- 📋 **v1.1 Squad Planner Next** — Phases 07-08 (planning)
+- ✅ **v1.1 Squad Planner Next** — Phases 07-08 (shipped 2026-06-06)
 
 ## Phases
 
@@ -23,70 +23,13 @@
 
 </details>
 
-### 📋 v1.1 Squad Planner Next (Planning)
+<details>
+<summary>✅ v1.1 Squad Planner Next (Phases 07-08) — SHIPPED 2026-06-06</summary>
 
-**Milestone Goal:** Add impediment tracking with resolution history, an annual timeline with cross-release comparison, and drag-and-drop feature reassignment across releases.
+- [x] Phase 07: Impediment Tracking — Register, timeline view, and resolution tracking (3/3 plans) — completed 2026-06-06
+- [x] Phase 08: Annual Timeline & Cross-Release View — Yearly timeline, cross-release comparison, drag-and-drop reassignment (3/3 plans) — completed 2026-06-06
 
-- [x] **Phase 7: Impediment Tracking** — Register, timeline view, and resolution tracking (completed 2026-06-06)
-- [x] **Phase 8: Annual Timeline & Cross-Release View** — Yearly timeline, cross-release comparison, drag-and-drop reassignment (completed 2026-06-06)
-
-## Phase Details
-
-### Phase 7: Impediment Tracking
-
-**Goal**: Users can register impediments with affected stories, see them as markers on the release timeline, and track resolution with blocked duration and delivery impact.
-**Depends on**: Phase 6
-**Requirements**: IMP-01, IMP-02, IMP-03
-**Success Criteria** (what must be TRUE):
-
-  1. User can register an impediment with title, description, date, and select affected stories
-  2. User can view impediment markers on the release timeline showing when they occurred and which stories they impacted
-  3. User can record a resolution date for an impediment, marking it as resolved
-  4. User can view blocked duration (time between registration and resolution) for resolved impediments
-  5. User can see delivery impact showing how impediments affected story or sprint completion
-
-**Plans**:
-
-- Wave 1: `07-01-impediment-data-api` — persistence, validation, calculations, and API routes
-- Wave 2: `07-02-impediment-ui` — create/list/detail/resolve UI and navigation
-- Wave 3: `07-03-timeline-impact-integration` — timeline markers and compact delivery impact
-
-Cross-cutting constraints:
-
-- Impediments remain story-linked and release-scoped through affected stories.
-- Resolution is final and does not mutate affected story statuses.
-- Blocked duration uses business days.
-- Delivery impact includes story count, summed estimated days, and blocked business days.
-
-**UI hint**: yes
-
-### Phase 8: Annual Timeline & Cross-Release View
-
-**Goal**: Users can view all releases on a yearly timeline with features grouped under each release, compare releases side by side, and reassign features between releases via drag-and-drop.
-**Depends on**: Phase 6
-**Requirements**: MREL-02, TL-01, TL-02, TL-03
-**Success Criteria** (what must be TRUE):
-
-  1. User can view a cross-release summary comparing key metrics across all releases side by side
-  2. User can view a yearly timeline showing all releases positioned across months and quarters
-  3. User can see features displayed on the timeline grouped under their target release
-  4. User can drag a feature from one release and drop it onto another on the timeline
-  5. Feature reassignment via drag-and-drop updates the feature's release association immediately
-
-**Plans**:
-
-- Wave 1: `08-01-annual-timeline-data` - annual data contract, release summaries, month grid, feature spans, and data tests
-- Wave 2 *(blocked on Wave 1 completion)*: `08-02-annual-timeline-page` - `/timeline` page, navigation, year selector, comparison UI, swimlane grid, and UI tests
-- Wave 3 *(blocked on Waves 1-2 completion)*: `08-03-feature-reassignment-dnd` - dnd-kit setup, reassignment API/domain logic, drag-and-drop UI, undo toast, and reassignment tests
-
-Cross-cutting constraints:
-
-- The annual timeline remains cross-release and standalone; it is not filtered by the active release selector.
-- The one-active-release constraint remains unchanged; this phase does not revive MREL-01.
-- Feature rows preserve detail navigation while drag-and-drop adds reassignment behavior.
-- Moving a feature to another release detaches its stories from sprints and returns them to backlog.
-
-**UI hint**: yes
+</details>
 
 ## Progress
 
@@ -98,8 +41,8 @@ Cross-cutting constraints:
 | 04. Sprint Board, Capacity Engine, And Leakage | v1.0 | 3/3 | Complete | 2026-06-03 |
 | 05. Release Intelligence, Reports, MCP, And AI | v1.0 | 3/3 | Complete | 2026-06-03 |
 | 06. UX Polish And Localization | v1.0 | 1/1 | Complete | 2026-06-04 |
-| 07. Impediment Tracking | v1.1 | 3/3 | Complete   | 2026-06-06 |
-| 08. Annual Timeline & Cross-Release View | v1.1 | 3/3 | Complete    | 2026-06-06 |
+| 07. Impediment Tracking | v1.1 | 3/3 | Complete | 2026-06-06 |
+| 08. Annual Timeline & Cross-Release View | v1.1 | 3/3 | Complete | 2026-06-06 |
 
 ## Coverage
 
@@ -115,11 +58,11 @@ Cross-cutting constraints:
 | Phase 8 | 4 | Complete |
 
 **Total v1.0 requirements:** 64 (shipped)
-**Total v1.1 requirements:** 7
-**Mapped v1.1 requirements:** 7
-**Unmapped v1.1 requirements:** 0
+**Total v1.1 requirements:** 7 (shipped)
 
 ---
 
 *Roadmap created: 2026-06-02*
-*Last updated: 2026-06-06 after Phase 8 completion*
+*Last updated: 2026-06-08 after v1.1 milestone close*
+
+See `.planning/milestones/v1.0-ROADMAP.md` and `.planning/milestones/v1.1-ROADMAP.md` for full phase details.

@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Squad Planner Next
-status: milestone_ready
-stopped_at: Phase 8 complete
-last_updated: "2026-06-06T16:18:00.000Z"
-last_activity: 2026-06-06 -- Phase 08 verified and completed
+status: Awaiting next milestone
+stopped_at: Phase 8 complete and verified
+last_updated: "2026-06-08T03:07:39.824Z"
+last_activity: 2026-06-08 — Milestone v1.1 completed and archived
 progress:
   total_phases: 2
   completed_phases: 2
@@ -55,12 +55,10 @@ v1.0 requirements: 64/64 shipped. See `.planning/milestones/v1.0-REQUIREMENTS.md
 
 ## Current Position
 
-Phase: 08
-Plan: 3 of 3
-Status: Phase complete and verified
-Last activity: 2026-06-06 -- Phase 08 verified and completed
-
-Progress: [██████████] 100%
+Phase: Milestone v1.1 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-08 — Milestone v1.1 completed and archived
 
 ## Performance Metrics
 
@@ -134,3 +132,7 @@ Resume file: None
 
 *State initialized: 2026-06-02*
 *Last updated: 2026-06-06 after Phase 8 completion*
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
