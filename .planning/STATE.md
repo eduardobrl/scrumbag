@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Planning & Estimate Audit
 status: planning
-last_updated: "2026-06-08T03:13:50.426Z"
-last_activity: 2026-06-08
+last_updated: "2026-06-09T01:30:08.178Z"
+last_activity: 2026-06-09
 progress:
   total_phases: 0
   completed_phases: 0
@@ -24,7 +24,7 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-06-05)
 
 **Core value:** A squad can see whether a release plan fits the team's real sprint capacity and adjust scope before delivery risk becomes invisible.
-**Current focus:** v1.1 milestone complete; ready for milestone close-out
+**Current focus:** v1.2 milestone started; defining requirements
 
 ## Roadmap Progress
 
@@ -57,7 +57,7 @@ v1.0 requirements: 64/64 shipped. See `.planning/milestones/v1.0-REQUIREMENTS.md
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-06-08 — Milestone v1.2 started
+Last activity: 2026-06-09 — Milestone v1.2 started
 
 ## Performance Metrics
 
