@@ -1,7 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { prisma } from "../../src/lib/db";
+import { ReleaseStatus, StoryStatus } from "@prisma/client";
 
 test.beforeEach(async () => {
+  await prisma.estimateChange.deleteMany();
+  await prisma.story.deleteMany();
+  await prisma.feature.deleteMany();
   await prisma.sprint.deleteMany();
   await prisma.release.deleteMany();
 });
@@ -107,4 +111,68 @@ test("prevents creating a second IN_PROGRESS release", async ({ page }) => {
   expect(secondReleaseResponse.ok(), secondReleaseBody).toBe(false);
 
   await expect(page.getByText("Only one release can be in progress")).toBeVisible();
+});
+
+test("shows release estimate drift after post-go-live changes", async ({ page }) => {
+  const release = await prisma.release.create({
+    data: {
+      name: "Release Drift",
+      objective: "See estimate drift",
+      startDate: new Date("2026-07-01T00:00:00.000Z"),
+      endDate: new Date("2026-07-31T00:00:00.000Z"),
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.IN_PROGRESS
+    }
+  });
+  const feature = await prisma.feature.create({ data: { releaseId: release.id, name: "Drift Feature" } });
+  const story = await prisma.story.create({
+    data: {
+      featureId: feature.id,
+      title: "Baselined story",
+      storyPoints: 8,
+      estimatedDays: 3,
+      status: StoryStatus.BACKLOG
+    }
+  });
+  const addedStory = await prisma.story.create({
+    data: {
+      featureId: feature.id,
+      title: "Added after baseline",
+      storyPoints: 13,
+      estimatedDays: 5,
+      status: StoryStatus.BACKLOG
+    }
+  });
+  const baseline = await prisma.releaseEstimateBaseline.create({
+    data: {
+      releaseId: release.id,
+      capturedAt: new Date("2026-07-10T00:00:00.000Z"),
+      items: {
+        create: {
+          storyId: story.id,
+          storyPoints: 5,
+          estimatedDays: 2
+        }
+      }
+    }
+  });
+  await prisma.story.update({
+    where: { id: addedStory.id },
+    data: { createdAt: new Date(baseline.capturedAt.getTime() + 1000) }
+  });
+  await prisma.estimateChange.createMany({
+    data: [
+      { storyId: story.id, field: "storyPoints", oldValue: 5, newValue: 8, changeReason: "Scope grew" },
+      { storyId: story.id, field: "estimatedDays", oldValue: 2, newValue: 3, changeReason: "Scope grew" }
+    ]
+  });
+
+  await page.goto(`/releases/${release.id}`);
+  await expect(page.getByText("Variação de estimativas")).toBeVisible();
+  await expect(page.getByText("Baseline versus estimativas atuais das histórias capturadas no go-live.")).toBeVisible();
+  await expect(page.getByText("Comparando 1 histórias, 1 alteradas, 0 canceladas desde a baseline, 1 adicionadas após a baseline.")).toBeVisible();
+  await expect(page.getByText("+3")).toBeVisible();
+  await expect(page.getByText("+1")).toBeVisible();
 });

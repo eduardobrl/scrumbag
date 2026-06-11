@@ -10,6 +10,8 @@ import {
   reconcileGeneratedSprints
 } from "@/lib/releases";
 import { getReleaseEstimateBaseline } from "@/lib/release-estimates";
+import { getReleaseEstimateDrift } from "@/lib/estimate-changes";
+import { createStory, updateStory, cancelStory } from "@/lib/stories";
 import { ReleaseStatus } from "@prisma/client";
 import { StoryStatus } from "@prisma/client";
 
@@ -493,6 +495,153 @@ describe("release update", () => {
         );
       }
     }
+  });
+});
+
+describe("release estimate drift", () => {
+  beforeEach(async () => {
+    await prisma.estimateChange.deleteMany();
+    await prisma.story.deleteMany();
+    await prisma.feature.deleteMany();
+    await prisma.sprint.deleteMany();
+    await prisma.release.deleteMany();
+  });
+
+  async function seedReleaseThroughGoLive() {
+    const created = await createRelease({
+      name: "Release Drift",
+      objective: "Audit estimate drift",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNED
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) throw new Error("Failed to seed release");
+
+    const feature = await prisma.feature.create({
+      data: {
+        releaseId: created.data.id,
+        name: "Drift feature"
+      }
+    });
+    const story = await createStory({
+      featureId: feature.id,
+      title: "Baselined story",
+      storyPoints: 5,
+      estimatedDays: 2
+    });
+    expect(story.ok).toBe(true);
+    if (!story.ok) throw new Error("Failed to seed story");
+
+    const planning = await updateRelease(created.data.id, {
+      name: "Release Drift",
+      objective: "Audit estimate drift",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNING
+    });
+    expect(planning.ok).toBe(true);
+
+    const goLive = await updateRelease(created.data.id, {
+      name: "Release Drift",
+      objective: "Audit estimate drift",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.IN_PROGRESS
+    });
+    expect(goLive.ok).toBe(true);
+
+    return { release: created.data, feature, story: story.data };
+  }
+
+  it("returns null before a baseline exists", async () => {
+    const created = await createRelease({
+      name: "Release No Baseline",
+      objective: "No drift yet",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNING
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    await expect(getReleaseEstimateDrift(prisma, created.data.id)).resolves.toBeNull();
+  });
+
+  it("compares baseline totals with current estimates and counts drift context", async () => {
+    const { release, feature, story } = await seedReleaseThroughGoLive();
+
+    const initialDrift = await getReleaseEstimateDrift(prisma, release.id);
+    expect(initialDrift).toMatchObject({
+      baseline: { storyPoints: 5, estimatedDays: 2 },
+      current: { storyPoints: 5, estimatedDays: 2 },
+      delta: { storyPoints: 0, estimatedDays: 0 },
+      counts: { comparedStories: 1, changedStories: 0, cancelledSinceBaseline: 0, addedAfterBaseline: 0 }
+    });
+
+    const updated = await updateStory(story.id, {
+      featureId: feature.id,
+      title: "Baselined story",
+      storyPoints: 8,
+      estimatedDays: 3,
+      status: StoryStatus.BACKLOG
+    });
+    expect(updated.ok).toBe(true);
+
+    const added = await createStory({
+      featureId: feature.id,
+      title: "Added after go-live",
+      storyPoints: 13,
+      estimatedDays: 5
+    });
+    expect(added.ok).toBe(true);
+    if (!added.ok) return;
+
+    const baseline = await getReleaseEstimateBaseline(prisma, release.id);
+    expect(baseline).toBeTruthy();
+    await prisma.story.update({
+      where: { id: added.data.id },
+      data: { createdAt: new Date(baseline!.capturedAt.getTime() + 1000) }
+    });
+
+    const drift = await getReleaseEstimateDrift(prisma, release.id);
+    expect(drift).toMatchObject({
+      baseline: { storyPoints: 5, estimatedDays: 2 },
+      current: { storyPoints: 8, estimatedDays: 3 },
+      delta: {
+        storyPoints: 3,
+        estimatedDays: 1,
+        storyPointsTone: "danger",
+        estimatedDaysTone: "danger"
+      },
+      counts: { comparedStories: 1, changedStories: 1, cancelledSinceBaseline: 0, addedAfterBaseline: 1 }
+    });
+  });
+
+  it("keeps cancelled baselined stories in drift totals", async () => {
+    const { release, story } = await seedReleaseThroughGoLive();
+
+    const canceled = await cancelStory(story.id);
+    expect(canceled.ok).toBe(true);
+
+    const drift = await getReleaseEstimateDrift(prisma, release.id);
+    expect(drift).toMatchObject({
+      baseline: { storyPoints: 5, estimatedDays: 2 },
+      current: { storyPoints: 5, estimatedDays: 2 },
+      counts: { comparedStories: 1, cancelledSinceBaseline: 1 }
+    });
   });
 });
 

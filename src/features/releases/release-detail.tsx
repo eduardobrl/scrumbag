@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { countBusinessDaysInRange } from "@/lib/capacity";
 import { getTranslations } from "next-intl/server";
+import type { ReleaseEstimateDrift } from "@/lib/estimate-changes";
 import { getReleaseStatusTone, type ReleaseStatusValue } from "@/lib/release-status";
 
 export type SprintView = {
@@ -30,12 +31,21 @@ export type ReleaseDetailView = {
   defaultSprintLengthBusinessDays: number;
   sprintCount: number;
   sprints: SprintView[];
+  estimateDrift?: ReleaseEstimateDrift | null;
 };
+
+function formatDelta(value: number) {
+  if (value > 0) return `+${value}`;
+  return value.toString();
+}
 
 export async function ReleaseDetail({ release }: { release: ReleaseDetailView }) {
   const tRelease = await getTranslations("release");
   const tCommon = await getTranslations("common");
   const tStatus = await getTranslations("status");
+  const showEstimateDrift = Boolean(
+    release.estimateDrift && (release.status === "IN_PROGRESS" || release.status === "CLOSED")
+  );
 
   return (
     <div className="space-y-6">
@@ -93,6 +103,63 @@ export async function ReleaseDetail({ release }: { release: ReleaseDetailView })
           <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tRelease("description")}</div>
           <p className="mt-1 text-sm text-slate-700">{release.description}</p>
         </Card>
+      )}
+
+      {showEstimateDrift && release.estimateDrift && (
+        <section className="space-y-3">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">{tRelease("estimateDrift.title")}</h2>
+            <p className="mt-1 text-sm text-slate-600">{tRelease("estimateDrift.subtitle")}</p>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tRelease("estimateDrift.storyPoints")}</div>
+              <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
+                <div>
+                  <div className="text-xs text-slate-500">{tRelease("estimateDrift.baseline")}</div>
+                  <div className="font-semibold text-slate-900">{release.estimateDrift.baseline.storyPoints}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500">{tRelease("estimateDrift.current")}</div>
+                  <div className="font-semibold text-slate-900">{release.estimateDrift.current.storyPoints}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500">{tRelease("estimateDrift.delta")}</div>
+                  <Badge tone={release.estimateDrift.delta.storyPointsTone}>
+                    {formatDelta(release.estimateDrift.delta.storyPoints)}
+                  </Badge>
+                </div>
+              </div>
+            </Card>
+            <Card>
+              <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tRelease("estimateDrift.estimatedDays")}</div>
+              <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
+                <div>
+                  <div className="text-xs text-slate-500">{tRelease("estimateDrift.baseline")}</div>
+                  <div className="font-semibold text-slate-900">{release.estimateDrift.baseline.estimatedDays}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500">{tRelease("estimateDrift.current")}</div>
+                  <div className="font-semibold text-slate-900">{release.estimateDrift.current.estimatedDays}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500">{tRelease("estimateDrift.delta")}</div>
+                  <Badge tone={release.estimateDrift.delta.estimatedDaysTone}>
+                    {formatDelta(release.estimateDrift.delta.estimatedDays)}
+                  </Badge>
+                </div>
+              </div>
+            </Card>
+          </div>
+          <p className="text-sm text-slate-600">
+            {tRelease("estimateDrift.metadata", {
+              compared: release.estimateDrift.counts.comparedStories,
+              changed: release.estimateDrift.counts.changedStories,
+              cancelled: release.estimateDrift.counts.cancelledSinceBaseline,
+              added: release.estimateDrift.counts.addedAfterBaseline
+            })}
+          </p>
+        </section>
       )}
 
       <section className="space-y-3">

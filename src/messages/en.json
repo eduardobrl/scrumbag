@@ -81,6 +81,16 @@
     "defaultSprintLength": "Default sprint length",
     "defaultSprintLengthBusinessDays": "Sprint length (business days)",
     "description": "Description",
+    "estimateDrift": {
+      "baseline": "Baseline",
+      "current": "Current",
+      "delta": "Delta",
+      "estimatedDays": "Estimated days",
+      "metadata": "Compared {compared} stories, {changed} changed, {cancelled} cancelled since baseline, {added} added after baseline.",
+      "storyPoints": "Story Points",
+      "subtitle": "Baseline versus current estimates for stories captured at go-live.",
+      "title": "Estimate Drift"
+    },
     "capacityPending": "Capacity pending",
     "generatedSprints": "Generated sprints",
     "meetings": "Meetings",
@@ -174,6 +184,16 @@
     "new": "New Story",
     "moveToBacklog": "Move to backlog",
     "noStories": "This feature has no stories yet.",
+    "changeReason": "Reason for estimate change",
+    "estimateHistory": {
+      "fields": {
+        "estimatedDays": "Estimated business days",
+        "storyPoints": "Story Points"
+      },
+      "reason": "Reason",
+      "subtitle": "Chronological record of post-go-live estimate edits.",
+      "title": "Estimate history"
+    },
     "planningHelper": "Planning mode keeps estimates editable and does not create audit history yet.",
     "save": "Save story",
     "storyPoints": "Story Points",

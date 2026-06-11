@@ -81,6 +81,16 @@
     "defaultSprintLength": "Duração padrão da sprint",
     "defaultSprintLengthBusinessDays": "Duração da sprint (dias úteis)",
     "description": "Descrição",
+    "estimateDrift": {
+      "baseline": "Baseline",
+      "current": "Atual",
+      "delta": "Delta",
+      "estimatedDays": "Dias estimados",
+      "metadata": "Comparando {compared} histórias, {changed} alteradas, {cancelled} canceladas desde a baseline, {added} adicionadas após a baseline.",
+      "storyPoints": "Story Points",
+      "subtitle": "Baseline versus estimativas atuais das histórias capturadas no go-live.",
+      "title": "Variação de estimativas"
+    },
     "capacityPending": "Capacidade pendente",
     "generatedSprints": "Sprints geradas",
     "meetings": "Reuniões",
@@ -174,6 +184,16 @@
     "new": "Nova História",
     "moveToBacklog": "Mover para backlog",
     "noStories": "Esta feature ainda não possui histórias.",
+    "changeReason": "Motivo da mudança de estimativa",
+    "estimateHistory": {
+      "fields": {
+        "estimatedDays": "Dias úteis estimados",
+        "storyPoints": "Story Points"
+      },
+      "reason": "Motivo",
+      "subtitle": "Registro cronológico das edições de estimativa após o go-live.",
+      "title": "Histórico de estimativas"
+    },
     "planningHelper": "O modo de planejamento mantém as estimativas editáveis e ainda não cria histórico de auditoria.",
     "save": "Salvar história",
     "storyPoints": "Story Points",

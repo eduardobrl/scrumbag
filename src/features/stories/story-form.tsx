@@ -1,5 +1,6 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Save, X } from "lucide-react";
@@ -12,10 +13,21 @@ type FeatureOption = {
   name: string;
 };
 
+type EstimateHistoryItem = {
+  id: string;
+  field: "storyPoints" | "estimatedDays";
+  oldValue: number | null;
+  newValue: number | null;
+  changeReason: string | null;
+  timestamp: string;
+  tone: "neutral" | "success" | "warning" | "danger";
+};
+
 type StoryFormProps = {
   features: FeatureOption[];
   fixedFeatureId?: string;
   releaseStatus?: string;
+  estimateHistory?: EstimateHistoryItem[];
   initial?: {
     id: string;
     featureId: string;
@@ -31,11 +43,22 @@ type StoryFormProps = {
 
 const STATUS_OPTIONS = ["BACKLOG", "SPRINT_BACKLOG", "IN_PROGRESS", "DONE", "CANCELLED"] as const;
 
-export function StoryForm({ features, fixedFeatureId, releaseStatus, initial }: StoryFormProps) {
+function formatEstimateValue(value: number | null) {
+  return value === null ? "-" : value.toString();
+}
+
+function signedDelta(oldValue: number | null, newValue: number | null) {
+  const delta = (newValue ?? 0) - (oldValue ?? 0);
+  if (delta > 0) return `+${delta}`;
+  return delta.toString();
+}
+
+export function StoryForm({ features, fixedFeatureId, releaseStatus, estimateHistory = [], initial }: StoryFormProps) {
   const router = useRouter();
   const tStories = useTranslations("stories");
   const tCommon = useTranslations("common");
   const tStatus = useTranslations("status");
+  const isPostGoLive = Boolean(initial && (releaseStatus === "IN_PROGRESS" || releaseStatus === "CLOSED"));
   const [featureId, setFeatureId] = useState(initial?.featureId ?? fixedFeatureId ?? features[0]?.id ?? "");
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
@@ -43,6 +66,7 @@ export function StoryForm({ features, fixedFeatureId, releaseStatus, initial }: 
   const [storyPoints, setStoryPoints] = useState(initial?.storyPoints?.toString() ?? "0");
   const [estimatedDays, setEstimatedDays] = useState(initial?.estimatedDays?.toString() ?? "0");
   const [status, setStatus] = useState(initial?.status ?? "BACKLOG");
+  const [changeReason, setChangeReason] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
 
@@ -60,7 +84,8 @@ export function StoryForm({ features, fixedFeatureId, releaseStatus, initial }: 
         acceptanceCriteria,
         storyPoints: Number(storyPoints),
         estimatedDays: Number(estimatedDays),
-        status
+        status,
+        ...(isPostGoLive ? { changeReason } : {})
       })
     });
     const payload = await response.json();
@@ -77,7 +102,8 @@ export function StoryForm({ features, fixedFeatureId, releaseStatus, initial }: 
   }
 
   return (
-    <form className="space-y-4 rounded-lg border border-line bg-white p-4" onSubmit={onSubmit}>
+    <div className="space-y-4">
+      <form className="space-y-4 rounded-lg border border-line bg-white p-4" onSubmit={onSubmit}>
       <label className="grid gap-1 text-sm font-medium text-slate-700">
         {tStories("feature")}
         <select
@@ -153,6 +179,13 @@ export function StoryForm({ features, fixedFeatureId, releaseStatus, initial }: 
         </p>
       )}
 
+      {isPostGoLive && (
+        <label className="grid gap-1 text-sm font-medium text-slate-700">
+          {tStories("changeReason")}
+          <Input value={changeReason} onChange={(event) => setChangeReason(event.target.value)} />
+        </label>
+      )}
+
       {initial && (
         <p className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
           {tStories("sprint")}: <span className="font-medium text-slate-800">{initial.currentSprintName}</span>
@@ -171,6 +204,39 @@ export function StoryForm({ features, fixedFeatureId, releaseStatus, initial }: 
           {tCommon("cancel")}
         </Button>
       </div>
-    </form>
+      </form>
+
+      {isPostGoLive && estimateHistory.length > 0 && (
+        <section className="space-y-3 rounded-lg border border-line bg-white p-4 shadow-sm">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">{tStories("estimateHistory.title")}</h2>
+            <p className="mt-1 text-sm text-slate-600">{tStories("estimateHistory.subtitle")}</p>
+          </div>
+          <div className="space-y-2">
+            {estimateHistory.map((change) => (
+              <article key={change.id} className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {tStories(`estimateHistory.fields.${change.field}`)}
+                    </p>
+                    <p className="text-xs text-slate-500">{new Date(change.timestamp).toLocaleString()}</p>
+                  </div>
+                  <Badge tone={change.tone}>{signedDelta(change.oldValue, change.newValue)}</Badge>
+                </div>
+                <p className="mt-2 text-sm text-slate-700">
+                  {formatEstimateValue(change.oldValue)} -&gt; {formatEstimateValue(change.newValue)}
+                </p>
+                {change.changeReason && (
+                  <p className="mt-2 text-sm text-slate-600">
+                    {tStories("estimateHistory.reason")}: {change.changeReason}
+                  </p>
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   );
 }

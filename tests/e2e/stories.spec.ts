@@ -3,10 +3,58 @@ import { prisma } from "../../src/lib/db";
 import { ReleaseStatus, StoryStatus } from "@prisma/client";
 
 test.beforeEach(async () => {
+  await prisma.estimateChange.deleteMany();
   await prisma.story.deleteMany();
   await prisma.feature.deleteMany();
   await prisma.sprint.deleteMany();
   await prisma.release.deleteMany();
+});
+
+test("shows post-go-live estimate history after an estimate edit", async ({ page }) => {
+  const release = await prisma.release.create({
+    data: {
+      name: "Release Audit",
+      objective: "Track estimate history",
+      startDate: new Date("2026-07-01T00:00:00.000Z"),
+      endDate: new Date("2026-07-31T00:00:00.000Z"),
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.IN_PROGRESS
+    }
+  });
+  const feature = await prisma.feature.create({ data: { releaseId: release.id, name: "Audited Feature" } });
+  const story = await prisma.story.create({
+    data: {
+      featureId: feature.id,
+      title: "Audited story",
+      storyPoints: 5,
+      estimatedDays: 2,
+      status: StoryStatus.BACKLOG
+    }
+  });
+
+  await page.goto(`/stories/${story.id}/edit`);
+  await expect(page.getByLabel("Motivo da mudança de estimativa")).toBeVisible();
+  await expect(page.getByText("Histórico de estimativas")).toHaveCount(0);
+  await page.getByLabel("Story Points").fill("8");
+  await page.getByLabel("Dias úteis estimados").fill("3");
+  await page.getByLabel("Motivo da mudança de estimativa").fill("Escopo detalhado");
+
+  const updateStoryResponse = page.waitForResponse(
+    (response) => response.url().includes(`/api/stories/${story.id}`) && response.request().method() === "PATCH"
+  );
+  await page.getByRole("button", { name: "Salvar história" }).click();
+  const updatedStoryResponse = await updateStoryResponse;
+  const updatedStoryBody = await updatedStoryResponse.text();
+  expect(updatedStoryResponse.ok(), updatedStoryBody).toBe(true);
+
+  await page.goto(`/stories/${story.id}/edit`);
+  await expect(page.getByText("Histórico de estimativas")).toBeVisible();
+  await expect(page.getByText("Registro cronológico das edições de estimativa após o go-live.")).toBeVisible();
+  await expect(page.getByText("Motivo: Escopo detalhado")).toHaveCount(2);
+  await expect(page.getByText("5 -> 8")).toBeVisible();
+  await expect(page.getByText("2 -> 3")).toBeVisible();
 });
 
 test.afterAll(async () => {
@@ -76,7 +124,7 @@ test("allows story estimate edits while the release is in PLANNING", async ({ pa
   await expect(page.getByText("2d").first()).toBeVisible();
   await expect(page.getByText("Backlog").first()).toBeVisible();
 
-  await page.getByRole("link", { name: "Editar história" }).click();
+  await page.getByRole("link", { name: "Editar história" }).nth(1).click();
   await expect(
     page.getByText("O modo de planejamento mantém as estimativas editáveis e ainda não cria histórico de auditoria.")
   ).toBeVisible();
@@ -99,7 +147,7 @@ test("allows story estimate edits while the release is in PLANNING", async ({ pa
   await expect(page.getByText("8").first()).toBeVisible();
   await expect(page.getByText("3d").first()).toBeVisible();
 
-  await page.getByRole("link", { name: "Editar história" }).click();
+  await page.getByRole("link", { name: "Editar história" }).nth(1).click();
   await page.getByLabel("Status").selectOption(StoryStatus.DONE);
   const updateStoryDoneResponse = page.waitForResponse(
     (response) => response.url().includes("/api/stories/") && response.request().method() === "PATCH"

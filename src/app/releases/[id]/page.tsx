@@ -1,4 +1,6 @@
 import { ReleaseDetail } from "@/features/releases/release-detail";
+import { prisma } from "@/lib/db";
+import { getReleaseEstimateDrift } from "@/lib/estimate-changes";
 import { getReleaseDetails, toReleaseView } from "@/lib/releases";
 import { getSprintPlanningSummary } from "@/lib/sprint-planning-summary";
 import { notFound } from "next/navigation";
@@ -12,6 +14,7 @@ export default async function ReleaseDetailPage({ params }: { params: Promise<{ 
   }
 
   const view = toReleaseView(release);
+  const estimateDrift = await getReleaseEstimateDrift(prisma, release.id);
   const sprints = await Promise.all(
     view.sprints.map(async (sprint) => ({
       ...sprint,
@@ -19,5 +22,5 @@ export default async function ReleaseDetailPage({ params }: { params: Promise<{ 
     }))
   );
 
-  return <ReleaseDetail release={{ ...view, sprints }} />;
+  return <ReleaseDetail release={{ ...view, sprints, estimateDrift }} />;
 }
