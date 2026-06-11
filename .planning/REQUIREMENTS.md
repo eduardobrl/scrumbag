@@ -19,13 +19,13 @@ Requirements for v1.2 milestone. Each maps to roadmap phases.
 
 ### Estimate Audit
 
-- [ ] **AUD-01**: When a release moves from PLANNING to IN_PROGRESS, the system captures a baseline snapshot of each story's story points and estimated days
-- [ ] **AUD-02**: After a release is IN_PROGRESS, changing a story's points or estimated days records the old value, new value, field changed, and timestamp
-- [ ] **AUD-03**: User can view a story's estimate change history in the story detail panel
+- [x] **AUD-01**: When a release moves from PLANNING to IN_PROGRESS, the system captures a baseline snapshot of each story's story points and estimated days
+- [x] **AUD-02**: After a release is IN_PROGRESS, changing a story's points or estimated days records the old value, new value, field changed, and timestamp
+- [x] **AUD-03**: User can view a story's estimate change history in the story detail panel
 
 ### Drift Summary
 
-- [ ] **DRF-01**: User can view a release-level drift summary that compares baseline totals against current totals for story points and estimated days since go-live
+- [x] **DRF-01**: User can view a release-level drift summary that compares baseline totals against current totals for story points and estimated days since go-live
 
 ## Future Requirements
 
@@ -58,12 +58,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REL-02 | Phase 9 | Pending |
 | EST-01 | Phase 9 | Pending |
 | EST-02 | Phase 9 | Pending |
-| AUD-01 | Phase 10 | Pending |
-| AUD-02 | Phase 10 | Pending |
-| AUD-03 | Phase 10 | Pending |
-| DRF-01 | Phase 10 | Pending |
+| AUD-01 | Phase 10 | Complete |
+| AUD-02 | Phase 10 | Complete |
+| AUD-03 | Phase 10 | Complete |
+| DRF-01 | Phase 10 | Complete |
 
 **Coverage:**
+
 - v1.2 requirements: 8 total
 - Mapped to phases: 8
 - Unmapped: 0

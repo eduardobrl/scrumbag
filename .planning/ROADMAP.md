@@ -36,7 +36,7 @@
 <summary>📋 v1.2 Planning & Estimate Audit (Phases 09-10) — PLANNING</summary>
 
 - [ ] Phase 09: Release Planning State & Editable Estimates (0/2 plans)
-- [ ] Phase 10: Estimate Audit History & Drift Summary (0/2 plans)
+- [x] Phase 10: Estimate Audit History & Drift Summary (2/2 plans) (completed 2026-06-11)
 
 </details>
 
@@ -106,7 +106,7 @@ Cross-cutting constraints:
 | 07. Impediment Tracking | v1.1 | 3/3 | Complete | 2026-06-06 |
 | 08. Annual Timeline & Cross-Release View | v1.1 | 3/3 | Complete | 2026-06-06 |
 | 09. Release Planning State & Editable Estimates | v1.2 | 0/2 | Planning | — |
-| 10. Estimate Audit History & Drift Summary | v1.2 | 0/2 | Planning | — |
+| 10. Estimate Audit History & Drift Summary | v1.2 | 2/2 | Complete    | 2026-06-11 |
 
 ## Coverage
 
@@ -121,7 +121,7 @@ Cross-cutting constraints:
 | Phase 7 | 3 | Complete |
 | Phase 8 | 4 | Complete |
 | Phase 9 | 4 | Planning |
-| Phase 10 | 4 | Planning |
+| Phase 10 | 4 | Complete |
 
 **Total v1.0 requirements:** 64 (shipped)
 **Total v1.1 requirements:** 7 (shipped)

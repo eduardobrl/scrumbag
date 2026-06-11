@@ -54,10 +54,10 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 - [ ] Release lifecycle includes PLANNING state between DRAFT and IN_PROGRESS
 - [ ] Release state transitions enforce DRAFT → PLANNING → IN_PROGRESS → COMPLETED order
 - [ ] Story estimates (points + days) are freely editable during PLANNING, no audit
-- [ ] Estimate baseline snapshot captured on PLANNING → IN_PROGRESS transition
-- [ ] After IN_PROGRESS, all estimate changes recorded with old value, new value, and timestamp
-- [ ] Per-story estimate change history visible in story detail panel
-- [ ] Release-level aggregate drift summary comparing baseline vs current estimates
+- [x] Estimate baseline snapshot captured on PLANNING → IN_PROGRESS transition
+- [x] After IN_PROGRESS, all estimate changes recorded with old value, new value, and timestamp
+- [x] Per-story estimate change history visible in story detail panel
+- [x] Release-level aggregate drift summary comparing baseline vs current estimates
 
 ### Deferred
 
@@ -84,7 +84,7 @@ A squad can see whether a release plan fits the team's real sprint capacity and 
 
 The source context is captured in `spec.md` and `telas.md`. The product is meant to support release planning for a squad that already thinks in releases, sprints, features, and stories, but needs a lightweight local tool to visualize capacity, overflow, leakage, delivery risk, impediments, and portfolio-level timeline.
 
-**Current state (after v1.2 initiation):** 8 phases, 22 plans, 70 shipped requirements (v1.0: 64, v1.1: 7). The app supports end-to-end squad management: members, absences, releases, sprints, features, stories, capacity planning, sprint boards, dashboards, reports, CSV/Excel exports, MCP integration, impediment tracking with timeline markers, an annual timeline with cross-release comparison, and drag-and-drop feature reassignment. v1.2 is now active: Planning & Estimate Audit, and the milestone requirements/roadmap are initialized.
+**Current state (after Phase 10 execution):** 8 phases, 24 plans, 74 shipped requirements (v1.0: 64, v1.1: 7, v1.2 Phase 10: 4). The app supports end-to-end squad management: members, absences, releases, sprints, features, stories, capacity planning, sprint boards, dashboards, reports, CSV/Excel exports, MCP integration, impediment tracking with timeline markers, an annual timeline with cross-release comparison, drag-and-drop feature reassignment, post-go-live estimate audit history, and release-level estimate drift summaries. v1.2 tracking still needs Phase 9 planning artifacts reconciled before the milestone can be closed cleanly.
 
 The stack is Next.js 15, TypeScript, Prisma 7 + SQLite (better-sqlite3), Tailwind CSS, dnd-kit, next-intl for i18n, XLSX/CSV export, and a local Node.js MCP server. The UI feels like a modern management tool: quiet, information-dense, desktop-first, with side navigation, global release context, tables, badges, progress bars, alerts, and horizontal timelines.
 
@@ -151,4 +151,4 @@ After each milestone:
 4. Update Context with the current state of the app, users, feedback, and risks.
 
 ---
-*Last updated: 2026-06-08 after v1.2 milestone initiation*
+*Last updated: 2026-06-11 after Phase 10 execution*
