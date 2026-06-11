@@ -7,6 +7,7 @@
     "build": "next build",
     "lint": "eslint src tests prisma *.config.* next.config.ts",
     "test": "tsx scripts/run-tests.ts unit",
+    "start": "next start -H localhost",
     "test:e2e": "tsx scripts/run-tests.ts e2e",
     "db:generate": "prisma generate",
     "db:migrate": "tsx scripts/db-sync.ts",
