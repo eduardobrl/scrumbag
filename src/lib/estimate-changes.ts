@@ -81,9 +81,12 @@ export async function getStoryEstimateHistory(database: EstimateChangeDatabase, 
     orderBy: { timestamp: "asc" }
   });
 
-  return changes
-    .filter((change) => isEstimateChangeField(change.field))
-    .map((change) => ({
+  return changes.flatMap((change) => {
+    if (!isEstimateChangeField(change.field)) {
+      return [];
+    }
+
+    return [{
       id: change.id,
       field: change.field,
       oldValue: change.oldValue,
@@ -91,7 +94,8 @@ export async function getStoryEstimateHistory(database: EstimateChangeDatabase, 
       changeReason: change.changeReason,
       timestamp: change.timestamp,
       tone: getEstimateDeltaTone(change.oldValue, change.newValue)
-    }));
+    }];
+  });
 }
 
 export async function getReleaseEstimateDrift(
