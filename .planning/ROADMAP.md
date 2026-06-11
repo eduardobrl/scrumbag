@@ -35,8 +35,8 @@
 <details>
 <summary>📋 v1.2 Planning & Estimate Audit (Phases 09-10) — PLANNING</summary>
 
-- [ ] Phase 09: Release Planning State & Editable Estimates (0/0 plans)
-- [ ] Phase 10: Estimate Audit History & Drift Summary (0/0 plans)
+- [ ] Phase 09: Release Planning State & Editable Estimates (0/2 plans)
+- [ ] Phase 10: Estimate Audit History & Drift Summary (0/2 plans)
 
 </details>
 

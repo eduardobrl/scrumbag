@@ -29,6 +29,8 @@ const labels: AnnualTimelineLabels = {
   remainingCapacity: "Capacidade restante",
   noReleases: "Nenhuma release encontrada para este ano.",
   noFeatures: "Nenhuma feature nesta release",
+  orphanFeatures: "Features órfãs",
+  noOrphanFeatures: "Nenhuma feature órfã.",
   active: "Ativa",
   finished: "Finalizada",
   cancelled: "Cancelada",
@@ -105,6 +107,21 @@ const data: AnnualTimelineData = {
       remainingCapacityDays: 14
     }
   ],
+  orphanFeatures: [
+    {
+      id: "feature-orphan",
+      releaseId: null,
+      name: "Orphan feature",
+      status: "ACTIVE",
+      storyCount: 1,
+      estimatedDays: 3,
+      completionPercentage: 0,
+      startIndex: null,
+      endIndex: null,
+      activeMonthIndexes: [],
+      inactiveGaps: []
+    }
+  ],
   releases: [
     {
       id: "release-1",
@@ -170,9 +187,17 @@ const data: AnnualTimelineData = {
 data.releases[0].summary = data.summaries[0];
 data.releases[1].summary = data.summaries[1];
 
+function renderAnnualTimeline() {
+  return renderToStaticMarkup(
+    <NextIntlClientProvider locale="pt-BR" messages={ptMessages} timeZone="America/Araguaina">
+      <AnnualTimelineView data={data} labels={labels} />
+    </NextIntlClientProvider>
+  );
+}
+
 describe("annual timeline UI", () => {
   it("renders quarter and month headers", () => {
-    const html = renderToStaticMarkup(<AnnualTimelineView data={data} labels={labels} />);
+    const html = renderAnnualTimeline();
 
     expect(html).toContain("Q1");
     expect(html).toContain("Q4");
@@ -181,7 +206,7 @@ describe("annual timeline UI", () => {
   });
 
   it("renders cross-release metrics for multiple releases", () => {
-    const html = renderToStaticMarkup(<AnnualTimelineView data={data} labels={labels} />);
+    const html = renderAnnualTimeline();
 
     expect(html).toContain("Comparação entre releases");
     expect(html).toContain("Release Alpha");
@@ -191,14 +216,23 @@ describe("annual timeline UI", () => {
   });
 
   it("renders feature links and status styles", () => {
-    const html = renderToStaticMarkup(<AnnualTimelineView data={data} labels={labels} />);
+    const html = renderAnnualTimeline();
 
     expect(html).toContain("/features/feature-active");
     expect(html).toContain("/features/feature-finished");
     expect(html).toContain("/features/feature-cancelled");
+    expect(html).toContain("/features/feature-orphan");
+    expect(html).toContain("Features órfãs");
     expect(html).toContain("Intervalo inativo");
     expect(html).toContain("line-through");
     expect(html).toContain("Nenhuma feature nesta release");
+  });
+
+  it("renders localized release status labels in swimlane headers", () => {
+    const html = renderAnnualTimeline();
+
+    expect(html).toContain("Em andamento");
+    expect(html).toContain("Planejado");
   });
 
   it("adds the timeline item after impediments and before squad", () => {

@@ -111,6 +111,9 @@ async function seedAnnualData() {
   const unplannedFeature = await prisma.feature.create({
     data: { releaseId: releaseB.id, name: "Unplanned feature", lifecycleStatus: FeatureLifecycleStatus.ACTIVE }
   });
+  const orphanFeature = await prisma.feature.create({
+    data: { name: "Orphan feature", lifecycleStatus: FeatureLifecycleStatus.ACTIVE }
+  });
 
   await prisma.story.create({
     data: {
@@ -153,7 +156,7 @@ async function seedAnnualData() {
     }
   });
 
-  return { releaseA, releaseB, activeFeature, finishedFeature, cancelledFeature, unplannedFeature };
+  return { releaseA, releaseB, activeFeature, finishedFeature, cancelledFeature, unplannedFeature, orphanFeature };
 }
 
 beforeEach(async () => {
@@ -253,5 +256,15 @@ describe("annual timeline data", () => {
     expect(features.get(cancelledFeature.id)?.status).toBe("CANCELLED");
     expect(features.get(unplannedFeature.id)?.startIndex).toBeNull();
     expect(features.get(unplannedFeature.id)?.endIndex).toBeNull();
+  });
+
+  it("keeps orphan features outside release summaries", async () => {
+    const { orphanFeature } = await seedAnnualData();
+
+    const data = await buildAnnualTimelineData(2026);
+
+    expect(data.orphanFeatures.map((feature) => feature.id)).toContain(orphanFeature.id);
+    expect(data.releases.flatMap((release) => release.features).map((feature) => feature.id)).not.toContain(orphanFeature.id);
+    expect(data.summaries.reduce((sum, summary) => sum + summary.featureCount, 0)).toBe(3);
   });
 });

@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
+import { getReleaseStatusTone, type ReleaseStatusValue } from "@/lib/release-status";
 
 type ReleaseOption = {
   id: string;
@@ -67,7 +68,7 @@ export function ReleaseSwitcher({
                 </option>
               ))}
             </select>
-            <Badge tone={selected.status === "IN_PROGRESS" ? "success" : "neutral"}>
+            <Badge tone={getReleaseStatusTone(selected.status as ReleaseStatusValue)}>
               {tStatus(selected.status)}
             </Badge>
             <Badge tone={selected.overCapacity ? "danger" : "success"}>

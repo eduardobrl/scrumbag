@@ -35,6 +35,8 @@ export default async function TimelinePage({
     remainingCapacity: t("remainingCapacity"),
     noReleases: t("noReleases"),
     noFeatures: t("noFeatures"),
+    orphanFeatures: t("orphanFeatures"),
+    noOrphanFeatures: t("noOrphanFeatures"),
     active: t("active"),
     finished: t("finished"),
     cancelled: t("cancelled"),

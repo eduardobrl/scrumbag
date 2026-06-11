@@ -18,6 +18,7 @@ enum AbsenceType {
 
 enum ReleaseStatus {
   PLANNED
+  PLANNING
   IN_PROGRESS
   CLOSED
   CANCELLED
@@ -90,8 +91,31 @@ model Release {
   status                    ReleaseStatus @default(PLANNED)
   sprints                   Sprint[]
   features                  Feature[]
+  estimateBaseline          ReleaseEstimateBaseline?
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt
+}
+
+model ReleaseEstimateBaseline {
+  id          String                        @id @default(cuid())
+  releaseId    String                        @unique
+  release      Release                       @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  capturedAt   DateTime                      @default(now())
+  items        ReleaseEstimateBaselineItem[]
+
+  @@index([releaseId])
+}
+
+model ReleaseEstimateBaselineItem {
+  id            String                    @id @default(cuid())
+  baselineId    String
+  baseline      ReleaseEstimateBaseline   @relation(fields: [baselineId], references: [id], onDelete: Cascade)
+  storyId       String
+  storyPoints   Float?
+  estimatedDays Float?
+
+  @@unique([baselineId, storyId])
+  @@index([storyId])
 }
 
 model Sprint {
@@ -112,8 +136,8 @@ model Sprint {
 
 model Feature {
   id              String                 @id @default(cuid())
-  releaseId       String
-  release         Release                @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  releaseId       String?
+  release         Release?               @relation(fields: [releaseId], references: [id], onDelete: Cascade)
   name            String
   description     String?
   lifecycleStatus FeatureLifecycleStatus @default(ACTIVE)

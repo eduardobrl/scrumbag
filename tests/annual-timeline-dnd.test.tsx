@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import React from "react";
+import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 import {
   AnnualTimelineView,
@@ -10,6 +11,7 @@ import {
   type AnnualTimelineLabels
 } from "@/features/timeline/annual-timeline-view";
 import type { AnnualTimelineData } from "@/lib/annual-timeline";
+import ptMessages from "@/messages/pt-BR.json";
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() })
@@ -30,6 +32,8 @@ const labels: AnnualTimelineLabels = {
   remainingCapacity: "Capacidade restante",
   noReleases: "Nenhuma release encontrada para este ano.",
   noFeatures: "Nenhuma feature nesta release",
+  orphanFeatures: "Features órfãs",
+  noOrphanFeatures: "Nenhuma feature órfã.",
   active: "Ativa",
   finished: "Finalizada",
   cancelled: "Cancelada",
@@ -93,6 +97,21 @@ const data: AnnualTimelineData = {
       remainingCapacityDays: 0
     }
   ],
+  orphanFeatures: [
+    {
+      id: "feature-orphan",
+      releaseId: null,
+      name: "Orphan feature",
+      status: "ACTIVE",
+      storyCount: 1,
+      estimatedDays: 3,
+      completionPercentage: 0,
+      startIndex: null,
+      endIndex: null,
+      activeMonthIndexes: [],
+      inactiveGaps: []
+    }
+  ],
   releases: []
 };
 
@@ -131,11 +150,20 @@ data.releases = [
   }
 ];
 
+function renderAnnualTimeline() {
+  return renderToStaticMarkup(
+    <NextIntlClientProvider locale="pt-BR" messages={ptMessages} timeZone="America/Araguaina">
+      <AnnualTimelineView data={data} labels={labels} />
+    </NextIntlClientProvider>
+  );
+}
+
 describe("annual timeline drag-and-drop", () => {
   it("renders draggable feature bars and release drop target markers", () => {
-    const html = renderToStaticMarkup(<AnnualTimelineView data={data} labels={labels} />);
+    const html = renderAnnualTimeline();
 
     expect(html).toContain('data-feature-id="feature-a"');
+    expect(html).toContain('data-orphan-feature-id="feature-orphan"');
     expect(html).toContain('data-release-id="release-a"');
     expect(html).toContain('data-release-id="release-b"');
     expect(html).toContain("/features/feature-a");
@@ -152,6 +180,7 @@ describe("annual timeline drag-and-drop", () => {
 
   it("ignores same-release, missing-target, and pending drops", () => {
     const feature = { featureId: "feature-a", sourceReleaseId: "release-a", featureName: "Move me" };
+    const orphan = { featureId: "feature-orphan", sourceReleaseId: null, featureName: "Orphan feature" };
 
     expect(getFeatureDropTargetId("release-drop-release-b")).toBe("release-b");
     expect(getFeatureDropTargetId("feature-drag-feature-a")).toBeNull();
@@ -161,5 +190,6 @@ describe("annual timeline drag-and-drop", () => {
     expect(shouldIgnoreFeatureDrop(feature, null, false)).toBe(true);
     expect(shouldIgnoreFeatureDrop(feature, "release-b", true)).toBe(true);
     expect(shouldIgnoreFeatureDrop(feature, "release-b", false)).toBe(false);
+    expect(shouldIgnoreFeatureDrop(orphan, "release-b", false)).toBe(false);
   });
 });

@@ -4,13 +4,14 @@ import { Card } from "@/components/ui/card";
 import { StoryList, type StoryListItem } from "@/features/stories/story-list";
 import { ArrowLeft, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 type FeatureDetailProps = {
   feature: {
     id: string;
     name: string;
     description: string;
-    releaseName: string;
+    releaseName: string | null;
     lifecycleStatus: string;
     summary: {
       calculatedStatus: string;
@@ -30,7 +31,10 @@ const STATUS_LABEL: Record<string, string> = {
   FINISHED: "Finalizada"
 };
 
-export function FeatureDetail({ feature, stories }: FeatureDetailProps) {
+export async function FeatureDetail({ feature, stories }: FeatureDetailProps) {
+  const tFeatures = await getTranslations("features");
+  const tStories = await getTranslations("stories");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
@@ -43,20 +47,20 @@ export function FeatureDetail({ feature, stories }: FeatureDetailProps) {
           </Button>
           <div>
             <h1 className="text-2xl font-semibold tracking-normal text-ink">{feature.name}</h1>
-            <p className="text-sm text-slate-500">{feature.releaseName}</p>
+            <p className="text-sm text-slate-500">{feature.releaseName ?? tFeatures("noRelease")}</p>
           </div>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" asChild>
             <Link href={`/features/${feature.id}/edit`}>
               <Pencil className="h-4 w-4" aria-hidden="true" />
-              Editar
+              {tStories("edit")}
             </Link>
           </Button>
           <Button asChild>
             <Link href={`/features/${feature.id}/stories/new`}>
               <Plus className="h-4 w-4" aria-hidden="true" />
-              Nova História
+              {tStories("new")}
             </Link>
           </Button>
         </div>
@@ -72,7 +76,7 @@ export function FeatureDetail({ feature, stories }: FeatureDetailProps) {
           </div>
         </Card>
         <Card>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Ciclo de vida</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{tFeatures("lifecycle")}</p>
           <div className="mt-1">
             <Badge tone={feature.lifecycleStatus === "CANCELLED" ? "danger" : "success"}>
               {feature.lifecycleStatus === "CANCELLED" ? "Cancelada" : "Ativa"}

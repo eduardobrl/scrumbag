@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Pencil } from "lucide-react";
 import { countBusinessDaysInRange } from "@/lib/capacity";
+import { getTranslations } from "next-intl/server";
+import { getReleaseStatusTone, type ReleaseStatusValue } from "@/lib/release-status";
 
 export type SprintView = {
   id: string;
@@ -30,27 +32,11 @@ export type ReleaseDetailView = {
   sprints: SprintView[];
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  PLANNED: "Planejada",
-  IN_PROGRESS: "Em andamento",
-  CLOSED: "Encerrada",
-  CANCELLED: "Cancelada"
-};
+export async function ReleaseDetail({ release }: { release: ReleaseDetailView }) {
+  const tRelease = await getTranslations("release");
+  const tCommon = await getTranslations("common");
+  const tStatus = await getTranslations("status");
 
-const STATUS_TONE: Record<string, "neutral" | "success" | "warning" | "danger"> = {
-  PLANNED: "neutral",
-  IN_PROGRESS: "success",
-  CLOSED: "warning",
-  CANCELLED: "danger"
-};
-
-const SPRINT_STATUS_LABEL: Record<string, string> = {
-  PLANNED: "Planejada",
-  IN_PROGRESS: "Em andamento",
-  CLOSED: "Encerrada"
-};
-
-export function ReleaseDetail({ release }: { release: ReleaseDetailView }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -61,68 +47,68 @@ export function ReleaseDetail({ release }: { release: ReleaseDetailView }) {
         <Button variant="secondary" asChild>
           <Link href={`/releases/${release.id}/edit`}>
             <Pencil className="h-4 w-4" aria-hidden="true" />
-            Editar
+            {tCommon("edit")}
           </Link>
         </Button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Período</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tCommon("period")}</div>
           <div className="mt-1 text-sm font-semibold">
             {release.startDate} - {release.endDate}
           </div>
         </Card>
         <Card>
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Status</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tCommon("status")}</div>
           <div className="mt-1">
-            <Badge tone={STATUS_TONE[release.status] ?? "neutral"}>
-              {STATUS_LABEL[release.status] ?? release.status}
+            <Badge tone={getReleaseStatusTone(release.status as ReleaseStatusValue)}>
+              {tStatus(release.status)}
             </Badge>
           </div>
         </Card>
         <Card>
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Reuniões %</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tRelease("meetingPercentage")}</div>
           <div className="mt-1 text-sm font-semibold">{release.meetingPercentage}%</div>
         </Card>
         <Card>
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Sustentação %</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tRelease("supportPercentage")}</div>
           <div className="mt-1 text-sm font-semibold">{release.supportPercentage}%</div>
         </Card>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Duração padrão da sprint</div>
-          <div className="mt-1 text-sm font-semibold">{release.defaultSprintLengthBusinessDays} dias úteis</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tRelease("defaultSprintLengthBusinessDays")}</div>
+          <div className="mt-1 text-sm font-semibold">{tCommon("workingDays", { count: release.defaultSprintLengthBusinessDays })}</div>
         </Card>
         <Card>
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Quantidade de sprints</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tRelease("sprintCount")}</div>
           <div className="mt-1 text-sm font-semibold">{release.sprintCount}</div>
         </Card>
       </div>
 
       {release.description && (
         <Card>
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">Descrição</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{tRelease("description")}</div>
           <p className="mt-1 text-sm text-slate-700">{release.description}</p>
         </Card>
       )}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Sprints geradas</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">{tRelease("generatedSprints")}</h2>
         <div className="overflow-hidden rounded-lg border border-line">
           <table className="w-full border-collapse text-left text-sm">
             <thead className="bg-slate-50 text-xs uppercase text-slate-500">
               <tr>
-                <th className="px-3 py-2">Sprint</th>
-                <th className="px-3 py-2">Período</th>
-                <th className="px-3 py-2">Status</th>
-                <th className="px-3 py-2">Objetivo</th>
-                <th className="px-3 py-2">Esforço planejado</th>
-                <th className="px-3 py-2">Capacidade</th>
-                <th className="px-3 py-2">Restante</th>
-                <th className="px-3 py-2">Risco</th>
+                <th className="px-3 py-2">{tRelease("sprint")}</th>
+                <th className="px-3 py-2">{tCommon("period")}</th>
+                <th className="px-3 py-2">{tCommon("status")}</th>
+                <th className="px-3 py-2">{tRelease("objective")}</th>
+                <th className="px-3 py-2">{tRelease("plannedEffort")}</th>
+                <th className="px-3 py-2">{tCommon("capacity")}</th>
+                <th className="px-3 py-2">{tRelease("remaining")}</th>
+                <th className="px-3 py-2">{tRelease("risk")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line bg-white">
@@ -130,11 +116,11 @@ export function ReleaseDetail({ release }: { release: ReleaseDetailView }) {
                 <tr key={sprint.id}>
                   <td className="px-3 py-3 font-medium">{sprint.name}</td>
                   <td className="px-3 py-3 whitespace-nowrap">
-                    {sprint.startDate} - {sprint.endDate} ({countBusinessDaysInRange(sprint.startDate, sprint.endDate)} dias úteis)
+                    {sprint.startDate} - {sprint.endDate} ({tCommon("workingDays", { count: countBusinessDaysInRange(sprint.startDate, sprint.endDate) })})
                   </td>
                   <td className="px-3 py-3">
                     <Badge tone={sprint.status === "IN_PROGRESS" ? "success" : sprint.status === "CLOSED" ? "warning" : "neutral"}>
-                      {SPRINT_STATUS_LABEL[sprint.status] ?? sprint.status}
+                      {tStatus(sprint.status)}
                     </Badge>
                   </td>
                   <td className="px-3 py-3 text-slate-500">{sprint.goal || "—"}</td>
@@ -142,7 +128,7 @@ export function ReleaseDetail({ release }: { release: ReleaseDetailView }) {
                   <td className="px-3 py-3 text-slate-500">—</td>
                   <td className="px-3 py-3 text-slate-500">—</td>
                   <td className="px-3 py-3">
-                    <Badge tone="neutral">Capacidade pendente</Badge>
+                    <Badge tone="neutral">{tRelease("capacityPending")}</Badge>
                   </td>
                 </tr>
               ))}

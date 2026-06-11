@@ -5,13 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Save, X } from "lucide-react";
-
-const STATUS_OPTIONS = [
-  { value: "PLANNED", label: "Planejada" },
-  { value: "IN_PROGRESS", label: "Em andamento" },
-  { value: "CLOSED", label: "Encerrada" },
-  { value: "CANCELLED", label: "Cancelada" }
-];
+import { useTranslations } from "next-intl";
+import { RELEASE_STATUS_VALUES } from "@/lib/release-status";
 
 type ReleaseEditFormProps = {
   id: string;
@@ -30,6 +25,9 @@ type ReleaseEditFormProps = {
 
 export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
   const router = useRouter();
+  const tRelease = useTranslations("release");
+  const tCommon = useTranslations("common");
+  const tStatus = useTranslations("status");
   const [name, setName] = useState(initial.name);
   const [objective, setObjective] = useState(initial.objective);
   const [description, setDescription] = useState(initial.description);
@@ -93,7 +91,7 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <label className="grid gap-1 text-sm font-medium text-slate-700">
-              Nome
+              {tRelease("name")}
               <Input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -103,15 +101,15 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
               {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
             </label>
             <label className="grid gap-1 text-sm font-medium text-slate-700">
-              Status
+              {tCommon("status")}
               <select
                 className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm"
                 value={status}
                 onChange={(event) => setStatus(event.target.value)}
               >
-                {STATUS_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
+                {RELEASE_STATUS_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {tStatus(value)}
                   </option>
                 ))}
               </select>
@@ -120,7 +118,7 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
           </div>
 
           <label className="grid gap-1 text-sm font-medium text-slate-700">
-            Objetivo
+            {tRelease("objective")}
             <Input
               value={objective}
               onChange={(event) => setObjective(event.target.value)}
@@ -131,18 +129,18 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
           </label>
 
           <label className="grid gap-1 text-sm font-medium text-slate-700">
-            Descrição
+            {tRelease("description")}
             <textarea
               className="min-h-[80px] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-accent focus:ring-2 focus:ring-teal-100"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              placeholder="Detalhes opcionais"
+              placeholder={tRelease("description")}
             />
           </label>
 
           <div className="grid grid-cols-2 gap-3">
             <label className="grid gap-1 text-sm font-medium text-slate-700">
-              Data de início
+              {tRelease("startDate")}
               <Input
                 type="date"
                 value={startDate}
@@ -152,7 +150,7 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
               {errors.startDate && <p className="text-xs text-red-600">{errors.startDate}</p>}
             </label>
             <label className="grid gap-1 text-sm font-medium text-slate-700">
-              Data de término
+              {tRelease("endDate")}
               <Input
                 type="date"
                 value={endDate}
@@ -165,7 +163,7 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
 
           <div className="grid grid-cols-3 gap-3">
             <label className="grid gap-1 text-sm font-medium text-slate-700">
-              Duração da sprint (dias úteis)
+              {tRelease("defaultSprintLengthBusinessDays")}
               <Input
                 type="number"
                 min={1}
@@ -178,7 +176,7 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
               )}
             </label>
             <label className="grid gap-1 text-sm font-medium text-slate-700">
-              Reuniões %
+              {tRelease("meetingPercentage")}
               <Input
                 type="number"
                 min={0}
@@ -190,7 +188,7 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
               {errors.meetingPercentage && <p className="text-xs text-red-600">{errors.meetingPercentage}</p>}
             </label>
             <label className="grid gap-1 text-sm font-medium text-slate-700">
-              Sustentação %
+              {tRelease("supportPercentage")}
               <Input
                 type="number"
                 min={0}
@@ -209,7 +207,7 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
         <div className="flex flex-col gap-3 lg:sticky lg:top-6 lg:self-start">
           <Button disabled={isPending} type="submit" className="w-full">
             <Save className="h-4 w-4" aria-hidden="true" />
-            Salvar alterações
+            {tCommon("saveChanges")}
           </Button>
           <Button
             type="button"
@@ -218,7 +216,7 @@ export function ReleaseEditForm({ id, initial }: ReleaseEditFormProps) {
             onClick={() => router.push(`/releases/${id}`)}
           >
             <X className="h-4 w-4" aria-hidden="true" />
-            Cancelar
+            {tCommon("cancel")}
           </Button>
         </div>
       </div>

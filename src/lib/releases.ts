@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { mergeErrors, requireText, type ValidationResult } from "@/lib/validation";
 import { generateSprintsForRelease } from "@/lib/sprint-generation";
 import { ReleaseStatus } from "@prisma/client";
+import { captureReleaseEstimateBaseline } from "@/lib/release-estimates";
+import { isAllowedReleaseTransition, isReleaseStatus } from "@/lib/release-status";
 
 export type ReleaseInput = {
   name: unknown;
@@ -50,8 +52,7 @@ function percentage(value: unknown, field: string): ValidationResult<number> {
 }
 
 function validateReleaseStatus(value: unknown): ValidationResult<ReleaseStatus> {
-  const valid = Object.values(ReleaseStatus);
-  if (valid.includes(value as ReleaseStatus)) {
+  if (isReleaseStatus(value)) {
     return { ok: true, data: value as ReleaseStatus };
   }
 
@@ -252,6 +253,15 @@ export async function updateRelease(id: string, input: ReleaseInput) {
 
   const data = validated.data;
 
+  if (!isAllowedReleaseTransition(existing.status as ReleaseStatus, data.status as ReleaseStatus)) {
+    return {
+      ok: false as const,
+      errors: {
+        status: "Release status must move forward one step at a time: PLANNED -> PLANNING -> IN_PROGRESS -> CLOSED"
+      }
+    };
+  }
+
   // Prevent multiple IN_PROGRESS releases (unless this release is already IN_PROGRESS)
   if (data.status === ReleaseStatus.IN_PROGRESS && existing.status !== ReleaseStatus.IN_PROGRESS) {
     const existingActive = await prisma.release.findFirst({
@@ -303,6 +313,10 @@ export async function updateRelease(id: string, input: ReleaseInput) {
         status: data.status
       }
     });
+
+    if (existing.status === ReleaseStatus.PLANNING && data.status === ReleaseStatus.IN_PROGRESS) {
+      await captureReleaseEstimateBaseline(tx, id);
+    }
 
     if (sprintInputs) {
       const existingSprints = await tx.sprint.findMany({

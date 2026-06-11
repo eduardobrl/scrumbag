@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { FeatureMoveToast, type FeatureMoveToastState } from "@/features/timeline/feature-move-toast";
 import type { FeatureReassignmentUndo } from "@/lib/features";
 import type { AnnualTimelineData, AnnualTimelineFeature } from "@/lib/annual-timeline";
+import { useTranslations } from "next-intl";
+import { getReleaseStatusTone, type ReleaseStatusValue } from "@/lib/release-status";
 
 export type AnnualTimelineLabels = {
   title: string;
@@ -24,6 +26,8 @@ export type AnnualTimelineLabels = {
   remainingCapacity: string;
   noReleases: string;
   noFeatures: string;
+  orphanFeatures: string;
+  noOrphanFeatures: string;
   active: string;
   finished: string;
   cancelled: string;
@@ -38,7 +42,7 @@ export type AnnualTimelineLabels = {
 
 export type DragFeatureData = {
   featureId: string;
-  sourceReleaseId: string;
+  sourceReleaseId: string | null;
   featureName: string;
 };
 
@@ -77,6 +81,7 @@ export function AnnualTimelineView({
   labels: AnnualTimelineLabels;
 }) {
   const router = useRouter();
+  const tStatus = useTranslations("status");
   const [pendingMove, setPendingMove] = useState(false);
   const [undoing, setUndoing] = useState(false);
   const [toast, setToast] = useState<FeatureMoveToastState>(null);
@@ -85,7 +90,7 @@ export function AnnualTimelineView({
     const featureFromData = event.active.data.current as DragFeatureData | undefined;
     const featureId = getFeatureDragId(typeof event.active.id === "string" ? event.active.id : null);
     const featureFromTimeline = featureId
-      ? data.releases.flatMap((release) => release.features).find((item) => item.id === featureId)
+      ? [...data.orphanFeatures, ...data.releases.flatMap((release) => release.features)].find((item) => item.id === featureId)
       : undefined;
     const feature = featureFromData ?? (featureFromTimeline
       ? {
@@ -244,8 +249,16 @@ export function AnnualTimelineView({
                 ))}
               </div>
 
+              <OrphanFeaturesSection features={data.orphanFeatures} labels={labels} pendingMove={pendingMove} />
+
               {data.releases.map((release) => (
-                <ReleaseSwimlane key={release.id} release={release} labels={labels} pendingMove={pendingMove} />
+                <ReleaseSwimlane
+                  key={release.id}
+                  release={release}
+                  labels={labels}
+                  pendingMove={pendingMove}
+                  statusLabel={tStatus}
+                />
               ))}
             </div>
           </div>
@@ -262,6 +275,78 @@ export function AnnualTimelineView({
   );
 }
 
+function OrphanFeaturesSection({
+  features,
+  labels,
+  pendingMove
+}: {
+  features: AnnualTimelineFeature[];
+  labels: AnnualTimelineLabels;
+  pendingMove: boolean;
+}) {
+  return (
+    <div className="mt-3 rounded-md border border-dashed border-slate-300 bg-slate-50 p-3">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-sm font-semibold text-ink">{labels.orphanFeatures}</h3>
+        <span className="text-xs text-slate-500">{features.length}</span>
+      </div>
+      {features.length === 0 ? (
+        <p className="mt-2 text-sm text-slate-500">{labels.noOrphanFeatures}</p>
+      ) : (
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature) => (
+            <DraggableOrphanFeature key={feature.id} feature={feature} disabled={pendingMove} labels={labels} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DraggableOrphanFeature({
+  feature,
+  disabled,
+  labels
+}: {
+  feature: AnnualTimelineFeature;
+  disabled: boolean;
+  labels: AnnualTimelineLabels;
+}) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: `feature-drag-${feature.id}`,
+    disabled,
+    data: {
+      featureId: feature.id,
+      sourceReleaseId: null,
+      featureName: feature.name
+    } satisfies DragFeatureData
+  });
+  const transformStyle = transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined;
+
+  return (
+    <Link
+      ref={setNodeRef}
+      href={`/features/${feature.id}`}
+      {...attributes}
+      {...listeners}
+      data-feature-id={feature.id}
+      data-orphan-feature-id={feature.id}
+      className={clsx(
+        "block rounded-md border border-line bg-white px-3 py-2 text-sm shadow-sm transition-opacity hover:border-accent",
+        isDragging && "opacity-70"
+      )}
+      style={{ transform: transformStyle }}
+      title={`${feature.name} - ${labels.orphanFeatures}`}
+      aria-label={`${feature.name} - ${labels.orphanFeatures}`}
+    >
+      <span className="block truncate font-medium text-accent">{feature.name}</span>
+      <span className="mt-1 block text-xs text-slate-500">
+        {feature.storyCount} {labels.stories} / {feature.estimatedDays.toFixed(1)}d / {feature.completionPercentage}%
+      </span>
+    </Link>
+  );
+}
+
 function Legend({ swatch, label }: { swatch: string; label: string }) {
   return (
     <span className="inline-flex items-center gap-1">
@@ -274,11 +359,13 @@ function Legend({ swatch, label }: { swatch: string; label: string }) {
 function ReleaseSwimlane({
   release,
   labels,
-  pendingMove
+  pendingMove,
+  statusLabel
 }: {
   release: AnnualTimelineData["releases"][number];
   labels: AnnualTimelineLabels;
   pendingMove: boolean;
+  statusLabel: (status: string) => string;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: `release-drop-${release.id}` });
 
@@ -295,7 +382,9 @@ function ReleaseSwimlane({
       <div className="col-span-full rounded-md border border-line bg-slate-50 px-3 py-2">
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-semibold text-ink">{release.name}</span>
-          <Badge tone={release.status === "IN_PROGRESS" ? "success" : "neutral"}>{release.status}</Badge>
+          <Badge tone={getReleaseStatusTone(release.status as ReleaseStatusValue)}>
+            {statusLabel(release.status)}
+          </Badge>
           <span className="text-xs text-slate-500">
             {release.startDate} - {release.endDate}
           </span>

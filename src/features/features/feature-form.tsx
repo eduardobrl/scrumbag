@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Save, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 
 type ReleaseOption = {
@@ -15,7 +16,7 @@ type FeatureFormProps = {
   releases: ReleaseOption[];
   initial?: {
     id: string;
-    releaseId: string;
+    releaseId: string | null;
     name: string;
     description: string;
   };
@@ -24,6 +25,8 @@ type FeatureFormProps = {
 
 export function FeatureForm({ releases, initial, selectedReleaseId }: FeatureFormProps) {
   const router = useRouter();
+  const tFeatures = useTranslations("features");
+  const tCommon = useTranslations("common");
   const [releaseId, setReleaseId] = useState(initial?.releaseId ?? selectedReleaseId ?? releases[0]?.id ?? "");
   const [name, setName] = useState(initial?.name ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
@@ -37,7 +40,7 @@ export function FeatureForm({ releases, initial, selectedReleaseId }: FeatureFor
     const response = await fetch(initial ? `/api/features/${initial.id}` : "/api/features", {
       method: initial ? "PATCH" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ releaseId, name, description })
+      body: JSON.stringify({ releaseId: releaseId || null, name, description })
     });
     const payload = await response.json();
 
@@ -47,21 +50,13 @@ export function FeatureForm({ releases, initial, selectedReleaseId }: FeatureFor
     }
 
     startTransition(() => {
-      router.push(initial ? `/features/${initial.id}` : `/features?releaseId=${releaseId}`);
+      router.push(initial ? `/features/${initial.id}` : `/features?releaseId=${releaseId || "orphans"}`);
       router.refresh();
       if (!initial) {
         setName("");
         setDescription("");
       }
     });
-  }
-
-  if (releases.length === 0) {
-    return (
-      <div className="rounded-lg border border-line bg-white p-4 text-sm text-slate-600">
-        Crie uma release antes de adicionar features.
-      </div>
-    );
   }
 
   return (
@@ -73,6 +68,7 @@ export function FeatureForm({ releases, initial, selectedReleaseId }: FeatureFor
           value={releaseId}
           onChange={(event) => setReleaseId(event.target.value)}
         >
+          <option value="">{tFeatures("noRelease")}</option>
           {releases.map((release) => (
             <option key={release.id} value={release.id}>
               {release.name}
@@ -102,12 +98,12 @@ export function FeatureForm({ releases, initial, selectedReleaseId }: FeatureFor
       <div className="flex gap-2">
         <Button disabled={isPending} type="submit">
           <Save className="h-4 w-4" aria-hidden="true" />
-          {initial ? "Salvar alterações" : "Nova Feature"}
+          {initial ? tCommon("saveChanges") : tFeatures("new")}
         </Button>
         {initial && (
           <Button type="button" variant="secondary" onClick={() => router.push(`/features/${initial.id}`)}>
             <X className="h-4 w-4" aria-hidden="true" />
-            Cancelar
+            {tCommon("cancel")}
           </Button>
         )}
       </div>

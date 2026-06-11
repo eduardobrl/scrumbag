@@ -144,6 +144,29 @@ describe("feature release reassignment domain", () => {
       expect(missingFeature.errors.general).toBe("Feature not found");
     }
   });
+
+  it("assigns an orphan feature to a release and undoes it back to orphan", async () => {
+    const { targetRelease } = await seedReassignment();
+    const orphan = await prisma.feature.create({
+      data: {
+        name: "Orphan Feature",
+        lifecycleStatus: FeatureLifecycleStatus.ACTIVE
+      }
+    });
+
+    const moved = await reassignFeatureRelease(orphan.id, targetRelease.id);
+    expect(moved.ok).toBe(true);
+    if (!moved.ok) return;
+
+    expect(moved.data.feature.releaseId).toBe(targetRelease.id);
+    expect(moved.data.undo.previousReleaseId).toBeNull();
+
+    const undone = await undoReassignFeatureRelease(orphan.id, moved.data.undo);
+    expect(undone.ok).toBe(true);
+    if (!undone.ok) return;
+
+    expect(undone.data.feature.releaseId).toBeNull();
+  });
 });
 
 describe("feature release reassignment API", () => {

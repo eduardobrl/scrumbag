@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { IconButton } from "@/components/ui/icon-button";
 import { Eye, Pencil } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { getReleaseStatusTone, type ReleaseStatusValue } from "@/lib/release-status";
 
 export type ReleaseListItem = {
   id: string;
@@ -13,13 +14,6 @@ export type ReleaseListItem = {
   sprintCount: number;
   meetingPercentage: number;
   supportPercentage: number;
-};
-
-const STATUS_TONE: Record<string, "neutral" | "success" | "warning" | "danger"> = {
-  PLANNED: "neutral",
-  IN_PROGRESS: "success",
-  CLOSED: "warning",
-  CANCELLED: "danger"
 };
 
 export async function ReleaseList({ releases }: { releases: ReleaseListItem[] }) {
@@ -58,7 +52,7 @@ export async function ReleaseList({ releases }: { releases: ReleaseListItem[] })
                 {release.startDate} - {release.endDate}
               </td>
               <td className="px-3 py-3">
-                <Badge tone={STATUS_TONE[release.status] ?? "neutral"}>
+                <Badge tone={getReleaseStatusTone(release.status as ReleaseStatusValue)}>
                   {tStatus(release.status)}
                 </Badge>
               </td>

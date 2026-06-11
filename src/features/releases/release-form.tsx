@@ -5,16 +5,14 @@ import { useRouter } from "next/navigation";
 import { CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-const STATUS_OPTIONS = [
-  { value: "PLANNED", label: "Planejada" },
-  { value: "IN_PROGRESS", label: "Em andamento" },
-  { value: "CLOSED", label: "Encerrada" },
-  { value: "CANCELLED", label: "Cancelada" }
-];
+import { useTranslations } from "next-intl";
+import { RELEASE_STATUS_VALUES } from "@/lib/release-status";
 
 export function ReleaseForm() {
   const router = useRouter();
+  const tRelease = useTranslations("release");
+  const tCommon = useTranslations("common");
+  const tStatus = useTranslations("status");
   const [name, setName] = useState("");
   const [objective, setObjective] = useState("");
   const [description, setDescription] = useState("");
@@ -72,7 +70,7 @@ export function ReleaseForm() {
     <form className="grid gap-3" onSubmit={onSubmit}>
       <div className="grid grid-cols-2 gap-3">
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Nome
+          {tRelease("name")}
           <Input
             value={name}
             onChange={(event) => setName(event.target.value)}
@@ -81,15 +79,15 @@ export function ReleaseForm() {
           />
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Status
+          {tCommon("status")}
           <select
             className="h-10 rounded-md border border-slate-300 bg-white px-3 text-sm"
             value={status}
             onChange={(event) => setStatus(event.target.value)}
           >
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
+            {RELEASE_STATUS_VALUES.map((value) => (
+              <option key={value} value={value}>
+                {tStatus(value)}
               </option>
             ))}
           </select>
@@ -97,7 +95,7 @@ export function ReleaseForm() {
       </div>
 
       <label className="grid gap-1 text-sm font-medium text-slate-700">
-        Objetivo
+        {tRelease("objective")}
         <Input
           value={objective}
           onChange={(event) => setObjective(event.target.value)}
@@ -107,18 +105,18 @@ export function ReleaseForm() {
       </label>
 
       <label className="grid gap-1 text-sm font-medium text-slate-700">
-        Descrição
+        {tRelease("description")}
         <textarea
           className="min-h-[60px] rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-accent focus:ring-2 focus:ring-teal-100"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          placeholder="Detalhes opcionais"
+          placeholder={tRelease("description")}
         />
       </label>
 
       <div className="grid grid-cols-2 gap-3">
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Data de início
+          {tRelease("startDate")}
           <Input
             type="date"
             value={startDate}
@@ -127,7 +125,7 @@ export function ReleaseForm() {
           />
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Data de término
+          {tRelease("endDate")}
           <Input
             type="date"
             value={endDate}
@@ -139,7 +137,7 @@ export function ReleaseForm() {
 
       <div className="grid grid-cols-3 gap-3">
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Duração da sprint (dias úteis)
+          {tRelease("defaultSprintLengthBusinessDays")}
           <Input
             type="number"
             min={1}
@@ -149,7 +147,7 @@ export function ReleaseForm() {
           />
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Reuniões %
+          {tRelease("meetingPercentage")}
           <Input
             type="number"
             min={0}
@@ -160,7 +158,7 @@ export function ReleaseForm() {
           />
         </label>
         <label className="grid gap-1 text-sm font-medium text-slate-700">
-          Sustentação %
+          {tRelease("supportPercentage")}
           <Input
             type="number"
             min={0}
@@ -176,7 +174,7 @@ export function ReleaseForm() {
 
       <Button disabled={isPending} type="submit">
         <CalendarPlus className="h-4 w-4" aria-hidden="true" />
-        Salvar e gerar sprints
+        {tRelease("saveAndGenerate")}
       </Button>
     </form>
   );

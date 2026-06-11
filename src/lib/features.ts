@@ -5,7 +5,7 @@ import { FeatureLifecycleStatus, StoryStatus } from "@prisma/client";
 export type CalculatedFeatureStatus = "NOT_STARTED" | "IN_PROGRESS" | "FINISHED";
 
 export type FeatureInput = {
-  releaseId: unknown;
+  releaseId?: unknown;
   name: unknown;
   description?: unknown;
 };
@@ -22,7 +22,7 @@ export type FeatureSummary = {
 
 export type FeatureReassignmentUndo = {
   featureId: string;
-  previousReleaseId: string;
+  previousReleaseId: string | null;
   targetReleaseId: string;
   stories: Array<{
     id: string;
@@ -52,8 +52,16 @@ async function requireRelease(releaseId: unknown): Promise<ValidationResult<stri
   return parsed;
 }
 
+async function optionalRelease(releaseId: unknown): Promise<ValidationResult<string | null>> {
+  if (releaseId === undefined || releaseId === null || releaseId === "") {
+    return { ok: true, data: null };
+  }
+
+  return requireRelease(releaseId);
+}
+
 export async function validateFeatureInput(input: FeatureInput) {
-  const releaseId = await requireRelease(input.releaseId);
+  const releaseId = await optionalRelease(input.releaseId);
   const name = requireText(input.name, "name");
 
   if (!releaseId.ok || !name.ok) {
@@ -238,7 +246,7 @@ function parseUndoPayload(value: unknown): ValidationResult<FeatureReassignmentU
   const payload = value as Partial<FeatureReassignmentUndo>;
   if (
     typeof payload.featureId !== "string" ||
-    typeof payload.previousReleaseId !== "string" ||
+    !(typeof payload.previousReleaseId === "string" || payload.previousReleaseId === null) ||
     typeof payload.targetReleaseId !== "string" ||
     !Array.isArray(payload.stories)
   ) {
@@ -289,12 +297,14 @@ export async function undoReassignFeatureRelease(featureId: string, undoPayload:
 
   const [feature, previousRelease] = await Promise.all([
     prisma.feature.findUnique({ where: { id: featureId } }),
-    prisma.release.findUnique({ where: { id: undo.previousReleaseId } })
+    undo.previousReleaseId
+      ? prisma.release.findUnique({ where: { id: undo.previousReleaseId } })
+      : Promise.resolve(null)
   ]);
   if (!feature) {
     return { ok: false as const, errors: { general: "Feature not found" } };
   }
-  if (!previousRelease) {
+  if (undo.previousReleaseId && !previousRelease) {
     return { ok: false as const, errors: { releaseId: "Release not found" } };
   }
 
@@ -304,7 +314,7 @@ export async function undoReassignFeatureRelease(featureId: string, undoPayload:
   const validSprints = new Set(
     (
       await prisma.sprint.findMany({
-        where: { id: { in: sprintIds }, releaseId: undo.previousReleaseId },
+        where: undo.previousReleaseId ? { id: { in: sprintIds }, releaseId: undo.previousReleaseId } : { id: { in: [] } },
         select: { id: true }
       })
     ).map((sprint) => sprint.id)
@@ -359,6 +369,14 @@ export async function listFeatures(releaseId?: string) {
   });
 }
 
+export async function listOrphanFeatures() {
+  return prisma.feature.findMany({
+    where: { releaseId: null },
+    include: featureInclude,
+    orderBy: [{ lifecycleStatus: "asc" }, { createdAt: "desc" }]
+  });
+}
+
 export async function getFeatureDetails(id: string) {
   return prisma.feature.findUnique({
     where: { id },
@@ -372,7 +390,7 @@ export function toFeatureView(feature: NonNullable<FeatureWithStories>) {
   return {
     id: feature.id,
     releaseId: feature.releaseId,
-    releaseName: feature.release.name,
+    releaseName: feature.release?.name ?? null,
     name: feature.name,
     description: feature.description ?? "",
     lifecycleStatus: feature.lifecycleStatus,

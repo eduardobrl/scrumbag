@@ -42,7 +42,7 @@ export type AnnualTimelineFeatureStatus = "ACTIVE" | "FINISHED" | "CANCELLED";
 
 export type AnnualTimelineFeature = {
   id: string;
-  releaseId: string;
+  releaseId: string | null;
   name: string;
   status: AnnualTimelineFeatureStatus;
   storyCount: number;
@@ -69,6 +69,7 @@ export type AnnualTimelineData = {
   months: AnnualTimelineMonth[];
   quarters: AnnualTimelineQuarter[];
   releases: AnnualTimelineRelease[];
+  orphanFeatures: AnnualTimelineFeature[];
   summaries: AnnualReleaseSummary[];
 };
 
@@ -234,7 +235,39 @@ async function buildReleaseFeatures(releaseId: string, year: number): Promise<An
     orderBy: [{ lifecycleStatus: "asc" }, { createdAt: "asc" }]
   });
 
-  return features.map((feature) => {
+  return features.map((feature) => toAnnualTimelineFeature(feature, year));
+}
+
+async function buildOrphanFeatures(year: number): Promise<AnnualTimelineFeature[]> {
+  const features = await prisma.feature.findMany({
+    where: { releaseId: null },
+    include: {
+      stories: {
+        include: { currentSprint: true },
+        orderBy: { createdAt: "asc" }
+      }
+    },
+    orderBy: [{ lifecycleStatus: "asc" }, { createdAt: "asc" }]
+  });
+
+  return features.map((feature) => toAnnualTimelineFeature(feature, year));
+}
+
+function toAnnualTimelineFeature(
+  feature: {
+    id: string;
+    releaseId: string | null;
+    name: string;
+    lifecycleStatus: FeatureLifecycleStatus;
+    stories: Array<{
+      storyPoints: number | null;
+      estimatedDays: number | null;
+      status: StoryStatus;
+      currentSprint: { name: string; startDate: Date; endDate: Date } | null;
+    }>;
+  },
+  year: number
+): AnnualTimelineFeature {
     const summary = calculateFeatureSummary(feature.stories);
     const activeMonthIndexes = deriveFeatureMonthIndexes(feature.stories, year);
     const startIndex = activeMonthIndexes.length > 0 ? activeMonthIndexes[0] : null;
@@ -260,7 +293,6 @@ async function buildReleaseFeatures(releaseId: string, year: number): Promise<An
       activeMonthIndexes,
       inactiveGaps
     };
-  });
 }
 
 export async function buildAnnualTimelineData(year: number): Promise<AnnualTimelineData> {
@@ -274,30 +306,34 @@ export async function buildAnnualTimelineData(year: number): Promise<AnnualTimel
     orderBy: { startDate: "asc" }
   });
 
-  const annualReleases = await Promise.all(
-    releases.map(async (release) => {
-      const [summary, features] = await Promise.all([
-        buildReleaseSummary(release.id),
-        buildReleaseFeatures(release.id, selectedYear)
-      ]);
+  const [annualReleases, orphanFeatures] = await Promise.all([
+    Promise.all(
+      releases.map(async (release) => {
+        const [summary, features] = await Promise.all([
+          buildReleaseSummary(release.id),
+          buildReleaseFeatures(release.id, selectedYear)
+        ]);
 
-      return {
-        id: release.id,
-        name: release.name,
-        status: release.status,
-        startDate: dateOnly(release.startDate),
-        endDate: dateOnly(release.endDate),
-        summary,
-        features
-      };
-    })
-  );
+        return {
+          id: release.id,
+          name: release.name,
+          status: release.status,
+          startDate: dateOnly(release.startDate),
+          endDate: dateOnly(release.endDate),
+          summary,
+          features
+        };
+      })
+    ),
+    buildOrphanFeatures(selectedYear)
+  ]);
 
   return {
     year: selectedYear,
     months,
     quarters,
     releases: annualReleases,
+    orphanFeatures,
     summaries: annualReleases.map((release) => release.summary)
   };
 }

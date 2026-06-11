@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
-import { calculateFeatureSummary, cancelFeature, createFeature, getFeatureDetails } from "@/lib/features";
+import { calculateFeatureSummary, cancelFeature, createFeature, getFeatureDetails, listFeatures, listOrphanFeatures } from "@/lib/features";
 import { ReleaseStatus, StoryStatus } from "@prisma/client";
 
 async function seedRelease() {
@@ -47,6 +47,24 @@ describe("feature CRUD", () => {
 
     const stillThere = await getFeatureDetails(created.data.id);
     expect(stillThere?.lifecycleStatus).toBe("CANCELLED");
+  });
+
+  it("creates and lists orphan features separately from release features", async () => {
+    const release = await seedRelease();
+    const orphan = await createFeature({ releaseId: null, name: "Parking lot" });
+    const releaseFeature = await createFeature({ releaseId: release.id, name: "Release scope" });
+
+    expect(orphan.ok).toBe(true);
+    expect(releaseFeature.ok).toBe(true);
+    if (!orphan.ok || !releaseFeature.ok) return;
+
+    expect(orphan.data.releaseId).toBeNull();
+
+    const releaseFeatures = await listFeatures(release.id);
+    const orphanFeatures = await listOrphanFeatures();
+
+    expect(releaseFeatures.map((feature) => feature.id)).toEqual([releaseFeature.data.id]);
+    expect(orphanFeatures.map((feature) => feature.id)).toEqual([orphan.data.id]);
   });
 });
 

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { createFeature, listFeatures, toFeatureView } from "@/lib/features";
+import { createFeature, listFeatures, listOrphanFeatures, toFeatureView } from "@/lib/features";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const features = await listFeatures(searchParams.get("releaseId") ?? undefined);
+  const releaseId = searchParams.get("releaseId");
+  const features = releaseId === "orphans" ? await listOrphanFeatures() : await listFeatures(releaseId ?? undefined);
 
   return NextResponse.json({ features: features.map(toFeatureView) });
 }

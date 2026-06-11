@@ -9,7 +9,9 @@ import {
   getActiveReleaseSummary,
   reconcileGeneratedSprints
 } from "@/lib/releases";
+import { getReleaseEstimateBaseline } from "@/lib/release-estimates";
 import { ReleaseStatus } from "@prisma/client";
+import { StoryStatus } from "@prisma/client";
 
 describe("sprint generation", () => {
   it("generates sequential non-overlapping sprints for a simple range", () => {
@@ -157,6 +159,24 @@ describe("release creation", () => {
     }
   });
 
+  it("creates a release directly in PLANNING", async () => {
+    const result = await createRelease({
+      name: "Planning Release",
+      objective: "Plan scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNING
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.status).toBe(ReleaseStatus.PLANNING);
+    }
+  });
+
   it("prevents a second IN_PROGRESS release", async () => {
     const first = await createRelease({
       name: "First",
@@ -262,6 +282,122 @@ describe("release update", () => {
     }
   });
 
+  it("enforces ordered lifecycle transitions and captures the baseline once", async () => {
+    const created = await createRelease({
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNED
+    });
+
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const feature = await prisma.feature.create({
+      data: {
+        releaseId: created.data.id,
+        name: "Planning feature"
+      }
+    });
+
+    const story = await prisma.story.create({
+      data: {
+        featureId: feature.id,
+        title: "Capture baseline story",
+        storyPoints: 8,
+        estimatedDays: 3,
+        status: StoryStatus.BACKLOG
+      }
+    });
+
+    const skipAhead = await updateRelease(created.data.id, {
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.IN_PROGRESS
+    });
+
+    expect(skipAhead.ok).toBe(false);
+    if (!skipAhead.ok) {
+      expect(skipAhead.errors.status).toContain("PLANNED -> PLANNING -> IN_PROGRESS -> CLOSED");
+    }
+
+    const planning = await updateRelease(created.data.id, {
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNING
+    });
+
+    expect(planning.ok).toBe(true);
+
+    const skipClose = await updateRelease(created.data.id, {
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.CLOSED
+    });
+
+    expect(skipClose.ok).toBe(false);
+    if (!skipClose.ok) {
+      expect(skipClose.errors.status).toContain("PLANNED -> PLANNING -> IN_PROGRESS -> CLOSED");
+    }
+
+    const goLive = await updateRelease(created.data.id, {
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.IN_PROGRESS
+    });
+
+    expect(goLive.ok).toBe(true);
+
+    const baseline = await getReleaseEstimateBaseline(prisma, created.data.id);
+    expect(baseline).toBeTruthy();
+    expect(baseline?.items).toHaveLength(1);
+    expect(baseline?.items[0].storyId).toBe(story.id);
+    expect(baseline?.items[0].storyPoints).toBe(8);
+    expect(baseline?.items[0].estimatedDays).toBe(3);
+
+    const repeatedGoLive = await updateRelease(created.data.id, {
+      name: "Release Q3 2026",
+      objective: "Plan Q3 scope",
+      startDate: "2026-07-01",
+      endDate: "2026-07-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.IN_PROGRESS
+    });
+
+    expect(repeatedGoLive.ok).toBe(true);
+
+    const baselineCount = await prisma.releaseEstimateBaseline.count({
+      where: { releaseId: created.data.id }
+    });
+    expect(baselineCount).toBe(1);
+  });
+
   it("rejects updating a second release to IN_PROGRESS", async () => {
     const first = await createRelease({
       name: "First",
@@ -287,6 +423,18 @@ describe("release update", () => {
     });
     expect(second.ok).toBe(true);
     if (!second.ok) return;
+
+    const planning = await updateRelease(second.data.id, {
+      name: "Second",
+      objective: "Second release",
+      startDate: "2026-08-01",
+      endDate: "2026-08-31",
+      defaultSprintLengthBusinessDays: 10,
+      meetingPercentage: 10,
+      supportPercentage: 20,
+      status: ReleaseStatus.PLANNING
+    });
+    expect(planning.ok).toBe(true);
 
     const updated = await updateRelease(second.data.id, {
       name: "Second",

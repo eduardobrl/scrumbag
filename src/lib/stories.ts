@@ -102,9 +102,21 @@ export async function createStory(input: StoryInput) {
     : null;
 
   if (currentSprintId) {
-    const sprint = await prisma.sprint.findUnique({ where: { id: currentSprintId } });
+    const [feature, sprint] = await Promise.all([
+      prisma.feature.findUnique({ where: { id: validated.data.featureId } }),
+      prisma.sprint.findUnique({ where: { id: currentSprintId } })
+    ]);
     if (!sprint) {
       return { ok: false as const, errors: { currentSprintId: "Sprint not found" } };
+    }
+    if (!feature?.releaseId) {
+      return {
+        ok: false as const,
+        errors: { currentSprintId: "Feature must belong to a release before planning stories" }
+      };
+    }
+    if (feature.releaseId !== sprint.releaseId) {
+      return { ok: false as const, errors: { currentSprintId: "Sprint must belong to the story release" } };
     }
   }
 

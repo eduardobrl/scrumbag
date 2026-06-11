@@ -1,4 +1,8 @@
 import { defineConfig } from "prisma/config";
+import { assertSafeDatabaseUrl, getDatabaseUrl } from "./src/lib/db-url";
+
+const databaseUrl = getDatabaseUrl();
+assertSafeDatabaseUrl(databaseUrl);
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -6,6 +10,6 @@ export default defineConfig({
     path: "prisma/migrations"
   },
   datasource: {
-    url: "file:./data/squad-planner.db"
+    url: databaseUrl
   }
 });

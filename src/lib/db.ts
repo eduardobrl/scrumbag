@@ -1,7 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { assertSafeDatabaseUrl, getDatabaseUrl } from "@/lib/db-url";
 
-const DATABASE_URL = "file:./data/squad-planner.db";
+const DATABASE_URL = getDatabaseUrl();
+assertSafeDatabaseUrl(DATABASE_URL);
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;

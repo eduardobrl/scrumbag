@@ -56,6 +56,9 @@ export async function previewStorySprintPlan(storyId: string, sprintId: string) 
   if (!sprint) {
     return { ok: false as const, errors: { sprintId: "Sprint not found" } };
   }
+  if (!story.feature.releaseId) {
+    return { ok: false as const, errors: { sprintId: "Feature must belong to a release before planning stories" } };
+  }
   if (sprint.releaseId !== story.feature.releaseId) {
     return { ok: false as const, errors: { sprintId: "Sprint must belong to the story release" } };
   }

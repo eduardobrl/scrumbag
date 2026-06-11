@@ -54,9 +54,9 @@ v1.0 requirements: 64/64 shipped. See `.planning/milestones/v1.0-REQUIREMENTS.md
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
+Phase: 09 - Release Planning State & Editable Estimates
+Plan: 2 plans
+Status: Planned
 Last activity: 2026-06-09 — Milestone v1.2 started
 
 ## Performance Metrics
