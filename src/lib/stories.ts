@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { isPostGoLiveReleaseStatus, type EstimateChangeField } from "@/lib/estimate-changes";
 import { mergeErrors, requireText, type ValidationResult } from "@/lib/validation";
 import { StoryStatus } from "@prisma/client";
 
@@ -11,6 +12,7 @@ export type StoryInput = {
   estimatedDays?: unknown;
   status?: unknown;
   currentSprintId?: unknown;
+  changeReason?: unknown;
 };
 
 function optionalText(value: unknown): string | undefined {
@@ -133,7 +135,10 @@ export async function createStory(input: StoryInput) {
 }
 
 export async function updateStory(id: string, input: StoryInput) {
-  const existing = await prisma.story.findUnique({ where: { id } });
+  const existing = await prisma.story.findUnique({
+    where: { id },
+    include: { feature: { include: { release: true } } }
+  });
   if (!existing) {
     return { ok: false as const, errors: { general: "Story not found" } };
   }
@@ -154,13 +159,54 @@ export async function updateStory(id: string, input: StoryInput) {
     return validated;
   }
 
-  const story = await prisma.story.update({
-    where: { id },
-    data: {
-      ...validated.data,
-      currentSprintId: requestedSprint
-    },
-    include: storyInclude
+  const changeReason = optionalText(input.changeReason);
+  const estimateChanges: Array<{
+    field: EstimateChangeField;
+    oldValue: number | null;
+    newValue: number | null;
+  }> = [];
+
+  if (isPostGoLiveReleaseStatus(existing.feature.release?.status)) {
+    if (existing.storyPoints !== validated.data.storyPoints) {
+      estimateChanges.push({
+        field: "storyPoints",
+        oldValue: existing.storyPoints,
+        newValue: validated.data.storyPoints
+      });
+    }
+
+    if (existing.estimatedDays !== validated.data.estimatedDays) {
+      estimateChanges.push({
+        field: "estimatedDays",
+        oldValue: existing.estimatedDays,
+        newValue: validated.data.estimatedDays
+      });
+    }
+  }
+
+  const story = await prisma.$transaction(async (tx) => {
+    const updated = await tx.story.update({
+      where: { id },
+      data: {
+        ...validated.data,
+        currentSprintId: requestedSprint
+      },
+      include: storyInclude
+    });
+
+    for (const change of estimateChanges) {
+      await tx.estimateChange.create({
+        data: {
+          storyId: id,
+          field: change.field,
+          oldValue: change.oldValue,
+          newValue: change.newValue,
+          changeReason
+        }
+      });
+    }
+
+    return updated;
   });
 
   return { ok: true as const, data: story };

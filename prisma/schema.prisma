@@ -162,11 +162,26 @@ model Story {
   status             StoryStatus @default(BACKLOG)
   leakageHistory     LeakageHistory[]
   impediments        Impediment[]
+  estimateChanges    EstimateChange[]
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
 
   @@index([featureId])
   @@index([currentSprintId])
+}
+
+model EstimateChange {
+  id           String   @id @default(cuid())
+  storyId      String
+  story        Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  field        String
+  oldValue     Float?
+  newValue     Float?
+  changeReason String?
+  timestamp    DateTime @default(now())
+
+  @@index([storyId])
+  @@index([timestamp])
 }
 
 model Impediment {

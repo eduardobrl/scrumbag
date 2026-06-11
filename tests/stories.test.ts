@@ -4,7 +4,7 @@ import { createStory, updateStory, cancelStory } from "@/lib/stories";
 import { createFeature, getFeatureDetails, toFeatureView } from "@/lib/features";
 import { ReleaseStatus, SprintStatus, StoryStatus } from "@prisma/client";
 
-async function seedFeature() {
+async function seedFeature(status: ReleaseStatus = ReleaseStatus.IN_PROGRESS) {
   const release = await prisma.release.create({
     data: {
       name: "Release Q3",
@@ -14,7 +14,7 @@ async function seedFeature() {
       defaultSprintLengthBusinessDays: 10,
       meetingPercentage: 10,
       supportPercentage: 20,
-      status: ReleaseStatus.IN_PROGRESS
+      status
     }
   });
   const sprint = await prisma.sprint.create({
@@ -32,6 +32,7 @@ async function seedFeature() {
 }
 
 beforeEach(async () => {
+  await prisma.estimateChange.deleteMany();
   await prisma.story.deleteMany();
   await prisma.feature.deleteMany();
   await prisma.sprint.deleteMany();
@@ -113,5 +114,110 @@ describe("story-driven feature aggregates", () => {
     expect(view.summary.totalEstimatedDays).toBe(2);
     expect(view.summary.calculatedStatus).toBe("FINISHED");
     expect(view.summary.progressPercentage).toBe(100);
+  });
+});
+
+describe("story estimate audit history", () => {
+  it("records one audit row per changed estimate field after go-live", async () => {
+    const { feature } = await seedFeature(ReleaseStatus.IN_PROGRESS);
+    const created = await createStory({
+      featureId: feature.id,
+      title: "Estimate me",
+      storyPoints: 5,
+      estimatedDays: 2
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const updated = await updateStory(created.data.id, {
+      featureId: feature.id,
+      title: "Estimate me",
+      storyPoints: 8,
+      estimatedDays: 3,
+      status: StoryStatus.BACKLOG,
+      changeReason: "Scope clarified"
+    });
+
+    expect(updated.ok).toBe(true);
+
+    const changes = await prisma.estimateChange.findMany({
+      where: { storyId: created.data.id },
+      orderBy: { field: "asc" }
+    });
+    expect(changes).toHaveLength(2);
+    expect(changes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          field: "storyPoints",
+          oldValue: 5,
+          newValue: 8,
+          changeReason: "Scope clarified"
+        }),
+        expect.objectContaining({
+          field: "estimatedDays",
+          oldValue: 2,
+          newValue: 3,
+          changeReason: "Scope clarified"
+        })
+      ])
+    );
+  });
+
+  it("does not record planning-time estimate edits", async () => {
+    const { feature } = await seedFeature(ReleaseStatus.PLANNING);
+    const created = await createStory({
+      featureId: feature.id,
+      title: "Still planning",
+      storyPoints: 5,
+      estimatedDays: 2
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const updated = await updateStory(created.data.id, {
+      featureId: feature.id,
+      title: "Still planning",
+      storyPoints: 8,
+      estimatedDays: 3,
+      status: StoryStatus.BACKLOG
+    });
+
+    expect(updated.ok).toBe(true);
+    await expect(prisma.estimateChange.count({ where: { storyId: created.data.id } })).resolves.toBe(0);
+  });
+
+  it("records explicit null estimate transitions but skips unchanged null values", async () => {
+    const { feature } = await seedFeature(ReleaseStatus.CLOSED);
+    const created = await createStory({
+      featureId: feature.id,
+      title: "Nullable estimate"
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+
+    const unchanged = await updateStory(created.data.id, {
+      featureId: feature.id,
+      title: "Nullable estimate",
+      status: StoryStatus.BACKLOG
+    });
+    expect(unchanged.ok).toBe(true);
+    await expect(prisma.estimateChange.count({ where: { storyId: created.data.id } })).resolves.toBe(0);
+
+    const changed = await updateStory(created.data.id, {
+      featureId: feature.id,
+      title: "Nullable estimate",
+      storyPoints: 3,
+      estimatedDays: "",
+      status: StoryStatus.BACKLOG
+    });
+    expect(changed.ok).toBe(true);
+
+    const changes = await prisma.estimateChange.findMany({ where: { storyId: created.data.id } });
+    expect(changes).toHaveLength(1);
+    expect(changes[0]).toMatchObject({
+      field: "storyPoints",
+      oldValue: null,
+      newValue: 3
+    });
   });
 });

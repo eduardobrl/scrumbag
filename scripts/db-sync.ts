@@ -137,6 +137,20 @@ CREATE INDEX IF NOT EXISTS "Feature_releaseId_idx" ON "Feature" ("releaseId");
 CREATE INDEX IF NOT EXISTS "Story_featureId_idx" ON "Story" ("featureId");
 CREATE INDEX IF NOT EXISTS "Story_currentSprintId_idx" ON "Story" ("currentSprintId");
 
+CREATE TABLE IF NOT EXISTS "EstimateChange" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "storyId" TEXT NOT NULL,
+  "field" TEXT NOT NULL,
+  "oldValue" REAL,
+  "newValue" REAL,
+  "changeReason" TEXT,
+  "timestamp" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT "EstimateChange_storyId_fkey" FOREIGN KEY ("storyId") REFERENCES "Story" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "EstimateChange_storyId_idx" ON "EstimateChange" ("storyId");
+CREATE INDEX IF NOT EXISTS "EstimateChange_timestamp_idx" ON "EstimateChange" ("timestamp");
+
 CREATE TABLE IF NOT EXISTS "Impediment" (
   "id" TEXT NOT NULL PRIMARY KEY,
   "title" TEXT NOT NULL,
