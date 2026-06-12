@@ -634,7 +634,18 @@ A timeline deverá exibir:
 * fim previsto;
 * progresso atual;
 * sprints com histórias finalizadas;
-* sprints com histórias vazadas.
+* sprints com histórias vazadas;
+* percentual da feature planejado em cada sprint;
+* comparação entre o percentual definido no planejamento e o percentual atualmente alocado.
+
+O percentual por sprint da feature será calculado por dias estimados:
+
+```text
+percentualFeatureNaSprint =
+dias estimados da feature naquela sprint / dias estimados totais da feature
+```
+
+Quando existir baseline de planejamento, o sistema deverá comparar o percentual capturado no go-live com a alocação atual das histórias por sprint. Antes do baseline existir, a timeline exibirá a distribuição planejada atual.
 
 ---
 

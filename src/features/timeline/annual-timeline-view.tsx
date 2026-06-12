@@ -36,6 +36,8 @@ export type AnnualTimelineLabels = {
   legendFinished: string;
   legendCancelled: string;
   legendGap: string;
+  planned: string;
+  current: string;
   movedTo: string;
   undo: string;
 };
@@ -441,8 +443,7 @@ function FeatureRow({
   columnCount: number;
 }) {
   const activeSet = new Set(feature.activeSprintIndexes);
-  const statusLabel =
-    feature.status === "CANCELLED" ? labels.cancelled : feature.status === "FINISHED" ? labels.finished : labels.active;
+  const allocationByIndex = new Map(feature.sprintAllocations.map((allocation) => [allocation.sprintIndex, allocation]));
 
   return (
     <>
@@ -460,15 +461,22 @@ function FeatureRow({
         const inSpan = feature.startIndex !== null && feature.endIndex !== null && index >= feature.startIndex && index <= feature.endIndex;
         const activeHere = activeSet.has(index);
         const isGap = inSpan && !activeHere;
+        const allocation = allocationByIndex.get(index);
+        const plannedPercentage = allocation?.plannedPercentage ?? 0;
+        const actualPercentage = allocation?.actualPercentage ?? 0;
 
         return (
-          <div key={`${feature.id}-${index}`} className="flex min-h-11 items-center">
+          <div key={`${feature.id}-${index}`} className="flex min-h-14 items-center">
             {inSpan ? (
               <DraggableFeatureBar
                 feature={feature}
                 disabled={pendingMove}
                 isGap={isGap}
-                label={`${feature.name} - ${isGap ? labels.legendGap : statusLabel}`}
+                label={`${feature.name} - ${labels.planned} ${plannedPercentage}%, ${labels.current} ${actualPercentage}%`}
+                plannedLabel={labels.planned}
+                currentLabel={labels.current}
+                plannedPercentage={plannedPercentage}
+                actualPercentage={actualPercentage}
               />
             ) : index === 0 && feature.startIndex === null ? (
               <DraggableUnplannedFeature feature={feature} disabled={pendingMove} label={`${feature.name} - ${labels.unplanned}`}>
@@ -530,12 +538,20 @@ function DraggableFeatureBar({
   feature,
   disabled,
   isGap,
-  label
+  label,
+  plannedLabel,
+  currentLabel,
+  plannedPercentage,
+  actualPercentage
 }: {
   feature: AnnualTimelineFeature;
   disabled: boolean;
   isGap: boolean;
   label: string;
+  plannedLabel: string;
+  currentLabel: string;
+  plannedPercentage: number;
+  actualPercentage: number;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `feature-drag-${feature.id}`,
@@ -547,6 +563,7 @@ function DraggableFeatureBar({
     } satisfies DragFeatureData
   });
   const transformStyle = transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined;
+  const hasAnyAllocation = plannedPercentage > 0 || actualPercentage > 0;
 
   return (
     <Link
@@ -556,19 +573,22 @@ function DraggableFeatureBar({
       {...listeners}
       data-feature-id={feature.id}
       className={clsx(
-        "h-5 w-full rounded-sm border transition-opacity",
+        "flex min-h-10 w-full flex-col justify-center rounded-sm border px-2 py-1 text-[11px] leading-4 transition-opacity",
         isDragging && "opacity-70",
         feature.status === "CANCELLED"
-          ? "border-slate-300 bg-slate-100"
+          ? "border-slate-300 bg-slate-100 text-slate-600"
           : feature.status === "FINISHED"
-            ? "border-transparent bg-emerald-600"
-            : isGap
-              ? "border-dashed border-slate-300 bg-white"
-              : "border-transparent bg-accent"
+            ? "border-transparent bg-emerald-600 text-white"
+            : isGap || !hasAnyAllocation
+              ? "border-dashed border-slate-300 bg-white text-slate-600"
+              : "border-transparent bg-accent text-white"
       )}
       style={{ transform: transformStyle }}
       title={label}
       aria-label={label}
-    />
+    >
+      <span>{plannedLabel} {plannedPercentage}%</span>
+      {feature.hasPlanBaseline ? <span>{currentLabel} {actualPercentage}%</span> : null}
+    </Link>
   );
 }

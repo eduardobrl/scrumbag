@@ -217,14 +217,36 @@ describe("annual timeline data", () => {
 
   it("builds feature spans with inactive sprint gaps", async () => {
     const { activeFeature } = await seedAnnualData();
+    const [sprintJan, activeStories] = await Promise.all([
+      prisma.sprint.findFirstOrThrow({ where: { name: "Sprint Jan" } }),
+      prisma.story.findMany({ where: { featureId: activeFeature.id } })
+    ]);
+    await prisma.releaseEstimateBaseline.create({
+      data: {
+        releaseId: activeFeature.releaseId!,
+        items: {
+          create: activeStories.map((story) => ({
+            storyId: story.id,
+            featureId: activeFeature.id,
+            plannedSprintId: sprintJan.id,
+            storyPoints: story.storyPoints,
+            estimatedDays: story.estimatedDays
+          }))
+        }
+      }
+    });
 
     const data = await buildAnnualTimelineData(2026);
     const feature = data.releases.flatMap((release) => release.features).find((item) => item.id === activeFeature.id);
+    const sprintJanAllocation = feature?.sprintAllocations.find((item) => item.sprintIndex === 0);
 
     expect(feature?.startIndex).toBe(0);
     expect(feature?.endIndex).toBe(2);
     expect(feature?.activeSprintIndexes).toEqual([0, 2]);
+    expect(feature?.plannedSprintIndexes).toEqual([0]);
     expect(feature?.inactiveGaps).toEqual([1]);
+    expect(feature?.hasPlanBaseline).toBe(true);
+    expect(sprintJanAllocation).toMatchObject({ plannedPercentage: 100, actualPercentage: 33 });
   });
 
   it("includes active, finished, cancelled, and unplanned feature rows", async () => {

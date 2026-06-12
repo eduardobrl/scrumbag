@@ -203,13 +203,31 @@ describe("timeline", () => {
   it("builds feature spans with inactive gaps and leaked sprint indicators", async () => {
     const { release, feature, sprint1 } = await seedRelease();
     await prisma.story.deleteMany({ where: { title: "Unestimated story" } });
+    const featureStories = await prisma.story.findMany({ where: { featureId: feature.id }, orderBy: { title: "asc" } });
+    await prisma.releaseEstimateBaseline.create({
+      data: {
+        releaseId: release.id,
+        items: {
+          create: featureStories.map((story) => ({
+            storyId: story.id,
+            featureId: feature.id,
+            plannedSprintId: sprint1.id,
+            storyPoints: story.storyPoints,
+            estimatedDays: story.estimatedDays
+          }))
+        }
+      }
+    });
 
     const timeline = await buildTimelineData(release.id);
     const row = timeline.features.find((item) => item.id === feature.id);
+    const sprint1Allocation = row?.sprintAllocations.find((item) => item.sprintId === sprint1.id);
 
     expect(row?.startIndex).toBe(0);
     expect(row?.endIndex).toBe(2);
     expect(row?.inactiveGaps).toContain(1);
+    expect(row?.hasPlanBaseline).toBe(true);
+    expect(sprint1Allocation).toMatchObject({ plannedPercentage: 100, actualPercentage: 60 });
     expect(timeline.sprints[0].isFinished).toBe(true);
     expect(timeline.leakedSprints).toContain(sprint1.id);
   });

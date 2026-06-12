@@ -83,6 +83,8 @@ CREATE TABLE IF NOT EXISTS "ReleaseEstimateBaselineItem" (
   "id" TEXT NOT NULL PRIMARY KEY,
   "baselineId" TEXT NOT NULL,
   "storyId" TEXT NOT NULL,
+  "featureId" TEXT,
+  "plannedSprintId" TEXT,
   "storyPoints" REAL,
   "estimatedDays" REAL,
   CONSTRAINT "ReleaseEstimateBaselineItem_baselineId_fkey" FOREIGN KEY ("baselineId") REFERENCES "ReleaseEstimateBaseline" ("id") ON DELETE CASCADE ON UPDATE CASCADE
@@ -194,6 +196,21 @@ CREATE INDEX IF NOT EXISTS "leakage_history_originSprintId_idx" ON "leakage_hist
 
 const featureColumns = db.prepare(`PRAGMA table_info("Feature")`).all() as Array<{ name: string; notnull: number }>;
 const releaseIdColumn = featureColumns.find((column) => column.name === "releaseId");
+const baselineItemColumns = db.prepare(`PRAGMA table_info("ReleaseEstimateBaselineItem")`).all() as Array<{ name: string }>;
+const baselineItemColumnNames = new Set(baselineItemColumns.map((column) => column.name));
+
+if (!baselineItemColumnNames.has("featureId")) {
+  db.exec(`ALTER TABLE "ReleaseEstimateBaselineItem" ADD COLUMN "featureId" TEXT;`);
+}
+
+if (!baselineItemColumnNames.has("plannedSprintId")) {
+  db.exec(`ALTER TABLE "ReleaseEstimateBaselineItem" ADD COLUMN "plannedSprintId" TEXT;`);
+}
+
+db.exec(`
+CREATE INDEX IF NOT EXISTS "ReleaseEstimateBaselineItem_featureId_idx" ON "ReleaseEstimateBaselineItem" ("featureId");
+CREATE INDEX IF NOT EXISTS "ReleaseEstimateBaselineItem_plannedSprintId_idx" ON "ReleaseEstimateBaselineItem" ("plannedSprintId");
+`);
 
 if (releaseIdColumn?.notnull === 1) {
   db.exec(`

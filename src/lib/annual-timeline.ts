@@ -1,5 +1,10 @@
 import { FeatureLifecycleStatus, StoryStatus } from "@prisma/client";
 import { calculateFeatureSummary } from "@/lib/features";
+import {
+  calculateFeatureSprintAllocation,
+  type FeatureAllocationBaselineItem,
+  type FeatureSprintAllocation
+} from "@/lib/feature-sprint-allocation";
 import { getDashboardData } from "@/lib/dashboard";
 import { prisma } from "@/lib/db";
 
@@ -44,6 +49,10 @@ export type AnnualReleaseSummary = {
 
 export type AnnualTimelineFeatureStatus = "ACTIVE" | "FINISHED" | "CANCELLED";
 
+export type AnnualTimelineSprintAllocation = FeatureSprintAllocation & {
+  sprintIndex: number;
+};
+
 export type AnnualTimelineFeature = {
   id: string;
   releaseId: string | null;
@@ -55,7 +64,10 @@ export type AnnualTimelineFeature = {
   startIndex: number | null;
   endIndex: number | null;
   activeSprintIndexes: number[];
+  plannedSprintIndexes: number[];
   inactiveGaps: number[];
+  hasPlanBaseline: boolean;
+  sprintAllocations: AnnualTimelineSprintAllocation[];
 };
 
 export type AnnualTimelineRelease = {
@@ -178,7 +190,9 @@ function deriveFeatureSprintIndexes(
 
 async function buildReleaseFeatures(
   releaseId: string,
-  sprintIndexById: Map<string, number>
+  sprintIndexById: Map<string, number>,
+  sprintIds: string[],
+  baselineItems: FeatureAllocationBaselineItem[] | null
 ): Promise<AnnualTimelineFeature[]> {
   const features = await prisma.feature.findMany({
     where: { releaseId },
@@ -191,7 +205,7 @@ async function buildReleaseFeatures(
     orderBy: [{ lifecycleStatus: "asc" }, { createdAt: "asc" }]
   });
 
-  return features.map((feature) => toAnnualTimelineFeature(feature, sprintIndexById));
+  return features.map((feature) => toAnnualTimelineFeature(feature, sprintIndexById, sprintIds, baselineItems));
 }
 
 async function buildOrphanFeatures(sprintIndexById: Map<string, number>): Promise<AnnualTimelineFeature[]> {
@@ -206,7 +220,7 @@ async function buildOrphanFeatures(sprintIndexById: Map<string, number>): Promis
     orderBy: [{ lifecycleStatus: "asc" }, { createdAt: "asc" }]
   });
 
-  return features.map((feature) => toAnnualTimelineFeature(feature, sprintIndexById));
+  return features.map((feature) => toAnnualTimelineFeature(feature, sprintIndexById, [], null));
 }
 
 function toAnnualTimelineFeature(
@@ -216,24 +230,40 @@ function toAnnualTimelineFeature(
     name: string;
     lifecycleStatus: FeatureLifecycleStatus;
     stories: Array<{
+      id: string;
+      currentSprintId: string | null;
       storyPoints: number | null;
       estimatedDays: number | null;
       status: StoryStatus;
       currentSprint: { id: string; name: string; startDate: Date; endDate: Date } | null;
     }>;
   },
-  sprintIndexById: Map<string, number>
+  sprintIndexById: Map<string, number>,
+  sprintIds: string[],
+  baselineItems: FeatureAllocationBaselineItem[] | null
 ): AnnualTimelineFeature {
   const summary = calculateFeatureSummary(feature.stories);
+  const allocation = calculateFeatureSprintAllocation({
+    featureId: feature.id,
+    stories: feature.stories,
+    baselineItems,
+    sprintIds
+  });
   const activeSprintIndexes = deriveFeatureSprintIndexes(feature.stories, sprintIndexById);
-  const startIndex = activeSprintIndexes.length > 0 ? activeSprintIndexes[0] : null;
-  const endIndex = activeSprintIndexes.length > 0 ? activeSprintIndexes[activeSprintIndexes.length - 1] : null;
-  const activeSet = new Set(activeSprintIndexes);
+  const plannedSprintIndexes = allocation.plannedSprintIds
+    .map((sprintId) => sprintIndexById.get(sprintId))
+    .filter((index): index is number => index !== undefined);
+  const visibleSprintIndexes = Array.from(new Set([...activeSprintIndexes, ...plannedSprintIndexes])).sort(
+    (left, right) => left - right
+  );
+  const startIndex = visibleSprintIndexes.length > 0 ? visibleSprintIndexes[0] : null;
+  const endIndex = visibleSprintIndexes.length > 0 ? visibleSprintIndexes[visibleSprintIndexes.length - 1] : null;
+  const visibleSet = new Set(visibleSprintIndexes);
   const inactiveGaps =
     startIndex === null || endIndex === null
       ? []
       : Array.from({ length: endIndex - startIndex + 1 }, (_, offset) => startIndex + offset).filter(
-          (index) => !activeSet.has(index)
+          (index) => !visibleSet.has(index)
         );
 
   return {
@@ -247,7 +277,13 @@ function toAnnualTimelineFeature(
     startIndex,
     endIndex,
     activeSprintIndexes,
-    inactiveGaps
+    plannedSprintIndexes,
+    inactiveGaps,
+    hasPlanBaseline: allocation.hasPlanBaseline,
+    sprintAllocations: allocation.allocations.flatMap((item) => {
+      const sprintIndex = sprintIndexById.get(item.sprintId);
+      return sprintIndex === undefined ? [] : [{ ...item, sprintIndex }];
+    })
   };
 }
 
@@ -309,9 +345,12 @@ export async function buildAnnualTimelineData(year: number): Promise<AnnualTimel
   const [annualReleases, orphanFeatures] = await Promise.all([
     Promise.all(
       releases.map(async (release) => {
-        const [summary, features] = await Promise.all([
+        const [summary, baseline] = await Promise.all([
           buildReleaseSummary(release.id),
-          buildReleaseFeatures(release.id, sprintIndexById)
+          prisma.releaseEstimateBaseline.findUnique({
+            where: { releaseId: release.id },
+            include: { items: true }
+          })
         ]);
 
         return {
@@ -321,7 +360,12 @@ export async function buildAnnualTimelineData(year: number): Promise<AnnualTimel
           startDate: dateOnly(release.startDate),
           endDate: dateOnly(release.endDate),
           summary,
-          features
+          features: await buildReleaseFeatures(
+            release.id,
+            sprintIndexById,
+            release.sprints.map((sprint) => sprint.id),
+            baseline?.items ?? null
+          )
         };
       })
     ),

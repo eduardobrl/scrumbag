@@ -118,6 +118,7 @@ function TimelineRow({
   sprints: TimelineData["sprints"];
 }) {
   const activeSet = new Set(feature.activeSprintIds);
+  const allocationBySprintId = new Map(feature.sprintAllocations.map((allocation) => [allocation.sprintId, allocation]));
 
   return (
     <>
@@ -130,18 +131,20 @@ function TimelineRow({
         const isGap = feature.inactiveGaps.includes(index);
         const activeHere = activeSet.has(sprint.id);
         const barClass = feature.isFinished ? "bg-emerald-600" : "bg-accent";
+        const allocation = allocationBySprintId.get(sprint.id);
 
         return (
-          <div key={`${feature.id}-${sprint.id}`} className="flex min-h-11 items-center">
+          <div key={`${feature.id}-${sprint.id}`} className="flex min-h-14 items-center">
             {inSpan ? (
-              <Link
+              <TimelineAllocationCell
                 href={`/features/${feature.id}`}
-                className={`h-5 w-full rounded-sm border ${
-                  isGap || !activeHere
-                    ? "border-slate-300 bg-white"
-                    : `border-transparent ${barClass}`
-                }`}
-                title={`${feature.name} ${isGap ? "inativo" : "ativo"}`}
+                title={`${feature.name} - planejado ${allocation?.plannedPercentage ?? 0}%, atual ${allocation?.actualPercentage ?? 0}%`}
+                isGap={isGap}
+                activeHere={activeHere}
+                barClass={barClass}
+                hasPlanBaseline={feature.hasPlanBaseline}
+                plannedPercentage={allocation?.plannedPercentage ?? 0}
+                actualPercentage={allocation?.actualPercentage ?? 0}
               />
             ) : (
               <div className="h-5 w-full rounded-sm border border-transparent" />
@@ -150,5 +153,44 @@ function TimelineRow({
         );
       })}
     </>
+  );
+}
+
+function TimelineAllocationCell({
+  href,
+  title,
+  isGap,
+  activeHere,
+  barClass,
+  hasPlanBaseline,
+  plannedPercentage,
+  actualPercentage
+}: {
+  href: string;
+  title: string;
+  isGap: boolean;
+  activeHere: boolean;
+  barClass: string;
+  hasPlanBaseline: boolean;
+  plannedPercentage: number;
+  actualPercentage: number;
+}) {
+  const hasAnyAllocation = plannedPercentage > 0 || actualPercentage > 0;
+
+  return (
+    <Link
+      href={href}
+      className={`flex min-h-10 w-full flex-col justify-center rounded-sm border px-2 py-1 text-[11px] leading-4 ${
+        isGap || !hasAnyAllocation
+          ? "border-slate-300 bg-white text-slate-500"
+          : activeHere
+            ? `border-transparent ${barClass} text-white`
+            : "border-dashed border-slate-300 bg-white text-slate-600"
+      }`}
+      title={title}
+    >
+      <span>Plan. {plannedPercentage}%</span>
+      {hasPlanBaseline ? <span>Atual {actualPercentage}%</span> : null}
+    </Link>
   );
 }

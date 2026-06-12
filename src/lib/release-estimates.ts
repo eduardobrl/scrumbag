@@ -4,6 +4,8 @@ type ReleaseEstimateDatabase = Pick<PrismaClient, "releaseEstimateBaseline" | "s
 
 type BaselineStory = {
   id: string;
+  featureId: string;
+  currentSprintId: string | null;
   storyPoints: number | null;
   estimatedDays: number | null;
 };
@@ -31,6 +33,8 @@ export async function captureReleaseEstimateBaseline(database: ReleaseEstimateDa
     },
     select: {
       id: true,
+      featureId: true,
+      currentSprintId: true,
       storyPoints: true,
       estimatedDays: true
     },
@@ -44,6 +48,8 @@ export async function captureReleaseEstimateBaseline(database: ReleaseEstimateDa
       items: {
         create: stories.map((story) => ({
           storyId: story.id,
+          featureId: story.featureId,
+          plannedSprintId: story.currentSprintId,
           storyPoints: story.storyPoints,
           estimatedDays: story.estimatedDays
         }))

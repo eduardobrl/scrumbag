@@ -42,6 +42,8 @@ const labels: AnnualTimelineLabels = {
   legendFinished: "Finalizada",
   legendCancelled: "Cancelada",
   legendGap: "Intervalo inativo",
+  planned: "Plan.",
+  current: "Atual",
   movedTo: "movida para",
   undo: "Desfazer"
 };
@@ -129,7 +131,10 @@ const data: AnnualTimelineData = {
       startIndex: null,
       endIndex: null,
       activeSprintIndexes: [],
-      inactiveGaps: []
+      plannedSprintIndexes: [],
+      inactiveGaps: [],
+      hasPlanBaseline: false,
+      sprintAllocations: []
     }
   ],
   releases: []
@@ -155,7 +160,27 @@ data.releases = [
         startIndex: 0,
         endIndex: 1,
         activeSprintIndexes: [0, 1],
-        inactiveGaps: []
+        plannedSprintIndexes: [0, 1],
+        inactiveGaps: [],
+        hasPlanBaseline: false,
+        sprintAllocations: [
+          {
+            sprintId: "sprint-a-1",
+            sprintIndex: 0,
+            plannedDays: 1,
+            actualDays: 1,
+            plannedPercentage: 50,
+            actualPercentage: 50
+          },
+          {
+            sprintId: "sprint-a-2",
+            sprintIndex: 1,
+            plannedDays: 1,
+            actualDays: 1,
+            plannedPercentage: 50,
+            actualPercentage: 50
+          }
+        ]
       }
     ]
   },

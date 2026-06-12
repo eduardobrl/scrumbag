@@ -111,11 +111,15 @@ model ReleaseEstimateBaselineItem {
   baselineId    String
   baseline      ReleaseEstimateBaseline   @relation(fields: [baselineId], references: [id], onDelete: Cascade)
   storyId       String
+  featureId     String?
+  plannedSprintId String?
   storyPoints   Float?
   estimatedDays Float?
 
   @@unique([baselineId, storyId])
   @@index([storyId])
+  @@index([featureId])
+  @@index([plannedSprintId])
 }
 
 model Sprint {

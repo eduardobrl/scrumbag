@@ -39,6 +39,8 @@ const labels: AnnualTimelineLabels = {
   legendFinished: "Finalizada",
   legendCancelled: "Cancelada",
   legendGap: "Intervalo inativo",
+  planned: "Plan.",
+  current: "Atual",
   movedTo: "movida para",
   undo: "Desfazer"
 };
@@ -127,7 +129,10 @@ const data: AnnualTimelineData = {
       startIndex: null,
       endIndex: null,
       activeSprintIndexes: [],
-      inactiveGaps: []
+      plannedSprintIndexes: [],
+      inactiveGaps: [],
+      hasPlanBaseline: false,
+      sprintAllocations: []
     }
   ],
   releases: [
@@ -150,7 +155,27 @@ const data: AnnualTimelineData = {
           startIndex: 0,
           endIndex: 2,
           activeSprintIndexes: [0, 2],
-          inactiveGaps: [1]
+          plannedSprintIndexes: [0, 2],
+          inactiveGaps: [1],
+          hasPlanBaseline: true,
+          sprintAllocations: [
+            {
+              sprintId: "sprint-a-1",
+              sprintIndex: 0,
+              plannedDays: 3,
+              actualDays: 2,
+              plannedPercentage: 60,
+              actualPercentage: 40
+            },
+            {
+              sprintId: "sprint-a-3",
+              sprintIndex: 2,
+              plannedDays: 2,
+              actualDays: 3,
+              plannedPercentage: 40,
+              actualPercentage: 60
+            }
+          ]
         },
         {
           id: "feature-finished",
@@ -163,7 +188,19 @@ const data: AnnualTimelineData = {
           startIndex: 1,
           endIndex: 1,
           activeSprintIndexes: [1],
-          inactiveGaps: []
+          plannedSprintIndexes: [1],
+          inactiveGaps: [],
+          hasPlanBaseline: false,
+          sprintAllocations: [
+            {
+              sprintId: "sprint-a-2",
+              sprintIndex: 1,
+              plannedDays: 2,
+              actualDays: 2,
+              plannedPercentage: 100,
+              actualPercentage: 100
+            }
+          ]
         },
         {
           id: "feature-cancelled",
@@ -176,7 +213,19 @@ const data: AnnualTimelineData = {
           startIndex: 2,
           endIndex: 2,
           activeSprintIndexes: [2],
-          inactiveGaps: []
+          plannedSprintIndexes: [2],
+          inactiveGaps: [],
+          hasPlanBaseline: false,
+          sprintAllocations: [
+            {
+              sprintId: "sprint-a-3",
+              sprintIndex: 2,
+              plannedDays: 1,
+              actualDays: 1,
+              plannedPercentage: 100,
+              actualPercentage: 100
+            }
+          ]
         }
       ]
     },
@@ -228,6 +277,8 @@ describe("annual timeline UI", () => {
     const html = renderAnnualTimeline();
 
     expect(html).toContain("/features/feature-active");
+    expect(html).toContain("Plan. 60%");
+    expect(html).toContain("Atual 40%");
     expect(html).toContain("/features/feature-finished");
     expect(html).toContain("/features/feature-cancelled");
     expect(html).toContain("/features/feature-orphan");

@@ -156,9 +156,19 @@ Cada feature deve exibir:
 * início previsto;
 * fim previsto;
 * percentual de conclusão;
+* percentual planejado por sprint;
+* percentual atual por sprint quando houver baseline de planejamento;
 * sprints com atividade;
 * sprints sem atividade dentro do intervalo;
 * indicador de feature finalizada.
+
+O percentual por sprint deve usar dias estimados da feature:
+
+```text
+dias da feature planejados naquela sprint / dias totais da feature
+```
+
+Após o go-live, cada célula da timeline deve comparar o percentual capturado na etapa de planejamento com o percentual atualmente alocado na sprint.
 
 ### Tabela de sprints
 

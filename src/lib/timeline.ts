@@ -2,6 +2,10 @@ import { FeatureLifecycleStatus, SprintStatus, StoryStatus } from "@prisma/clien
 import { calculateFeatureSummary } from "@/lib/features";
 import { countBusinessDaysInRange } from "@/lib/date-utils";
 import { prisma } from "@/lib/db";
+import {
+  calculateFeatureSprintAllocation,
+  type FeatureSprintAllocation
+} from "@/lib/feature-sprint-allocation";
 
 export type TimelineSprint = {
   id: string;
@@ -20,9 +24,12 @@ export type TimelineFeature = {
   startIndex: number | null;
   endIndex: number | null;
   activeSprintIds: string[];
+  plannedSprintIds: string[];
   inactiveGaps: number[];
   completionProgress: number;
   isFinished: boolean;
+  hasPlanBaseline: boolean;
+  sprintAllocations: FeatureSprintAllocation[];
 };
 
 export type TimelineImpediment = {
@@ -52,7 +59,7 @@ function dateOnly(date: Date): string {
 }
 
 export async function buildTimelineData(releaseId: string): Promise<TimelineData> {
-  const [sprints, features, leakage, impediments] = await Promise.all([
+  const [sprints, features, leakage, impediments, estimateBaseline] = await Promise.all([
     prisma.sprint.findMany({
       where: { releaseId },
       orderBy: { startDate: "asc" }
@@ -87,10 +94,15 @@ export async function buildTimelineData(releaseId: string): Promise<TimelineData
         }
       },
       orderBy: [{ status: "asc" }, { reportedDate: "desc" }, { createdAt: "desc" }]
+    }),
+    prisma.releaseEstimateBaseline.findUnique({
+      where: { releaseId },
+      include: { items: true }
     })
   ]);
 
   const sprintIndex = new Map(sprints.map((sprint, index) => [sprint.id, index]));
+  const sprintIds = sprints.map((sprint) => sprint.id);
   const timelineSprints = sprints.map((sprint) => ({
     id: sprint.id,
     name: sprint.name,
@@ -102,23 +114,27 @@ export async function buildTimelineData(releaseId: string): Promise<TimelineData
 
   const timelineFeatures = features.map((feature) => {
     const scopedStories = feature.stories.filter((story) => story.status !== StoryStatus.CANCELLED);
-    const activeSprintIds = Array.from(
-      new Set(
-        scopedStories
-          .map((story) => story.currentSprintId)
-          .filter((id): id is string => typeof id === "string" && sprintIndex.has(id))
-      )
-    ).sort((left, right) => sprintIndex.get(left)! - sprintIndex.get(right)!);
+    const allocation = calculateFeatureSprintAllocation({
+      featureId: feature.id,
+      stories: feature.stories,
+      baselineItems: estimateBaseline?.items ?? null,
+      sprintIds
+    });
+    const activeSprintIds = allocation.actualSprintIds;
+    const plannedSprintIds = allocation.plannedSprintIds;
+    const visibleSprintIds = Array.from(new Set([...activeSprintIds, ...plannedSprintIds])).sort(
+      (left, right) => sprintIndex.get(left)! - sprintIndex.get(right)!
+    );
 
-    const startIndex = activeSprintIds.length > 0 ? sprintIndex.get(activeSprintIds[0])! : null;
+    const startIndex = visibleSprintIds.length > 0 ? sprintIndex.get(visibleSprintIds[0])! : null;
     const endIndex =
-      activeSprintIds.length > 0 ? sprintIndex.get(activeSprintIds[activeSprintIds.length - 1])! : null;
-    const activeIndexSet = new Set(activeSprintIds.map((id) => sprintIndex.get(id)!));
+      visibleSprintIds.length > 0 ? sprintIndex.get(visibleSprintIds[visibleSprintIds.length - 1])! : null;
+    const visibleIndexSet = new Set(visibleSprintIds.map((id) => sprintIndex.get(id)!));
     const inactiveGaps =
       startIndex === null || endIndex === null
         ? []
         : Array.from({ length: endIndex - startIndex + 1 }, (_, offset) => startIndex + offset).filter(
-            (index) => !activeIndexSet.has(index)
+            (index) => !visibleIndexSet.has(index)
           );
     const summary = calculateFeatureSummary(feature.stories);
 
@@ -130,9 +146,12 @@ export async function buildTimelineData(releaseId: string): Promise<TimelineData
       startIndex,
       endIndex,
       activeSprintIds,
+      plannedSprintIds,
       inactiveGaps,
       completionProgress: summary.progressPercentage,
-      isFinished: scopedStories.length > 0 && scopedStories.every((story) => story.status === StoryStatus.DONE)
+      isFinished: scopedStories.length > 0 && scopedStories.every((story) => story.status === StoryStatus.DONE),
+      hasPlanBaseline: allocation.hasPlanBaseline,
+      sprintAllocations: allocation.allocations
     };
   });
 
