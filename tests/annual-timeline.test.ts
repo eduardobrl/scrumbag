@@ -210,9 +210,37 @@ describe("annual timeline data", () => {
       estimatedDays: 7,
       completionPercentage: 50,
       sprintCount: 3,
-      plannedEffortDays: 7
+      plannedEffortDays: 7,
+      overCapacityDays: 0
     });
     expect(summary?.totalCapacityDays).toBeGreaterThan(0);
+  });
+
+  it("includes sprint and release overflow metrics", async () => {
+    const { releaseA, activeFeature } = await seedAnnualData();
+    const sprintJan = await prisma.sprint.findFirstOrThrow({ where: { releaseId: releaseA.id, name: "Sprint Jan" } });
+    await prisma.story.create({
+      data: {
+        featureId: activeFeature.id,
+        currentSprintId: sprintJan.id,
+        title: "Large scope",
+        storyPoints: 13,
+        estimatedDays: 40,
+        status: StoryStatus.SPRINT_BACKLOG
+      }
+    });
+
+    const data = await buildAnnualTimelineData(2026);
+    const sprint = data.sprints.find((item) => item.id === sprintJan.id);
+    const summary = data.summaries.find((item) => item.id === releaseA.id);
+
+    expect(sprint).toMatchObject({
+      plannedEffortDays: 43,
+      netCapacityDays: 10,
+      remainingCapacityDays: -33,
+      overCapacityDays: 33
+    });
+    expect(summary?.overCapacityDays).toBeGreaterThan(0);
   });
 
   it("builds feature spans with inactive sprint gaps", async () => {

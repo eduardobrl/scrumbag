@@ -36,7 +36,7 @@ export function SprintTable({ sprints }: { sprints: DashboardSprintRow[] }) {
               <th className="px-3 py-2">Objetivo</th>
               <th className="px-3 py-2">Capacidade</th>
               <th className="px-3 py-2">Planejado</th>
-              <th className="px-3 py-2">Restante</th>
+              <th className="px-3 py-2">Saldo</th>
               <th className="px-3 py-2">Ocupação</th>
               <th className="px-3 py-2">Progresso</th>
               <th className="px-3 py-2">Status</th>
@@ -54,8 +54,10 @@ export function SprintTable({ sprints }: { sprints: DashboardSprintRow[] }) {
                 <td className="max-w-64 px-3 py-3 text-slate-600">{sprint.goal || "-"}</td>
                 <td className="px-3 py-3 text-slate-600">{sprint.netCapacityDays.toFixed(1)}d</td>
                 <td className="px-3 py-3 text-slate-600">{sprint.plannedEffortDays.toFixed(1)}d</td>
-                <td className={sprint.remainingCapacityDays < 0 ? "px-3 py-3 text-red-700" : "px-3 py-3 text-slate-600"}>
-                  {sprint.remainingCapacityDays.toFixed(1)}d
+                <td className={sprint.overCapacityDays > 0 ? "px-3 py-3 font-medium text-red-700" : "px-3 py-3 text-emerald-700"}>
+                  {sprint.overCapacityDays > 0
+                    ? `Estouro ${sprint.overCapacityDays.toFixed(1)}d`
+                    : `Sobra ${Math.max(0, sprint.remainingCapacityDays).toFixed(1)}d`}
                 </td>
                 <td className="px-3 py-3">
                   <Badge tone={occupancyTone(sprint.occupancyPercentage)}>

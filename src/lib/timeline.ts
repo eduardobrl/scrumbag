@@ -1,4 +1,5 @@
 import { FeatureLifecycleStatus, SprintStatus, StoryStatus } from "@prisma/client";
+import { calculateSprintCapacity } from "@/lib/capacity";
 import { calculateFeatureSummary } from "@/lib/features";
 import { countBusinessDaysInRange } from "@/lib/date-utils";
 import { prisma } from "@/lib/db";
@@ -14,6 +15,10 @@ export type TimelineSprint = {
   endDate: string;
   status: string;
   isFinished: boolean;
+  netCapacityDays: number;
+  plannedEffortDays: number;
+  remainingCapacityDays: number;
+  overCapacityDays: number;
 };
 
 export type TimelineFeature = {
@@ -62,7 +67,13 @@ export async function buildTimelineData(releaseId: string): Promise<TimelineData
   const [sprints, features, leakage, impediments, estimateBaseline] = await Promise.all([
     prisma.sprint.findMany({
       where: { releaseId },
-      orderBy: { startDate: "asc" }
+      orderBy: { startDate: "asc" },
+      include: {
+        stories: {
+          where: { status: { not: StoryStatus.CANCELLED } },
+          select: { estimatedDays: true }
+        }
+      }
     }),
     prisma.feature.findMany({
       where: { releaseId, lifecycleStatus: FeatureLifecycleStatus.ACTIVE },
@@ -103,14 +114,25 @@ export async function buildTimelineData(releaseId: string): Promise<TimelineData
 
   const sprintIndex = new Map(sprints.map((sprint, index) => [sprint.id, index]));
   const sprintIds = sprints.map((sprint) => sprint.id);
-  const timelineSprints = sprints.map((sprint) => ({
-    id: sprint.id,
-    name: sprint.name,
-    startDate: dateOnly(sprint.startDate),
-    endDate: dateOnly(sprint.endDate),
-    status: sprint.status,
-    isFinished: sprint.status === SprintStatus.CLOSED
-  }));
+  const sprintCapacities = await Promise.all(sprints.map((sprint) => calculateSprintCapacity(sprint.id)));
+  const timelineSprints = sprints.map((sprint, index) => {
+    const netCapacityDays = round(sprintCapacities[index].netCapacityDays);
+    const plannedEffortDays = round(sprint.stories.reduce((sum, story) => sum + (story.estimatedDays ?? 0), 0));
+    const remainingCapacityDays = round(netCapacityDays - plannedEffortDays);
+
+    return {
+      id: sprint.id,
+      name: sprint.name,
+      startDate: dateOnly(sprint.startDate),
+      endDate: dateOnly(sprint.endDate),
+      status: sprint.status,
+      isFinished: sprint.status === SprintStatus.CLOSED,
+      netCapacityDays,
+      plannedEffortDays,
+      remainingCapacityDays,
+      overCapacityDays: round(Math.max(0, plannedEffortDays - netCapacityDays))
+    };
+  });
 
   const timelineFeatures = features.map((feature) => {
     const scopedStories = feature.stories.filter((story) => story.status !== StoryStatus.CANCELLED);
@@ -196,4 +218,8 @@ export async function buildTimelineData(releaseId: string): Promise<TimelineData
     leakedSprints: leakage.map((item) => item.originSprintId),
     impediments: timelineImpediments
   };
+}
+
+function round(value: number): number {
+  return Math.round(value * 10) / 10;
 }

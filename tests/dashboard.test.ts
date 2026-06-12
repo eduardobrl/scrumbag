@@ -176,6 +176,8 @@ describe("dashboard aggregation and alerts", () => {
 
     expect(data.totalCapacityDays).toBeGreaterThan(0);
     expect(data.plannedEffortDays).toBe(5);
+    expect(data.overCapacityDays).toBe(0);
+    expect(data.sprints.every((sprint) => sprint.overCapacityDays === 0)).toBe(true);
     expect(data.risk).toBe("On track");
   });
 
@@ -192,10 +194,14 @@ describe("dashboard aggregation and alerts", () => {
     });
 
     const alerts = await detectAlerts(release.id);
+    const dashboard = await getDashboardData(release.id);
+
     expect(alerts.some((alert) => alert.type === "SPRINT_OVER_CAPACITY")).toBe(true);
     expect(alerts.some((alert) => alert.type === "LEAKED_STORIES")).toBe(true);
     expect(alerts.some((alert) => alert.type === "FEATURE_WITHOUT_STORIES")).toBe(true);
     expect(alerts.some((alert) => alert.type === "STORY_WITHOUT_ESTIMATE")).toBe(true);
+    expect(dashboard.overCapacityDays).toBeGreaterThan(0);
+    expect(dashboard.sprints.find((sprint) => sprint.id === sprint2.id)?.overCapacityDays).toBeGreaterThan(0);
   });
 });
 
@@ -228,6 +234,12 @@ describe("timeline", () => {
     expect(row?.inactiveGaps).toContain(1);
     expect(row?.hasPlanBaseline).toBe(true);
     expect(sprint1Allocation).toMatchObject({ plannedPercentage: 100, actualPercentage: 60 });
+    expect(timeline.sprints[0]).toMatchObject({
+      netCapacityDays: 5,
+      plannedEffortDays: 3,
+      remainingCapacityDays: 2,
+      overCapacityDays: 0
+    });
     expect(timeline.sprints[0].isFinished).toBe(true);
     expect(timeline.leakedSprints).toContain(sprint1.id);
   });

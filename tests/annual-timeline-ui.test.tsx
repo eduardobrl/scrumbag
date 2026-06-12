@@ -27,6 +27,11 @@ const labels: AnnualTimelineLabels = {
   completion: "Conclusão",
   sprints: "Sprints",
   remainingCapacity: "Capacidade restante",
+  overCapacity: "Estouro",
+  surplus: "Sobra",
+  releaseOverflow: "Estouro da release",
+  sprintOverflow: "Estouro da sprint",
+  capacity: "Capacidade",
   noReleases: "Nenhuma release encontrada para este ano.",
   noFeatures: "Nenhuma feature nesta release",
   orphanFeatures: "Features órfãs",
@@ -61,7 +66,11 @@ const data: AnnualTimelineData = {
     shortLabel: `S${index === 3 ? 1 : index + 1}`,
     startDate,
     endDate,
-    status: "PLANNED"
+    status: "PLANNED",
+    netCapacityDays: 10,
+    plannedEffortDays: index === 0 ? 16 : index === 1 ? 2 : index === 2 ? 3 : 6,
+    remainingCapacityDays: index === 0 ? -6 : index === 1 ? 8 : index === 2 ? 7 : 4,
+    overCapacityDays: index === 0 ? 6 : 0
   })),
   releaseBands: [
     {
@@ -99,7 +108,8 @@ const data: AnnualTimelineData = {
       sprintCount: 2,
       totalCapacityDays: 40,
       plannedEffortDays: 10,
-      remainingCapacityDays: 30
+      remainingCapacityDays: 30,
+      overCapacityDays: 0
     },
     {
       id: "release-2",
@@ -114,7 +124,8 @@ const data: AnnualTimelineData = {
       sprintCount: 1,
       totalCapacityDays: 20,
       plannedEffortDays: 6,
-      remainingCapacityDays: 14
+      remainingCapacityDays: 14,
+      overCapacityDays: 0
     }
   ],
   orphanFeatures: [
@@ -271,6 +282,15 @@ describe("annual timeline UI", () => {
     expect(html).toContain("Release Beta");
     expect(html).toContain("12.0d");
     expect(html).toContain("14.0d");
+    expect(html).toContain("Estouro da release");
+    expect(html).toContain("Sobra 30.0d");
+  });
+
+  it("renders sprint overflow in timeline headers", () => {
+    const html = renderAnnualTimeline();
+
+    expect(html).toContain("Capacidade 10.0d");
+    expect(html).toContain("Estouro 6.0d");
   });
 
   it("renders feature links and status styles", () => {

@@ -15,6 +15,7 @@ export type DashboardSprintRow = {
   netCapacityDays: number;
   plannedEffortDays: number;
   remainingCapacityDays: number;
+  overCapacityDays: number;
   occupancyPercentage: number;
   progressPercentage: number;
   overCapacity: boolean;
@@ -33,6 +34,7 @@ export type DashboardData = {
   totalCapacityDays: number;
   plannedEffortDays: number;
   remainingCapacityDays: number;
+  overCapacityDays: number;
   risk: "On track" | "Over capacity";
   featureCount: number;
   storyCount: number;
@@ -69,6 +71,7 @@ export async function getSprintDashboardRows(releaseId: string): Promise<Dashboa
       ]);
       const plannedEffortDays = sprint.stories.reduce((sum, story) => sum + (story.estimatedDays ?? 0), 0);
       const remainingCapacityDays = capacity.netCapacityDays - plannedEffortDays;
+      const overCapacityDays = Math.max(0, plannedEffortDays - capacity.netCapacityDays);
       const occupancyPercentage =
         capacity.netCapacityDays > 0 ? (plannedEffortDays / capacity.netCapacityDays) * 100 : 0;
 
@@ -87,6 +90,7 @@ export async function getSprintDashboardRows(releaseId: string): Promise<Dashboa
         netCapacityDays: round(capacity.netCapacityDays),
         plannedEffortDays: round(plannedEffortDays),
         remainingCapacityDays: round(remainingCapacityDays),
+        overCapacityDays: round(overCapacityDays),
         occupancyPercentage: round(occupancyPercentage),
         progressPercentage: round(progress * 100),
         overCapacity: plannedEffortDays > capacity.netCapacityDays
@@ -123,6 +127,7 @@ export async function getDashboardData(releaseId: string): Promise<DashboardData
 
   const totalCapacityDays = round(sprints.reduce((sum, sprint) => sum + sprint.netCapacityDays, 0));
   const plannedEffortDays = round(sprints.reduce((sum, sprint) => sum + sprint.plannedEffortDays, 0));
+  const overCapacityDays = round(Math.max(0, plannedEffortDays - totalCapacityDays));
 
   return {
     release: {
@@ -137,6 +142,7 @@ export async function getDashboardData(releaseId: string): Promise<DashboardData
     totalCapacityDays,
     plannedEffortDays,
     remainingCapacityDays: round(totalCapacityDays - plannedEffortDays),
+    overCapacityDays,
     risk: plannedEffortDays > totalCapacityDays ? "Over capacity" : "On track",
     featureCount,
     storyCount: stories.length,

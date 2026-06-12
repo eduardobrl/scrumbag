@@ -30,6 +30,11 @@ const labels: AnnualTimelineLabels = {
   completion: "Conclusão",
   sprints: "Sprints",
   remainingCapacity: "Capacidade restante",
+  overCapacity: "Estouro",
+  surplus: "Sobra",
+  releaseOverflow: "Estouro da release",
+  sprintOverflow: "Estouro da sprint",
+  capacity: "Capacidade",
   noReleases: "Nenhuma release encontrada para este ano.",
   noFeatures: "Nenhuma feature nesta release",
   orphanFeatures: "Features órfãs",
@@ -63,7 +68,11 @@ const data: AnnualTimelineData = {
     shortLabel: index === 2 ? "S1" : `S${index + 1}`,
     startDate,
     endDate,
-    status: "PLANNED"
+    status: "PLANNED",
+    netCapacityDays: 10,
+    plannedEffortDays: 1,
+    remainingCapacityDays: 9,
+    overCapacityDays: 0
   })),
   releaseBands: [
     {
@@ -101,7 +110,8 @@ const data: AnnualTimelineData = {
       sprintCount: 1,
       totalCapacityDays: 10,
       plannedEffortDays: 2,
-      remainingCapacityDays: 8
+      remainingCapacityDays: 8,
+      overCapacityDays: 0
     },
     {
       id: "release-b",
@@ -116,7 +126,8 @@ const data: AnnualTimelineData = {
       sprintCount: 0,
       totalCapacityDays: 0,
       plannedEffortDays: 0,
-      remainingCapacityDays: 0
+      remainingCapacityDays: 0,
+      overCapacityDays: 0
     }
   ],
   orphanFeatures: [

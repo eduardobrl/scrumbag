@@ -5,6 +5,7 @@ import {
   type FeatureAllocationBaselineItem,
   type FeatureSprintAllocation
 } from "@/lib/feature-sprint-allocation";
+import { calculateSprintCapacity } from "@/lib/capacity";
 import { getDashboardData } from "@/lib/dashboard";
 import { prisma } from "@/lib/db";
 
@@ -18,6 +19,10 @@ export type AnnualTimelineSprint = {
   startDate: string;
   endDate: string;
   status: string;
+  netCapacityDays: number;
+  plannedEffortDays: number;
+  remainingCapacityDays: number;
+  overCapacityDays: number;
 };
 
 export type AnnualTimelineReleaseBand = {
@@ -45,6 +50,7 @@ export type AnnualReleaseSummary = {
   totalCapacityDays: number;
   plannedEffortDays: number;
   remainingCapacityDays: number;
+  overCapacityDays: number;
 };
 
 export type AnnualTimelineFeatureStatus = "ACTIVE" | "FINISHED" | "CANCELLED";
@@ -144,7 +150,8 @@ async function buildReleaseSummary(releaseId: string): Promise<AnnualReleaseSumm
     sprintCount: data.sprints.length,
     totalCapacityDays: data.totalCapacityDays,
     plannedEffortDays: data.plannedEffortDays,
-    remainingCapacityDays: data.remainingCapacityDays
+    remainingCapacityDays: data.remainingCapacityDays,
+    overCapacityDays: data.overCapacityDays
   };
 }
 
@@ -295,7 +302,15 @@ export async function buildAnnualTimelineData(year: number): Promise<AnnualTimel
       endDate: { gte: yearStart(selectedYear) }
     },
     include: {
-      sprints: { orderBy: { startDate: "asc" } }
+      sprints: {
+        orderBy: { startDate: "asc" },
+        include: {
+          stories: {
+            where: { status: { not: StoryStatus.CANCELLED } },
+            select: { estimatedDays: true }
+          }
+        }
+      }
     },
     orderBy: { startDate: "asc" }
   });
@@ -307,17 +322,28 @@ export async function buildAnnualTimelineData(year: number): Promise<AnnualTimel
       releaseSprintIndex
     }))
   );
-  const timelineSprints: AnnualTimelineSprint[] = sprints.map(({ source, release, releaseSprintIndex }, index) => ({
-    index,
-    id: source.id,
-    releaseId: release.id,
-    name: source.name,
-    label: source.name,
-    shortLabel: sprintShortLabel(source.name, releaseSprintIndex),
-    startDate: dateOnly(source.startDate),
-    endDate: dateOnly(source.endDate),
-    status: source.status
-  }));
+  const sprintCapacities = await Promise.all(sprints.map(({ source }) => calculateSprintCapacity(source.id)));
+  const timelineSprints: AnnualTimelineSprint[] = sprints.map(({ source, release, releaseSprintIndex }, index) => {
+    const netCapacityDays = round(sprintCapacities[index].netCapacityDays);
+    const plannedEffortDays = round(source.stories.reduce((sum, story) => sum + (story.estimatedDays ?? 0), 0));
+    const remainingCapacityDays = round(netCapacityDays - plannedEffortDays);
+
+    return {
+      index,
+      id: source.id,
+      releaseId: release.id,
+      name: source.name,
+      label: source.name,
+      shortLabel: sprintShortLabel(source.name, releaseSprintIndex),
+      startDate: dateOnly(source.startDate),
+      endDate: dateOnly(source.endDate),
+      status: source.status,
+      netCapacityDays,
+      plannedEffortDays,
+      remainingCapacityDays,
+      overCapacityDays: round(Math.max(0, plannedEffortDays - netCapacityDays))
+    };
+  });
   const sprintIndexById = new Map(timelineSprints.map((sprint) => [sprint.id, sprint.index]));
   const releaseBands: AnnualTimelineReleaseBand[] = releases.flatMap((release) => {
     const indexes = release.sprints

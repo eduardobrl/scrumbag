@@ -12,6 +12,10 @@ type Metric = {
 };
 
 export function DashboardCards({ data }: { data: DashboardData }) {
+  const releaseCapacityHelper =
+    data.overCapacityDays > 0
+      ? `Estouro da release: ${data.overCapacityDays.toFixed(1)}d`
+      : `Sobra da release: ${Math.max(0, data.remainingCapacityDays).toFixed(1)}d`;
   const metrics: Metric[] = [
     {
       label: "Progresso",
@@ -25,7 +29,7 @@ export function DashboardCards({ data }: { data: DashboardData }) {
     {
       label: "Risco",
       value: data.risk === "Over capacity" ? "Acima da capacidade" : "No prazo",
-      helper: `${data.remainingCapacityDays.toFixed(1)}d restantes`,
+      helper: releaseCapacityHelper,
       icon: AlertTriangle,
       tone: data.risk === "Over capacity" ? "danger" : "success"
     },

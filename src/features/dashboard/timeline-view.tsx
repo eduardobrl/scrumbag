@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CheckCircle2, CircleAlert, Flag } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { TimelineData } from "@/lib/timeline";
 import { countBusinessDaysInRange } from "@/lib/date-utils";
@@ -13,35 +14,29 @@ export function TimelineView({ data }: { data: TimelineData }) {
           <p className="mt-1 text-sm text-slate-600">Features distribuídas nas sprints planejadas</p>
         </div>
         <div className="flex flex-wrap gap-3 text-xs text-slate-600">
-          <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded bg-accent" /> Intervalo da feature</span>
-          <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded border border-slate-300 bg-white" /> Intervalo inativo</span>
-          <span className="inline-flex items-center gap-1"><span className="h-2 w-5 rounded bg-rose-600" /> Impedimento</span>
-          <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-rose-700" aria-hidden /> Impedimento resolvido</span>
-          <span className="inline-flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-emerald-700" aria-hidden /> Sprint finalizada</span>
-          <span className="inline-flex items-center gap-1"><Flag className="h-3 w-3 text-amber-700" aria-hidden /> Sprint com vazamento</span>
+          <Legend swatch="bg-accent" label="Intervalo da feature" />
+          <Legend swatch="border border-slate-300 bg-white" label="Intervalo inativo" />
+          <Legend swatch="bg-rose-600" label="Impedimento" />
+          <span className="inline-flex items-center gap-1">
+            <CheckCircle2 className="h-3 w-3 text-rose-700" aria-hidden /> Impedimento resolvido
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <CheckCircle2 className="h-3 w-3 text-emerald-700" aria-hidden /> Sprint finalizada
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <Flag className="h-3 w-3 text-amber-700" aria-hidden /> Sprint com vazamento
+          </span>
         </div>
       </div>
 
       <div className="mt-4 overflow-x-auto">
         <div
           className="grid min-w-[860px] gap-1 text-sm"
-          style={{ gridTemplateColumns: `220px repeat(${Math.max(data.sprints.length, 1)}, minmax(96px, 1fr))` }}
+          style={{ gridTemplateColumns: `220px repeat(${Math.max(data.sprints.length, 1)}, minmax(112px, 1fr))` }}
         >
           <div />
           {data.sprints.map((sprint) => (
-            <div key={sprint.id} className="rounded-md border border-line bg-slate-50 p-2 text-xs font-medium text-slate-700">
-              <div className="flex items-center gap-1">
-                <span>{sprint.name}</span>
-                {sprint.isFinished ? <CheckCircle2 className="h-3 w-3 text-emerald-700" aria-label="Sprint finalizada" /> : null}
-                {data.leakedSprints.includes(sprint.id) ? <Flag className="h-3 w-3 text-amber-700" aria-label="Sprint com vazamento" /> : null}
-              </div>
-              <div className="mt-1 text-[11px] font-normal text-slate-500">
-                {sprint.startDate} - {sprint.endDate}
-              </div>
-              <div className="text-[11px] font-normal text-slate-500">
-                {countBusinessDaysInRange(sprint.startDate, sprint.endDate)} dias úteis
-              </div>
-            </div>
+            <SprintHeader key={sprint.id} sprint={sprint} leaked={data.leakedSprints.includes(sprint.id)} />
           ))}
 
           {data.features.map((feature) => (
@@ -59,6 +54,41 @@ export function TimelineView({ data }: { data: TimelineData }) {
         </div>
       </div>
     </Card>
+  );
+}
+
+function Legend({ swatch, label }: { swatch: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className={`h-2 w-5 rounded ${swatch}`} />
+      {label}
+    </span>
+  );
+}
+
+function SprintHeader({ sprint, leaked }: { sprint: TimelineData["sprints"][number]; leaked: boolean }) {
+  const overCapacity = sprint.overCapacityDays > 0;
+  const balanceLabel = overCapacity
+    ? `Estouro ${sprint.overCapacityDays.toFixed(1)}d`
+    : `Sobra ${Math.max(0, sprint.remainingCapacityDays).toFixed(1)}d`;
+
+  return (
+    <div className="rounded-md border border-line bg-slate-50 p-2 text-xs font-medium text-slate-700">
+      <div className="flex items-center gap-1">
+        <span>{sprint.name}</span>
+        {sprint.isFinished ? <CheckCircle2 className="h-3 w-3 text-emerald-700" aria-label="Sprint finalizada" /> : null}
+        {leaked ? <Flag className="h-3 w-3 text-amber-700" aria-label="Sprint com vazamento" /> : null}
+      </div>
+      <div className="mt-1 text-[11px] font-normal text-slate-500">
+        {sprint.startDate} - {sprint.endDate}
+      </div>
+      <div className="mt-1 space-y-1 text-[11px] font-normal text-slate-600">
+        <div>{countBusinessDaysInRange(sprint.startDate, sprint.endDate)} dias úteis</div>
+        <div>Cap. {sprint.netCapacityDays.toFixed(1)}d</div>
+        <div>Plan. {sprint.plannedEffortDays.toFixed(1)}d</div>
+        <Badge tone={overCapacity ? "danger" : "success"}>{balanceLabel}</Badge>
+      </div>
+    </div>
   );
 }
 

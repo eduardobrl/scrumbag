@@ -24,6 +24,11 @@ export type AnnualTimelineLabels = {
   completion: string;
   sprints: string;
   remainingCapacity: string;
+  overCapacity: string;
+  surplus: string;
+  releaseOverflow: string;
+  sprintOverflow: string;
+  capacity: string;
   noReleases: string;
   noFeatures: string;
   orphanFeatures: string;
@@ -159,8 +164,9 @@ export function AnnualTimelineView({
   }
 
   const columnCount = Math.max(data.sprints.length, 1);
-  const gridColumns = `220px repeat(${columnCount}, minmax(96px, 1fr))`;
-  const timelineMinWidth = `${220 + columnCount * 104}px`;
+  const gridColumns = `220px repeat(${columnCount}, minmax(128px, 1fr))`;
+  const timelineMinWidth = `${220 + columnCount * 136}px`;
+  const summaryByReleaseId = new Map(data.summaries.map((summary) => [summary.id, summary]));
 
   return (
     <div className="space-y-6">
@@ -182,6 +188,7 @@ export function AnnualTimelineView({
                 <th className="px-3 py-2 font-semibold">{labels.completion}</th>
                 <th className="px-3 py-2 font-semibold">{labels.sprints}</th>
                 <th className="px-3 py-2 font-semibold">{labels.remainingCapacity}</th>
+                <th className="px-3 py-2 font-semibold">{labels.releaseOverflow}</th>
               </tr>
             </thead>
             <tbody>
@@ -205,6 +212,13 @@ export function AnnualTimelineView({
                     )}
                   >
                     {summary.remainingCapacityDays.toFixed(1)}d
+                  </td>
+                  <td className="px-3 py-3">
+                    <CapacityBalanceBadge
+                      overCapacityDays={summary.overCapacityDays}
+                      remainingCapacityDays={summary.remainingCapacityDays}
+                      labels={labels}
+                    />
                   </td>
                 </tr>
               ))}
@@ -235,18 +249,29 @@ export function AnnualTimelineView({
                 style={{ gridTemplateColumns: gridColumns }}
               >
                 <div />
-                {data.releaseBands.map((release) => (
-                  <div
-                    key={release.releaseId}
-                    className="rounded-md border border-line bg-slate-50 px-2 py-1 text-center text-xs font-semibold text-slate-700"
-                    style={{ gridColumn: `span ${release.sprintCount}` }}
-                  >
-                    <span className="block truncate">{release.label}</span>
-                    <span className="block truncate text-[11px] font-normal text-slate-500">
-                      {release.startDate} - {release.endDate}
-                    </span>
-                  </div>
-                ))}
+                {data.releaseBands.map((release) => {
+                  const summary = summaryByReleaseId.get(release.releaseId);
+
+                  return (
+                    <div
+                      key={release.releaseId}
+                      className="rounded-md border border-line bg-slate-50 px-2 py-1 text-center text-xs font-semibold text-slate-700"
+                      style={{ gridColumn: `span ${release.sprintCount}` }}
+                    >
+                      <span className="block truncate">{release.label}</span>
+                      <span className="block truncate text-[11px] font-normal text-slate-500">
+                        {release.startDate} - {release.endDate}
+                      </span>
+                      {summary ? (
+                        <span className={clsx("mt-1 block truncate text-[11px]", summary.overCapacityDays > 0 ? "text-red-700" : "text-emerald-700")}>
+                          {summary.overCapacityDays > 0
+                            ? `${labels.overCapacity} ${summary.overCapacityDays.toFixed(1)}d`
+                            : `${labels.surplus} ${Math.max(0, summary.remainingCapacityDays).toFixed(1)}d`}
+                        </span>
+                      ) : null}
+                    </div>
+                  );
+                })}
                 <div />
                 {data.sprints.map((sprint) => (
                   <div
@@ -257,6 +282,14 @@ export function AnnualTimelineView({
                     <span className="block truncate">{sprint.shortLabel}</span>
                     <span className="block truncate text-[11px] font-normal text-slate-500">
                       {sprint.startDate.slice(5)} - {sprint.endDate.slice(5)}
+                    </span>
+                    <span className="mt-1 block truncate text-[11px] font-normal text-slate-500">
+                      {labels.capacity} {sprint.netCapacityDays.toFixed(1)}d / {labels.planned} {sprint.plannedEffortDays.toFixed(1)}d
+                    </span>
+                    <span className={clsx("mt-1 block truncate text-[11px]", sprint.overCapacityDays > 0 ? "text-red-700" : "text-emerald-700")}>
+                      {sprint.overCapacityDays > 0
+                        ? `${labels.overCapacity} ${sprint.overCapacityDays.toFixed(1)}d`
+                        : `${labels.surplus} ${Math.max(0, sprint.remainingCapacityDays).toFixed(1)}d`}
                     </span>
                   </div>
                 ))}
@@ -371,6 +404,25 @@ function Legend({ swatch, label }: { swatch: string; label: string }) {
   );
 }
 
+function CapacityBalanceBadge({
+  overCapacityDays,
+  remainingCapacityDays,
+  labels
+}: {
+  overCapacityDays: number;
+  remainingCapacityDays: number;
+  labels: AnnualTimelineLabels;
+}) {
+  const overCapacity = overCapacityDays > 0;
+  const value = overCapacity ? overCapacityDays : Math.max(0, remainingCapacityDays);
+
+  return (
+    <Badge tone={overCapacity ? "danger" : "success"}>
+      {overCapacity ? labels.overCapacity : labels.surplus} {value.toFixed(1)}d
+    </Badge>
+  );
+}
+
 function ReleaseSwimlane({
   release,
   labels,
@@ -407,6 +459,11 @@ function ReleaseSwimlane({
           <span className="text-xs text-slate-500">
             {release.startDate} - {release.endDate}
           </span>
+          <CapacityBalanceBadge
+            overCapacityDays={release.summary.overCapacityDays}
+            remainingCapacityDays={release.summary.remainingCapacityDays}
+            labels={labels}
+          />
         </div>
       </div>
       {release.features.length === 0 ? (
