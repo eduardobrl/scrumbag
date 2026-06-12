@@ -17,8 +17,8 @@ vi.mock("next/navigation", () => ({
 vi.stubGlobal("React", React);
 
 const labels: AnnualTimelineLabels = {
-  title: "Timeline anual",
-  subtitle: "Compare releases",
+  title: "Timeline por sprint",
+  subtitle: "Compare releases por sprints",
   comparisonTitle: "Comparação entre releases",
   release: "Release",
   features: "Features",
@@ -45,36 +45,44 @@ const labels: AnnualTimelineLabels = {
 
 const data: AnnualTimelineData = {
   year: 2026,
-  months: [
-    "Jan",
-    "Fev",
-    "Mar",
-    "Abr",
-    "Mai",
-    "Jun",
-    "Jul",
-    "Ago",
-    "Set",
-    "Out",
-    "Nov",
-    "Dez"
-  ].map((label, index) => ({
+  sprints: [
+    ["sprint-a-1", "release-1", "Sprint 1", "2026-01-01", "2026-01-14"],
+    ["sprint-a-2", "release-1", "Sprint 2", "2026-01-15", "2026-01-28"],
+    ["sprint-a-3", "release-1", "Sprint 3", "2026-01-29", "2026-02-11"],
+    ["sprint-b-1", "release-2", "Sprint 1", "2026-07-01", "2026-07-14"]
+  ].map(([id, releaseId, name, startDate, endDate], index) => ({
     index,
-    month: index + 1,
-    year: 2026,
-    label,
-    shortLabel: label,
-    startDate: `2026-${String(index + 1).padStart(2, "0")}-01`,
-    endDate: `2026-${String(index + 1).padStart(2, "0")}-28`,
-    quarter: (Math.floor(index / 3) + 1) as 1 | 2 | 3 | 4
+    id,
+    releaseId,
+    name,
+    label: name,
+    shortLabel: `S${index === 3 ? 1 : index + 1}`,
+    startDate,
+    endDate,
+    status: "PLANNED"
   })),
-  quarters: [1, 2, 3, 4].map((quarter) => ({
-    quarter: quarter as 1 | 2 | 3 | 4,
-    label: `Q${quarter}`,
-    startIndex: (quarter - 1) * 3,
-    endIndex: quarter * 3 - 1,
-    monthCount: 3
-  })),
+  releaseBands: [
+    {
+      releaseId: "release-1",
+      label: "Release Alpha",
+      status: "IN_PROGRESS",
+      startIndex: 0,
+      endIndex: 2,
+      sprintCount: 3,
+      startDate: "2026-01-01",
+      endDate: "2026-03-31"
+    },
+    {
+      releaseId: "release-2",
+      label: "Release Beta",
+      status: "PLANNED",
+      startIndex: 3,
+      endIndex: 3,
+      sprintCount: 1,
+      startDate: "2026-07-01",
+      endDate: "2026-09-30"
+    }
+  ],
   summaries: [
     {
       id: "release-1",
@@ -118,7 +126,7 @@ const data: AnnualTimelineData = {
       completionPercentage: 0,
       startIndex: null,
       endIndex: null,
-      activeMonthIndexes: [],
+      activeSprintIndexes: [],
       inactiveGaps: []
     }
   ],
@@ -141,7 +149,7 @@ const data: AnnualTimelineData = {
           completionPercentage: 40,
           startIndex: 0,
           endIndex: 2,
-          activeMonthIndexes: [0, 2],
+          activeSprintIndexes: [0, 2],
           inactiveGaps: [1]
         },
         {
@@ -154,7 +162,7 @@ const data: AnnualTimelineData = {
           completionPercentage: 100,
           startIndex: 1,
           endIndex: 1,
-          activeMonthIndexes: [1],
+          activeSprintIndexes: [1],
           inactiveGaps: []
         },
         {
@@ -167,7 +175,7 @@ const data: AnnualTimelineData = {
           completionPercentage: 0,
           startIndex: 2,
           endIndex: 2,
-          activeMonthIndexes: [2],
+          activeSprintIndexes: [2],
           inactiveGaps: []
         }
       ]
@@ -196,13 +204,14 @@ function renderAnnualTimeline() {
 }
 
 describe("annual timeline UI", () => {
-  it("renders quarter and month headers", () => {
+  it("renders release and sprint headers", () => {
     const html = renderAnnualTimeline();
 
-    expect(html).toContain("Q1");
-    expect(html).toContain("Q4");
-    expect(html).toContain("Jan");
-    expect(html).toContain("Dez");
+    expect(html).toContain("Release Alpha");
+    expect(html).toContain("Release Beta");
+    expect(html).toContain("S1");
+    expect(html).toContain("S3");
+    expect(html).toContain("01-01 - 01-14");
   });
 
   it("renders cross-release metrics for multiple releases", () => {
@@ -263,7 +272,7 @@ describe("annual timeline UI", () => {
       </NextIntlClientProvider>
     );
 
-    expect(html).toContain("Contexto anual");
+    expect(html).toContain("Contexto da timeline");
     expect(html).toContain("Não filtrado por release");
     expect(html).not.toContain("<select");
   });

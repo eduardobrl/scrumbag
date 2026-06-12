@@ -44,7 +44,7 @@
   },
   "header": {
     "activeRelease": "Release em foco",
-    "annualContext": "Contexto anual",
+    "annualContext": "Contexto da timeline",
     "allReleases": "Selecionar release",
     "capacity": "Capacidade",
     "notFiltered": "Não filtrado por release",
@@ -266,8 +266,8 @@
   "timeline": {
     "active": "Ativa",
     "activeTitle": "{name} ativo",
-    "annualSubtitle": "Compare releases, capacidade e features em uma visão anual independente da release em foco.",
-    "annualTitle": "Timeline anual",
+    "annualSubtitle": "Compare releases, sprints e execução de features em uma visão independente da release em foco.",
+    "annualTitle": "Timeline por sprint",
     "cancelled": "Cancelada",
     "comparisonTitle": "Comparação entre releases",
     "completion": "Conclusão",

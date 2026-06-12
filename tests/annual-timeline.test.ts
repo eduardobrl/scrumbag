@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { FeatureLifecycleStatus, ReleaseStatus, RoleType, SprintStatus, StoryStatus } from "@prisma/client";
 import {
   buildAnnualTimelineData,
-  buildAnnualTimelineMonths,
-  dateToMonthIndex,
   releaseOverlapsYear
 } from "@/lib/annual-timeline";
 import { prisma } from "@/lib/db";
@@ -78,6 +76,15 @@ async function seedAnnualData() {
       startDate: new Date("2026-01-05T00:00:00.000Z"),
       endDate: new Date("2026-01-16T00:00:00.000Z"),
       status: SprintStatus.CLOSED
+    }
+  });
+  await prisma.sprint.create({
+    data: {
+      releaseId: releaseA.id,
+      name: "Sprint Fev",
+      startDate: new Date("2026-02-02T00:00:00.000Z"),
+      endDate: new Date("2026-02-13T00:00:00.000Z"),
+      status: SprintStatus.PLANNED
     }
   });
   const sprintMar = await prisma.sprint.create({
@@ -163,36 +170,8 @@ beforeEach(async () => {
   await resetDb();
 });
 
-describe("annual timeline month grid", () => {
-  it("generates twelve PT-BR month columns grouped by quarters", () => {
-    const { months, quarters } = buildAnnualTimelineMonths(2026);
-
-    expect(months).toHaveLength(12);
-    expect(months.map((month) => month.label)).toEqual([
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez"
-    ]);
-    expect(quarters).toEqual([
-      { quarter: 1, label: "Q1", startIndex: 0, endIndex: 2, monthCount: 3 },
-      { quarter: 2, label: "Q2", startIndex: 3, endIndex: 5, monthCount: 3 },
-      { quarter: 3, label: "Q3", startIndex: 6, endIndex: 8, monthCount: 3 },
-      { quarter: 4, label: "Q4", startIndex: 9, endIndex: 11, monthCount: 3 }
-    ]);
-  });
-
-  it("maps dates and release overlaps to the selected year", () => {
-    expect(dateToMonthIndex(new Date("2026-07-01T00:00:00.000Z"), 2026)).toBe(6);
-    expect(dateToMonthIndex(new Date("2027-01-01T00:00:00.000Z"), 2026)).toBeNull();
+describe("annual timeline sprint grid", () => {
+  it("checks release overlaps against the selected year", () => {
     expect(
       releaseOverlapsYear(
         {
@@ -212,7 +191,10 @@ describe("annual timeline data", () => {
     const data = await buildAnnualTimelineData(2026);
 
     expect(data.releases.map((release) => release.name)).toEqual(["Release A", "Release B"]);
-    expect(data.months).toHaveLength(12);
+    expect(data.sprints.map((sprint) => sprint.name)).toEqual(["Sprint Jan", "Sprint Fev", "Sprint Mar", "Sprint Jul"]);
+    expect(data.releaseBands.map((release) => release.label)).toEqual(["Release A", "Release B"]);
+    expect(data.releaseBands[0]).toMatchObject({ startIndex: 0, endIndex: 2, sprintCount: 3 });
+    expect(data.releaseBands[1]).toMatchObject({ startIndex: 3, endIndex: 3, sprintCount: 1 });
   });
 
   it("builds cross-release summary metrics", async () => {
@@ -227,13 +209,13 @@ describe("annual timeline data", () => {
       storyCount: 3,
       estimatedDays: 7,
       completionPercentage: 50,
-      sprintCount: 2,
+      sprintCount: 3,
       plannedEffortDays: 7
     });
     expect(summary?.totalCapacityDays).toBeGreaterThan(0);
   });
 
-  it("builds feature spans with inactive month gaps", async () => {
+  it("builds feature spans with inactive sprint gaps", async () => {
     const { activeFeature } = await seedAnnualData();
 
     const data = await buildAnnualTimelineData(2026);
@@ -241,7 +223,7 @@ describe("annual timeline data", () => {
 
     expect(feature?.startIndex).toBe(0);
     expect(feature?.endIndex).toBe(2);
-    expect(feature?.activeMonthIndexes).toEqual([0, 2]);
+    expect(feature?.activeSprintIndexes).toEqual([0, 2]);
     expect(feature?.inactiveGaps).toEqual([1]);
   });
 

@@ -44,7 +44,7 @@
   },
   "header": {
     "activeRelease": "Focused release",
-    "annualContext": "Annual context",
+    "annualContext": "Timeline context",
     "allReleases": "Select release",
     "capacity": "Capacity",
     "notFiltered": "Not filtered by release",
@@ -266,8 +266,8 @@
   "timeline": {
     "active": "Active",
     "activeTitle": "{name} active",
-    "annualSubtitle": "Compare releases, capacity, and features in an annual view independent from the focused release.",
-    "annualTitle": "Annual timeline",
+    "annualSubtitle": "Compare releases, sprints, and feature execution in a view independent from the focused release.",
+    "annualTitle": "Sprint timeline",
     "cancelled": "Cancelled",
     "comparisonTitle": "Cross-release comparison",
     "completion": "Completion",

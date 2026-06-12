@@ -20,8 +20,8 @@ vi.mock("next/navigation", () => ({
 vi.stubGlobal("React", React);
 
 const labels: AnnualTimelineLabels = {
-  title: "Timeline anual",
-  subtitle: "Compare releases",
+  title: "Timeline por sprint",
+  subtitle: "Compare releases por sprints",
   comparisonTitle: "Comparação entre releases",
   release: "Release",
   features: "Features",
@@ -48,23 +48,43 @@ const labels: AnnualTimelineLabels = {
 
 const data: AnnualTimelineData = {
   year: 2026,
-  months: Array.from({ length: 12 }, (_, index) => ({
+  sprints: [
+    ["sprint-a-1", "release-a", "Sprint 1", "2026-01-01", "2026-01-14"],
+    ["sprint-a-2", "release-a", "Sprint 2", "2026-01-15", "2026-01-28"],
+    ["sprint-b-1", "release-b", "Sprint 1", "2026-07-01", "2026-07-14"]
+  ].map(([id, releaseId, name, startDate, endDate], index) => ({
     index,
-    month: index + 1,
-    year: 2026,
-    label: `M${index + 1}`,
-    shortLabel: `M${index + 1}`,
-    startDate: "2026-01-01",
-    endDate: "2026-01-28",
-    quarter: (Math.floor(index / 3) + 1) as 1 | 2 | 3 | 4
+    id,
+    releaseId,
+    name,
+    label: name,
+    shortLabel: index === 2 ? "S1" : `S${index + 1}`,
+    startDate,
+    endDate,
+    status: "PLANNED"
   })),
-  quarters: [1, 2, 3, 4].map((quarter) => ({
-    quarter: quarter as 1 | 2 | 3 | 4,
-    label: `Q${quarter}`,
-    startIndex: (quarter - 1) * 3,
-    endIndex: quarter * 3 - 1,
-    monthCount: 3
-  })),
+  releaseBands: [
+    {
+      releaseId: "release-a",
+      label: "Release A",
+      status: "IN_PROGRESS",
+      startIndex: 0,
+      endIndex: 1,
+      sprintCount: 2,
+      startDate: "2026-01-01",
+      endDate: "2026-03-31"
+    },
+    {
+      releaseId: "release-b",
+      label: "Release B",
+      status: "PLANNED",
+      startIndex: 2,
+      endIndex: 2,
+      sprintCount: 1,
+      startDate: "2026-07-01",
+      endDate: "2026-09-30"
+    }
+  ],
   summaries: [
     {
       id: "release-a",
@@ -108,7 +128,7 @@ const data: AnnualTimelineData = {
       completionPercentage: 0,
       startIndex: null,
       endIndex: null,
-      activeMonthIndexes: [],
+      activeSprintIndexes: [],
       inactiveGaps: []
     }
   ],
@@ -134,7 +154,7 @@ data.releases = [
         completionPercentage: 0,
         startIndex: 0,
         endIndex: 1,
-        activeMonthIndexes: [0, 1],
+        activeSprintIndexes: [0, 1],
         inactiveGaps: []
       }
     ]

@@ -3,23 +3,27 @@ import { calculateFeatureSummary } from "@/lib/features";
 import { getDashboardData } from "@/lib/dashboard";
 import { prisma } from "@/lib/db";
 
-export type AnnualTimelineMonth = {
+export type AnnualTimelineSprint = {
   index: number;
-  month: number;
-  year: number;
+  id: string;
+  releaseId: string;
+  name: string;
   label: string;
   shortLabel: string;
   startDate: string;
   endDate: string;
-  quarter: 1 | 2 | 3 | 4;
+  status: string;
 };
 
-export type AnnualTimelineQuarter = {
-  quarter: 1 | 2 | 3 | 4;
+export type AnnualTimelineReleaseBand = {
+  releaseId: string;
   label: string;
+  status: string;
   startIndex: number;
   endIndex: number;
-  monthCount: number;
+  sprintCount: number;
+  startDate: string;
+  endDate: string;
 };
 
 export type AnnualReleaseSummary = {
@@ -50,7 +54,7 @@ export type AnnualTimelineFeature = {
   completionPercentage: number;
   startIndex: number | null;
   endIndex: number | null;
-  activeMonthIndexes: number[];
+  activeSprintIndexes: number[];
   inactiveGaps: number[];
 };
 
@@ -66,14 +70,12 @@ export type AnnualTimelineRelease = {
 
 export type AnnualTimelineData = {
   year: number;
-  months: AnnualTimelineMonth[];
-  quarters: AnnualTimelineQuarter[];
+  sprints: AnnualTimelineSprint[];
+  releaseBands: AnnualTimelineReleaseBand[];
   releases: AnnualTimelineRelease[];
   orphanFeatures: AnnualTimelineFeature[];
   summaries: AnnualReleaseSummary[];
 };
-
-const MONTH_LABELS_PT = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
 function dateOnly(date: Date): string {
   return date.toISOString().slice(0, 10);
@@ -81,14 +83,6 @@ function dateOnly(date: Date): string {
 
 function round(value: number): number {
   return Math.round(value * 10) / 10;
-}
-
-function monthStart(year: number, monthIndex: number): Date {
-  return new Date(Date.UTC(year, monthIndex, 1));
-}
-
-function monthEnd(year: number, monthIndex: number): Date {
-  return new Date(Date.UTC(year, monthIndex + 1, 0));
 }
 
 function yearStart(year: number): Date {
@@ -99,36 +93,6 @@ function yearEnd(year: number): Date {
   return new Date(Date.UTC(year, 11, 31));
 }
 
-export function buildAnnualTimelineMonths(year: number): {
-  months: AnnualTimelineMonth[];
-  quarters: AnnualTimelineQuarter[];
-} {
-  const months = Array.from({ length: 12 }, (_, index) => {
-    const quarter = (Math.floor(index / 3) + 1) as 1 | 2 | 3 | 4;
-
-    return {
-      index,
-      month: index + 1,
-      year,
-      label: MONTH_LABELS_PT[index],
-      shortLabel: MONTH_LABELS_PT[index],
-      startDate: dateOnly(monthStart(year, index)),
-      endDate: dateOnly(monthEnd(year, index)),
-      quarter
-    };
-  });
-
-  const quarters = [1, 2, 3, 4].map((quarter) => ({
-    quarter: quarter as 1 | 2 | 3 | 4,
-    label: `Q${quarter}`,
-    startIndex: (quarter - 1) * 3,
-    endIndex: quarter * 3 - 1,
-    monthCount: 3
-  }));
-
-  return { months, quarters };
-}
-
 export function releaseOverlapsYear(
   release: { startDate: Date; endDate: Date },
   year: number
@@ -136,12 +100,11 @@ export function releaseOverlapsYear(
   return release.startDate <= yearEnd(year) && release.endDate >= yearStart(year);
 }
 
-export function dateToMonthIndex(date: Date, year: number): number | null {
-  if (date < yearStart(year) || date > yearEnd(year)) {
-    return null;
-  }
+function sprintShortLabel(name: string, index: number): string {
+  const trimmed = name.trim();
+  const numericSuffix = trimmed.match(/(\d+)$/)?.[1];
 
-  return date.getUTCMonth();
+  return numericSuffix ? `S${numericSuffix}` : `S${index + 1}`;
 }
 
 async function buildReleaseSummary(releaseId: string): Promise<AnnualReleaseSummary> {
@@ -189,12 +152,13 @@ function deriveFeatureStatus(feature: {
   return "ACTIVE";
 }
 
-function deriveFeatureMonthIndexes(
+function deriveFeatureSprintIndexes(
   stories: Array<{
     status: StoryStatus;
-    currentSprint: { startDate: Date; endDate: Date } | null;
+    currentSprintId?: string | null;
+    currentSprint: { id: string } | null;
   }>,
-  year: number
+  sprintIndexById: Map<string, number>
 ): number[] {
   const indexes = new Set<number>();
 
@@ -203,27 +167,19 @@ function deriveFeatureMonthIndexes(
       continue;
     }
 
-    const start = Math.max(story.currentSprint.startDate.getUTCMonth(), 0);
-    const end = Math.min(story.currentSprint.endDate.getUTCMonth(), 11);
-    const storyStartYear = story.currentSprint.startDate.getUTCFullYear();
-    const storyEndYear = story.currentSprint.endDate.getUTCFullYear();
-
-    if (storyEndYear < year || storyStartYear > year) {
-      continue;
-    }
-
-    const startIndex = storyStartYear < year ? 0 : start;
-    const endIndex = storyEndYear > year ? 11 : end;
-
-    for (let index = startIndex; index <= endIndex; index += 1) {
-      indexes.add(index);
+    const sprintIndex = sprintIndexById.get(story.currentSprint.id);
+    if (sprintIndex !== undefined) {
+      indexes.add(sprintIndex);
     }
   }
 
   return Array.from(indexes).sort((left, right) => left - right);
 }
 
-async function buildReleaseFeatures(releaseId: string, year: number): Promise<AnnualTimelineFeature[]> {
+async function buildReleaseFeatures(
+  releaseId: string,
+  sprintIndexById: Map<string, number>
+): Promise<AnnualTimelineFeature[]> {
   const features = await prisma.feature.findMany({
     where: { releaseId },
     include: {
@@ -235,10 +191,10 @@ async function buildReleaseFeatures(releaseId: string, year: number): Promise<An
     orderBy: [{ lifecycleStatus: "asc" }, { createdAt: "asc" }]
   });
 
-  return features.map((feature) => toAnnualTimelineFeature(feature, year));
+  return features.map((feature) => toAnnualTimelineFeature(feature, sprintIndexById));
 }
 
-async function buildOrphanFeatures(year: number): Promise<AnnualTimelineFeature[]> {
+async function buildOrphanFeatures(sprintIndexById: Map<string, number>): Promise<AnnualTimelineFeature[]> {
   const features = await prisma.feature.findMany({
     where: { releaseId: null },
     include: {
@@ -250,7 +206,7 @@ async function buildOrphanFeatures(year: number): Promise<AnnualTimelineFeature[
     orderBy: [{ lifecycleStatus: "asc" }, { createdAt: "asc" }]
   });
 
-  return features.map((feature) => toAnnualTimelineFeature(feature, year));
+  return features.map((feature) => toAnnualTimelineFeature(feature, sprintIndexById));
 }
 
 function toAnnualTimelineFeature(
@@ -263,47 +219,91 @@ function toAnnualTimelineFeature(
       storyPoints: number | null;
       estimatedDays: number | null;
       status: StoryStatus;
-      currentSprint: { name: string; startDate: Date; endDate: Date } | null;
+      currentSprint: { id: string; name: string; startDate: Date; endDate: Date } | null;
     }>;
   },
-  year: number
+  sprintIndexById: Map<string, number>
 ): AnnualTimelineFeature {
-    const summary = calculateFeatureSummary(feature.stories);
-    const activeMonthIndexes = deriveFeatureMonthIndexes(feature.stories, year);
-    const startIndex = activeMonthIndexes.length > 0 ? activeMonthIndexes[0] : null;
-    const endIndex = activeMonthIndexes.length > 0 ? activeMonthIndexes[activeMonthIndexes.length - 1] : null;
-    const activeSet = new Set(activeMonthIndexes);
-    const inactiveGaps =
-      startIndex === null || endIndex === null
-        ? []
-        : Array.from({ length: endIndex - startIndex + 1 }, (_, offset) => startIndex + offset).filter(
-            (index) => !activeSet.has(index)
-          );
+  const summary = calculateFeatureSummary(feature.stories);
+  const activeSprintIndexes = deriveFeatureSprintIndexes(feature.stories, sprintIndexById);
+  const startIndex = activeSprintIndexes.length > 0 ? activeSprintIndexes[0] : null;
+  const endIndex = activeSprintIndexes.length > 0 ? activeSprintIndexes[activeSprintIndexes.length - 1] : null;
+  const activeSet = new Set(activeSprintIndexes);
+  const inactiveGaps =
+    startIndex === null || endIndex === null
+      ? []
+      : Array.from({ length: endIndex - startIndex + 1 }, (_, offset) => startIndex + offset).filter(
+          (index) => !activeSet.has(index)
+        );
 
-    return {
-      id: feature.id,
-      releaseId: feature.releaseId,
-      name: feature.name,
-      status: deriveFeatureStatus(feature),
-      storyCount: summary.storyCount,
-      estimatedDays: summary.totalEstimatedDays,
-      completionPercentage: summary.progressPercentage,
-      startIndex,
-      endIndex,
-      activeMonthIndexes,
-      inactiveGaps
-    };
+  return {
+    id: feature.id,
+    releaseId: feature.releaseId,
+    name: feature.name,
+    status: deriveFeatureStatus(feature),
+    storyCount: summary.storyCount,
+    estimatedDays: summary.totalEstimatedDays,
+    completionPercentage: summary.progressPercentage,
+    startIndex,
+    endIndex,
+    activeSprintIndexes,
+    inactiveGaps
+  };
 }
 
 export async function buildAnnualTimelineData(year: number): Promise<AnnualTimelineData> {
   const selectedYear = Number.isInteger(year) ? year : new Date().getUTCFullYear();
-  const { months, quarters } = buildAnnualTimelineMonths(selectedYear);
   const releases = await prisma.release.findMany({
     where: {
       startDate: { lte: yearEnd(selectedYear) },
       endDate: { gte: yearStart(selectedYear) }
     },
+    include: {
+      sprints: { orderBy: { startDate: "asc" } }
+    },
     orderBy: { startDate: "asc" }
+  });
+
+  const sprints = releases.flatMap((release) =>
+    release.sprints.map((sprint, releaseSprintIndex) => ({
+      source: sprint,
+      release,
+      releaseSprintIndex
+    }))
+  );
+  const timelineSprints: AnnualTimelineSprint[] = sprints.map(({ source, release, releaseSprintIndex }, index) => ({
+    index,
+    id: source.id,
+    releaseId: release.id,
+    name: source.name,
+    label: source.name,
+    shortLabel: sprintShortLabel(source.name, releaseSprintIndex),
+    startDate: dateOnly(source.startDate),
+    endDate: dateOnly(source.endDate),
+    status: source.status
+  }));
+  const sprintIndexById = new Map(timelineSprints.map((sprint) => [sprint.id, sprint.index]));
+  const releaseBands: AnnualTimelineReleaseBand[] = releases.flatMap((release) => {
+    const indexes = release.sprints
+      .map((sprint) => sprintIndexById.get(sprint.id))
+      .filter((index): index is number => index !== undefined);
+
+    if (indexes.length === 0) {
+      return [];
+    }
+
+    return [
+      {
+        releaseId: release.id,
+        label: release.name,
+        status: release.status,
+        startIndex: indexes[0],
+        endIndex: indexes[indexes.length - 1],
+        sprintCount: indexes.length,
+        startDate: dateOnly(release.startDate),
+        endDate: dateOnly(release.endDate)
+      }
+    ];
   });
 
   const [annualReleases, orphanFeatures] = await Promise.all([
@@ -311,7 +311,7 @@ export async function buildAnnualTimelineData(year: number): Promise<AnnualTimel
       releases.map(async (release) => {
         const [summary, features] = await Promise.all([
           buildReleaseSummary(release.id),
-          buildReleaseFeatures(release.id, selectedYear)
+          buildReleaseFeatures(release.id, sprintIndexById)
         ]);
 
         return {
@@ -325,13 +325,13 @@ export async function buildAnnualTimelineData(year: number): Promise<AnnualTimel
         };
       })
     ),
-    buildOrphanFeatures(selectedYear)
+    buildOrphanFeatures(sprintIndexById)
   ]);
 
   return {
     year: selectedYear,
-    months,
-    quarters,
+    sprints: timelineSprints,
+    releaseBands,
     releases: annualReleases,
     orphanFeatures,
     summaries: annualReleases.map((release) => release.summary)

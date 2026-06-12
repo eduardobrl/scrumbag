@@ -156,6 +156,10 @@ export function AnnualTimelineView({
     );
   }
 
+  const columnCount = Math.max(data.sprints.length, 1);
+  const gridColumns = `220px repeat(${columnCount}, minmax(96px, 1fr))`;
+  const timelineMinWidth = `${220 + columnCount * 104}px`;
+
   return (
     <div className="space-y-6">
       <Card>
@@ -223,28 +227,35 @@ export function AnnualTimelineView({
           </div>
 
           <div className="mt-4 overflow-x-auto">
-            <div className="min-w-[1120px] text-sm">
+            <div className="text-sm" style={{ minWidth: timelineMinWidth }}>
               <div
                 className="grid gap-1"
-                style={{ gridTemplateColumns: "220px repeat(12, minmax(72px, 1fr))" }}
+                style={{ gridTemplateColumns: gridColumns }}
               >
                 <div />
-                {data.quarters.map((quarter) => (
+                {data.releaseBands.map((release) => (
                   <div
-                    key={quarter.quarter}
-                    className="rounded-md border border-line bg-slate-50 px-2 py-1 text-center text-xs font-semibold text-slate-600"
-                    style={{ gridColumn: `span ${quarter.monthCount}` }}
+                    key={release.releaseId}
+                    className="rounded-md border border-line bg-slate-50 px-2 py-1 text-center text-xs font-semibold text-slate-700"
+                    style={{ gridColumn: `span ${release.sprintCount}` }}
                   >
-                    {quarter.label}
+                    <span className="block truncate">{release.label}</span>
+                    <span className="block truncate text-[11px] font-normal text-slate-500">
+                      {release.startDate} - {release.endDate}
+                    </span>
                   </div>
                 ))}
                 <div />
-                {data.months.map((month) => (
+                {data.sprints.map((sprint) => (
                   <div
-                    key={month.index}
+                    key={sprint.id}
                     className="rounded-md border border-line bg-white px-2 py-2 text-center text-xs font-semibold text-slate-600"
+                    title={`${sprint.name} - ${sprint.startDate} - ${sprint.endDate}`}
                   >
-                    {month.label}
+                    <span className="block truncate">{sprint.shortLabel}</span>
+                    <span className="block truncate text-[11px] font-normal text-slate-500">
+                      {sprint.startDate.slice(5)} - {sprint.endDate.slice(5)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -258,6 +269,8 @@ export function AnnualTimelineView({
                   labels={labels}
                   pendingMove={pendingMove}
                   statusLabel={tStatus}
+                  columnCount={columnCount}
+                  gridColumns={gridColumns}
                 />
               ))}
             </div>
@@ -360,12 +373,16 @@ function ReleaseSwimlane({
   release,
   labels,
   pendingMove,
-  statusLabel
+  statusLabel,
+  columnCount,
+  gridColumns
 }: {
   release: AnnualTimelineData["releases"][number];
   labels: AnnualTimelineLabels;
   pendingMove: boolean;
   statusLabel: (status: string) => string;
+  columnCount: number;
+  gridColumns: string;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: `release-drop-${release.id}` });
 
@@ -377,7 +394,7 @@ function ReleaseSwimlane({
         "mt-3 grid gap-1 rounded-md border p-1 transition-colors",
         isOver ? "border-accent bg-teal-50" : "border-transparent"
       )}
-      style={{ gridTemplateColumns: "220px repeat(12, minmax(72px, 1fr))" }}
+      style={{ gridTemplateColumns: gridColumns }}
     >
       <div className="col-span-full rounded-md border border-line bg-slate-50 px-3 py-2">
         <div className="flex flex-wrap items-center gap-2">
@@ -393,13 +410,19 @@ function ReleaseSwimlane({
       {release.features.length === 0 ? (
         <>
           <div className="flex min-h-11 items-center text-sm text-slate-500">{labels.noFeatures}</div>
-          {Array.from({ length: 12 }, (_, index) => (
+          {Array.from({ length: columnCount }, (_, index) => (
             <div key={`${release.id}-empty-${index}`} className="min-h-11 rounded-sm border border-transparent" />
           ))}
         </>
       ) : (
         release.features.map((feature) => (
-          <FeatureRow key={feature.id} feature={feature} labels={labels} pendingMove={pendingMove} />
+          <FeatureRow
+            key={feature.id}
+            feature={feature}
+            labels={labels}
+            pendingMove={pendingMove}
+            columnCount={columnCount}
+          />
         ))
       )}
     </div>
@@ -409,13 +432,15 @@ function ReleaseSwimlane({
 function FeatureRow({
   feature,
   labels,
-  pendingMove
+  pendingMove,
+  columnCount
 }: {
   feature: AnnualTimelineFeature;
   labels: AnnualTimelineLabels;
   pendingMove: boolean;
+  columnCount: number;
 }) {
-  const activeSet = new Set(feature.activeMonthIndexes);
+  const activeSet = new Set(feature.activeSprintIndexes);
   const statusLabel =
     feature.status === "CANCELLED" ? labels.cancelled : feature.status === "FINISHED" ? labels.finished : labels.active;
 
@@ -431,7 +456,7 @@ function FeatureRow({
         <span className="min-w-0 truncate">{feature.name}</span>
         <span className="shrink-0 text-xs font-normal text-slate-500">{feature.completionPercentage}%</span>
       </Link>
-      {Array.from({ length: 12 }, (_, index) => {
+      {Array.from({ length: columnCount }, (_, index) => {
         const inSpan = feature.startIndex !== null && feature.endIndex !== null && index >= feature.startIndex && index <= feature.endIndex;
         const activeHere = activeSet.has(index);
         const isGap = inSpan && !activeHere;
